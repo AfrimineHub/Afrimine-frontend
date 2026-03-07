@@ -1,4 +1,4 @@
-import { SubmitEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { useNavigate, } from 'react-router-dom';
 import { Input } from '../components/inputs/Input';
 import { Select } from '../components/Select';
