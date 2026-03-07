@@ -31,3 +31,7 @@ jobs:
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/afrimine-client:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/afrimine-client:${{ github.sha }}
+
+      - name: Trigger Render Deploy
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
