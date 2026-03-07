@@ -1,5 +1,5 @@
 export * from './LoginPage';
-export * from './RegisterPage';
+export * from './AccountRegistrationPage';
 export * from './AccountCreatedPage';
 export * from './KycPage';
 export * from './ProfileSetupPage';
