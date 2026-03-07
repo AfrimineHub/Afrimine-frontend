@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown } from 'lucide-react'; // Using lucide-react for the icon
 
 interface Option {
