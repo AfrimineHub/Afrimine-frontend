@@ -11,14 +11,21 @@ export const BusinessProfileForm = () => {
     e.preventDefault();
 
     // Api call here
-    navigate('/auth/created');
+    navigate('/auth/kyc');
   }
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
       <Select 
         label="Business Type" 
         placeholder="Enter your business name" 
-        options={[{label: "Private Limited", value: "pvt"}]} 
+        options={
+          [
+            {label: "Individual", value: "indivi"},
+            {label: "Company", value: "coy"},
+            {label: "Cooperative", value: "coorp"},
+            {label: "Government entity", value: "gov"},
+          ]
+        }
         onChange={() => {}} 
       />
       <Input label="Country" placeholder="Enter your country" />
