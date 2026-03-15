@@ -11,7 +11,7 @@ export const AccountRegistrationForm = () => {
     e.preventDefault();
 
     // API call logic here
-    navigate('/auth/kyc');
+    navigate('/auth/created');
   }
   const userTypes = [
     { label: "Miner / Site Owner", value: "miner" },
