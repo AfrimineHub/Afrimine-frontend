@@ -1,4 +1,5 @@
 import { Outlet, useMatches, Link } from 'react-router-dom';
+// import Logo from '@/shared/components/Logo';
 
 const AuthLayout = () => {
   const matches = useMatches();
@@ -21,13 +22,20 @@ const AuthLayout = () => {
         to="/"
         className="absolute top-6 left-6 md:top-8 md:left-8 lg:top-12 lg:left-16 z-50 flex items-center gap-2"
       >
-        <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center font-bold text-black shadow-lg">
-          A
+        <div className="w-8 h-8 bg-white/50 backdrop-blur-lg rounded-lg flex items-center justify-center shadow-lg">
+          <img
+            src="/images/afrimine-logo1.svg"
+            alt="Afrimine logo"
+            className="w-auto h-10 object-contain rounded-lg drop-shadow-md"
+          />
         </div>
         <span className="text-lg md:text-xl font-bold tracking-tight text-white">
           Afrimine
         </span>
       </Link>
+      {/* <div className="w-8 h-8 bg-yellow-500 rounded-lg flex items-center justify-center shadow-lg">
+        <Logo className="absolute top-6 left-6 md:top-8 md:left-8 lg:top-12 lg:left-16 z-50 text-white" />
+      </div> */}
 
       {/* Marketing Content */}
       <div className="w-full lg:w-1/2 text-white px-6 pt-28 pb-12 md:px-12 lg:p-16 flex flex-col justify-center relative z-20">
