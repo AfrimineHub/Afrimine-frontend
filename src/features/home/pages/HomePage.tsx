@@ -1,4 +1,4 @@
-import { Search, Bell, Bookmark, MessageSquare, Package, ChevronsRight, ChevronRight } from 'lucide-react';
+import { Search, Bell, Bookmark, MessageSquare, Package, ChevronRight, Home } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import DataListSection from '../components/DataListSection';
 import ProjectCard from '../components/ProjectCard';
@@ -8,6 +8,9 @@ const HomePage = () => {
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       {/* HEADER SECTION */}
       <div className="mb-8">
+      <nav className="flex items-center gap-2 text-[10px] text-gray-400 mb-2">
+          <span><Home size={16} /></span> <span>Home</span>  
+        </nav>
         <h1 className="text-2xl font-bold text-gray-900">Welcome Back, John</h1>
         <p className="text-gray-500 text-sm">Find mining opportunities that match your interest.</p>
         
@@ -20,7 +23,7 @@ const HomePage = () => {
               className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 outline-none transition-all"
             />
           </div>
-          <button className="bg-[#0d0d0d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+          <button className="bg-[#0d0d0d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors cursor-pointer">
             Search
           </button>
         </div>
@@ -45,10 +48,10 @@ const HomePage = () => {
           icon={<Package size={18} className='fill-yellow-500'/>} 
           label="Ongoing Order" count={10} />
         <button 
-          className="bg-yellow-500 text-white rounded-xl flex items-center justify-center gap-2 font-bold hover:bg-orange-600"
+          className="bg-yellow-500 text-white rounded-xl flex items-center justify-center gap-2 font-bold hover:bg-orange-600 cursor-pointer"
           >
           List Item
-        </button>
+        </button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
       </div>
 
       {/* RECOMMENDED FOR YOU */}
