@@ -44,7 +44,7 @@ const Navbar = () => {
       {/* RIGHT SECTION: Profile/Icons */}
       <div className="flex items-center md:gap-4">
         <button className="p-2 hover:bg-white/10 rounded-full transition-colors relative">
-          <Bell size={20} className="text-gray-300" />
+          <Bell size={20} className="text-gray-300 cursor-pointer" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-yellow-500 rounded-full border-2 border-[#1A1A1A]"></span>
         </button>
         <div className="flex items-center gap-2 cursor-pointer group">

@@ -8,6 +8,10 @@ import AccountCreatedPage from '../features/auth/pages/AccountCreatedPage';
 import AccountSetupSuccessPage from '../features/auth/pages/AccountSetupSuccessPage';
 import MainLayout from "@/layouts/Mainlayout/MainLayout";
 import HomePage from "@/features/home/pages/HomePage";
+import MarketplacePage from "@/features/marketplace/pages/MarketplacePage";
+import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
+import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
+import MessagesPage from "@/features/messages/pages/MessagesPage";
 
 export const router = createBrowserRouter([
   { 
@@ -40,6 +44,10 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "home", element: <HomePage /> },
+      { path: "marketplace", element: <MarketplacePage /> },
+      { path: "my-ad", element: <MyAdsPage /> },
+      { path: "my-order", element: <MyOrdersPage /> },
+      { path: "messages", element: <MessagesPage /> },
     ]
   }
 ]);
