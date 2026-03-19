@@ -1,7 +1,7 @@
 import { Search } from 'lucide-react';
 
 export const ChatSidebar = () => (
-  <aside className="w-full md:w-80 bg-white border-r flex flex-col">
+  <aside className="w-full md:w-80 bg-white border-r flex flex-col md:h-auto max-h-[40vh] md:max-h-none min-h-0">
     <div className="p-4 border-b">
       <h2 className="text-lg font-bold text-gray-900 mb-4">My Order</h2>
       <div className="relative">
