@@ -11,7 +11,7 @@ const MessagesPage = () => {
         <span><Home size={16} /></span> <span>▶</span> <span className="text-gray-600">Messages</span>
       </nav>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col md:flex-row flex-1 overflow-hidden min-h-0">
         <ChatSidebar />
 
         {/* Main Chat Area */}

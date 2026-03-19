@@ -16,9 +16,9 @@ export const ListingsGrid = () => {
   return (
     <section className="mt-8">
       {/* Header with CTA */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <h2 className="text-xl font-bold text-gray-800">Recent Listings</h2>
-        <button className="bg-yellow-400 hover:bg-[#CA8A04] text-black font-bold px-5 py-2 rounded-lg text-sm transition-colors shadow-sm cursor-pointer">
+        <button className="bg-yellow-400 hover:bg-[#CA8A04] text-black font-bold px-5 py-2 rounded-lg text-sm transition-colors shadow-sm cursor-pointer w-full sm:w-auto">
           Post New Listings
         </button>
       </div>

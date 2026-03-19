@@ -10,14 +10,14 @@ export const AdsFilterBar = () => {
 
   return (
     <div className="space-y-6 mb-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
         <h2 className="text-xl font-bold text-gray-900">My Ads</h2>
-        <button className="bg-yellow-500 hover:bg-[#D66A20] text-black px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-bold shadow-sm transition-all cursor-pointer">
+        <button className="bg-yellow-500 hover:bg-[#D66A20] text-black px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-bold shadow-sm transition-all cursor-pointer w-full sm:w-auto">
           <Plus size={18} /> Add New Listing
         </button>
       </div>
 
-      <div className="flex items-center gap-6 border-b border-gray-100 overflow-x-auto">
+      <div className="flex items-center gap-6 border-b border-gray-100 overflow-x-auto whitespace-nowrap">
         {tabs.map((tab) => (
           <button key={tab.name} className="pb-3 text-sm font-medium text-gray-500 hover:text-gray-900 relative whitespace-nowrap cursor-pointer">
             {tab.name} ({tab.count})
@@ -26,7 +26,7 @@ export const AdsFilterBar = () => {
         ))}
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-2 sm:gap-3">
         {['Listing Type', 'Active', 'Regions', 'Sort by'].map((filter) => (
           <div key={filter} className="bg-white border border-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium text-gray-600 cursor-pointer hover:bg-gray-50">
             {filter === 'Active' && <span className="w-4 h-4 bg-[#8B5E3C]/20 text-[#8B5E3C] flex items-center justify-center rounded text-[10px]">8</span>}
