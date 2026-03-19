@@ -33,7 +33,7 @@ export const ChatWindow = () => (
       </div>
   
       {/* Input Area */}
-      <div className="p-3 sm:p-4 border-t">
+      <div className="p-3 sm:p-4">
          <div className="flex gap-2 items-center bg-gray-50 p-2 rounded-xl">
          <button className="text-gray-400 hover:text-gray-600 p-1 transition-colors cursor-pointer">
           <Paperclip size={20} />
