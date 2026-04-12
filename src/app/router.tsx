@@ -7,11 +7,11 @@ import ProfileSetupPage from '../features/auth/pages/ProfileSetupPage';
 import AccountCreatedPage from '../features/auth/pages/AccountCreatedPage';
 import AccountSetupSuccessPage from '../features/auth/pages/AccountSetupSuccessPage';
 import MainLayout from "@/layouts/Mainlayout/MainLayout";
-import HomePage from "@/features/home/pages/HomePage";
 import MarketplacePage from "@/features/marketplace/pages/MarketplacePage";
 import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
+import LandingPage from "@/features/landing/pages/LandingPage";
 
 export const router = createBrowserRouter([
   { 
@@ -42,8 +42,8 @@ export const router = createBrowserRouter([
     path: "/",
     element: <MainLayout />,
     children: [
-      { index: true, element: <HomePage /> },
-      { path: "home", element: <HomePage /> },
+      { index: true, element: <LandingPage /> },
+      { path: "home", element: <LandingPage /> },
       { path: "marketplace", element: <MarketplacePage /> },
       { path: "my-ad", element: <MyAdsPage /> },
       { path: "my-order", element: <MyOrdersPage /> },
