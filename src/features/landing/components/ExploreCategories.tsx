@@ -4,7 +4,7 @@ const categories = [
   { title: 'Minerals', icon: '/images/categories/cat-minerals.svg', count: '150+ Listings' },
   { title: 'Heavy Equipment', icon: '/images/categories/cat-equip.svg', count: '220+ Listings' },
   { title: 'Mining Sites', icon: '/images/categories/cat-sites.png', count: '85+ Listings' },
-  { title: 'Joint Ventures', icon: '/images/categories/cat-jv.svg', count: '45+ Listings' },
+  { title: 'Manpower', icon: '/images/categories/cat-jv.svg', count: '45+ Listings' },
 ];
 
 const ExploreCategories: React.FC = () => {
