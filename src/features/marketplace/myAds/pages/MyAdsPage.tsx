@@ -1,80 +1,88 @@
-import { AdsSummary } from '../components/AdsSummary';
 import { AdsFilterBar } from '../components/AdsFilterBar';
 import { AdListItem } from '../components/AdListItem';
-import { Home } from 'lucide-react';
 
 const mockAds = [
   {
-    title: 'Gold Mining Site',
-    location: 'Tarauni, Kano, Nigeria',
-    type: 'Mining Site',
+    image: '/images/listings/gold-ore.png',
+    title: 'Premium Gold Ore - High Grade',
+    category: 'Mineral',
     status: 'Active' as const,
-    stats: { views: 320, inquiries: 30, saves: 80 },
-    date: 'Published 2 days ago',
+    price: '₦900,000',
+    stats: { views: 1247, inquiries: 34 },
+    date: 'March 15, 2026',
   },
   {
-    title: 'Gold Mining Site',
-    location: 'Tarauni, Kano, Nigeria',
-    type: 'Mining Site',
+    image: '/images/listings/heavy-duty-excavator.png',
+    title: 'Heavy Duty Mining Excavator',
+    category: 'Equipment',
     status: 'Active' as const,
-    stats: { views: 320, inquiries: 30, saves: 80 },
-    date: 'Published 2 days ago',
+    price: '₦500,000',
+    stats: { views: 832, inquiries: 18 },
+    date: 'March 10, 2026',
   },
   {
-    title: 'Gold Mining Site',
-    location: 'Tarauni, Kano, Nigeria',
-    type: 'Mining Site',
-    status: 'Active' as const,
-    stats: { views: 320, inquiries: 30, saves: 80 },
-    date: 'Published 2 days ago',
+    image: '/images/listings/copper-min-conc.png',
+    title: 'Copper Mineral Concentrate',
+    category: 'Mineral',
+    status: 'Pending' as const,
+    price: '₦800,000',
+    stats: { views: 458, inquiries: 12 },
+    date: 'March 20, 2026',
   },
   {
-    title: 'Gold Mining Site',
-    location: 'Tarauni, Kano, Nigeria',
-    type: 'Mining Site',
+    image: '/images/listings/diamond-mine-site.png',
+    title: 'Diamond Mining Site - Lease',
+    category: 'Site',
     status: 'Active' as const,
-    stats: { views: 320, inquiries: 30, saves: 80 },
-    date: 'Published 2 days ago',
+    price: '₦1000,000',
+    stats: { views: 2543, inquiries: 90 },
+    date: 'March 5, 2026',
   },
+  {
+    image: '/images/listings/industrial-rock-crusher.png',
+    title: 'Industrial Rock Crusher Equipment',
+    category: 'Equipment',
+    status: 'Rejected' as const,
+    price: '₦270,000',
+    stats: { views: 123, inquiries: 2 },
+    date: 'March 18, 2026',
+  },
+  // Add more items matching the image...
 ];
 
 const MyAdsPage = () => {
   return (
-    <div className="min-h-screen bg-[#F9FAFB] p-4 md:p-8 lg:px-16">
-      <header className="mb-6">
-        <nav className="text-xs flex gap-2 text-gray-400 mb-3 font-medium tracking-wider">
-            <Home size={16} />
-            <div className="text-xs text-gray-400 flex items-center gap-2">
-              <span className="hover:text-gray-600 cursor-pointer">Home</span> 
-              <span className="text-gray-300">▶</span>
-              <span className="text-gray-600 font-medium">Marketplace</span>
-              <span className="text-gray-300">▶</span>
-              <span className="text-gray-600 font-medium">My Ads</span>
-            </div>
-        </nav>
-      </header>
+    <div className="min-h-screen bg-white p-6 md:p-10">
+      <AdsFilterBar />
 
-      <section className="bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-100 p-4 md:p-6">
-        <AdsFilterBar />
-        <AdsSummary />
-
-        <div className="mt-2 rounded-xl border border-gray-100 overflow-hidden bg-white">
-          {mockAds.map((ad) => (
-            <AdListItem
-              key={ad.title}
-              title={ad.title}
-              location={ad.location}
-              type={ad.type}
-              status={ad.status}
-              stats={ad.stats}
-              date={ad.date}
-            />
-          ))}
+      <div className="mt-8 overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <th className="pb-4 px-4">Listings</th>
+              <th className="pb-4 px-4">Status</th>
+              <th className="pb-4 px-4">Category</th>
+              <th className="pb-4 px-4">Price</th>
+              <th className="pb-4 px-4">Performance</th>
+              <th className="pb-4 px-4">Date Created</th>
+              <th className="pb-4 px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {mockAds.map((ad, index) => (
+              <AdListItem key={index} {...ad} />
+            ))}
+          </tbody>
+        </table>
+        
+        {/* Simple Pagination Footer as seen in image */}
+        <div className="flex justify-end mt-6 gap-2">
+           <button className="px-3 py-1 rounded bg-yellow-500 text-white text-xs font-bold">1</button>
+           <button className="px-3 py-1 rounded border border-gray-200 text-gray-500 text-xs hover:bg-gray-50">2</button>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
 
 export default MyAdsPage;
-
