@@ -3,7 +3,7 @@ import React from 'react';
 const HeroSection: React.FC = () => {
   return (
     <section 
-      className="relative flex items-center justify-center h-[600px] bg-cover bg-center"
+      className="relative flex items-center justify-center min-h-[calc(100svh-4rem)] bg-cover bg-center py-12 sm:py-16 lg:py-20"
       style={{ backgroundImage: "url('/images/background.jpg')" }}
     >
       {/* Dark overlay for text readability */}
@@ -15,12 +15,12 @@ const HeroSection: React.FC = () => {
           Trusted by 10,000+ Global Miners
         </div>
         
-        <h1 className="mb-6 text-5xl font-bold tracking-tight text-white md:text-6xl">
+        <h1 className="mb-6 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
           Buy & Sell Verified <span className="text-yellow-500">Mining Assets</span><br />
           And Equipment
         </h1>
         
-        <p className="max-w-2xl mx-auto mb-8 text-lg text-gray-300">
+        <p className="max-w-2xl mx-auto mb-8 text-base text-gray-300 sm:text-lg">
           The premier marketplace connecting buyers and sellers of premium mining claims, 
           heavy machinery, and raw minerals with secure escrow protection.
         </p>

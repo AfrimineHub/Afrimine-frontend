@@ -20,7 +20,7 @@ export const VendorDashboardPage: React.FC = () => {
   }, [isSidebarOpen]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 overflow-hidden bg-gray-50">
+    <div className="flex w-full bg-gray-50">
       {/* Sidebar - Hidden on mobile, Drawer on click */}
       <div
         className={`
@@ -41,7 +41,7 @@ export const VendorDashboardPage: React.FC = () => {
       )}
       
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto overscroll-y-contain">
+      <main className="flex-1 flex flex-col min-w-0">
         {/* Mobile Top Bar */}
         <div className="lg:hidden shrink-0 flex items-center justify-between gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4 bg-white border-b border-gray-100">
           <button
