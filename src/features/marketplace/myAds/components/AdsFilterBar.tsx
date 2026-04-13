@@ -1,38 +1,25 @@
-import { ChevronDown, Plus } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 
 export const AdsFilterBar = () => {
-  const tabs = [
-    { name: 'All Listings', count: 8 },
-    { name: 'Active Listings', count: 5 },
-    { name: 'Pending Listings', count: 8, alert: true },
-    { name: 'Drafts', count: 1 },
-  ];
-
   return (
     <div className="space-y-6 mb-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-        <h2 className="text-xl font-bold text-gray-900">My Ads</h2>
-        <button className="bg-yellow-500 hover:bg-[#D66A20] text-black px-4 py-2 rounded-lg flex items-center justify-center gap-2 text-sm font-bold shadow-sm transition-all cursor-pointer w-full sm:w-auto">
-          <Plus size={18} /> Add New Listing
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">My Listings</h2>
+          <p className="text-sm text-gray-500">Manage and track your assets</p>
+        </div>
+        <button className="bg-[#22272B] hover:bg-black text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-bold transition-all shadow-sm">
+          <Plus size={18} /> Create New Listing
         </button>
       </div>
 
-      <div className="flex items-center gap-6 border-b border-gray-100 overflow-x-auto whitespace-nowrap">
-        {tabs.map((tab) => (
-          <button key={tab.name} className="pb-3 text-sm font-medium text-gray-500 hover:text-gray-900 relative whitespace-nowrap cursor-pointer">
-            {tab.name} ({tab.count})
-            {tab.alert && <span className="absolute top-0 -right-2 w-1.5 h-1.5 bg-red-500 rounded-full" />}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap gap-2 sm:gap-3">
-        {['Listing Type', 'Active', 'Regions', 'Sort by'].map((filter) => (
-          <div key={filter} className="bg-white border border-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-medium text-gray-600 cursor-pointer hover:bg-gray-50">
-            {filter === 'Active' && <span className="w-4 h-4 bg-[#8B5E3C]/20 text-[#8B5E3C] flex items-center justify-center rounded text-[10px]">8</span>}
-            {filter} <ChevronDown size={14} className="text-gray-400" />
-          </div>
-        ))}
+      <div className="relative max-w-full">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+        <input 
+          type="text" 
+          placeholder="Search by title..." 
+          className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500/20 focus:border-yellow-500 outline-none transition-all"
+        />
       </div>
     </div>
   );

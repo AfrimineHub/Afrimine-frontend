@@ -12,6 +12,9 @@ import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
+import { VendorDashboardPage } from "@/features/dashboard/pages/VendorDashboardPage";
+import { QuotesListPage } from "@/features/dashboard/pages/quotes/QuotesListPage";
+import { QuoteDetailsPage } from "@/features/dashboard/pages/quotes/QuoteDetailsPage";
 
 export const router = createBrowserRouter([
   { 
@@ -48,6 +51,12 @@ export const router = createBrowserRouter([
       { path: "my-ad", element: <MyAdsPage /> },
       { path: "my-order", element: <MyOrdersPage /> },
       { path: "messages", element: <MessagesPage /> },
+      { path: "vendor-dashboard", element: <VendorDashboardPage /> },
+      { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
+      { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
+      { path: "/dashboard/my-subscription", element: <VendorDashboardPage /> },
+      { path: "/dashboard/my-payouts", element: <VendorDashboardPage /> },
+      { path: "/dashboard/my-kyc", element: <KycPage /> },
     ]
   }
 ]);
