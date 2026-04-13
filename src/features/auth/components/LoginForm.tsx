@@ -1,7 +1,15 @@
+import { useNavigate } from 'react-router-dom';
 import { Input } from '../components/inputs/Input';
 import { Button } from '../components/buttons/Button';
 
 export const LoginForm = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = () => {
+    // API call
+
+    navigate('/vendor-dashboard');
+  };
   return (
     <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
       <Input label="Email" placeholder="Input your email" type="email" />
@@ -16,10 +24,15 @@ export const LoginForm = () => {
         <a href="#" className="hover:text-yellow-600">Forgot Password?</a>
       </div>
 
-      <Button type="submit">Login</Button>
+      <Button 
+        type="submit" onClick={handleSubmit}
+        className='cursor-pointer'
+        >
+          Login
+        </Button>
       
       <div className="text-center py-2 text-gray-400 text-xs">Or Continue with</div>
-      <Button variant="outline">Signup with Google</Button>
+      <Button variant="outline" className='cursor-pointer'>Signup with Google</Button>
     </form>
   );
 };

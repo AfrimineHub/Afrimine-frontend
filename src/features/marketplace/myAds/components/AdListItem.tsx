@@ -1,4 +1,5 @@
-import { Eye, Mail, Edit2, Trash2, ExternalLink, MoreVertical } from 'lucide-react';
+import { useState } from 'react';
+import { Eye, Edit2, Trash2, ExternalLink, EyeOff, } from 'lucide-react';
 
 interface AdItemProps {
   image: string;
@@ -11,6 +12,10 @@ interface AdItemProps {
 }
 
 export const AdListItem = ({ image, title, category, status, price, stats, date }: AdItemProps) => {
+  const [showActions, setShowActions] = useState(false);
+
+  const toggleActions = () => setShowActions(!showActions);
+
   const statusStyles = {
     Active: "bg-green-100 text-green-700",
     Pending: "bg-yellow-100 text-yellow-700",
@@ -61,10 +66,22 @@ export const AdListItem = ({ image, title, category, status, price, stats, date 
       {/* Actions Column */}
       <td className="py-4 px-4">
         <div className="flex items-center gap-2 text-gray-400">
-          <button className="p-1 hover:text-blue-600"><Eye size={16} /></button>
-          <button className="p-1 hover:text-yellow-600"><Edit2 size={16} /></button>
-          <button className="p-1 hover:text-red-600"><Trash2 size={16} /></button>
-          <button className="p-1 hover:text-gray-900"><ExternalLink size={16} /></button>
+          <button 
+            onClick={toggleActions} 
+            className="p-1 hover:text-blue-600 transition-colors"
+            title={showActions ? "Hide actions" : "Show actions"}
+          >
+            {/* Optional: Switch icon based on state */}
+            {showActions ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+          
+          {showActions && (
+            <>
+              <button className="p-1 hover:text-yellow-600"><Edit2 size={16} /></button>
+              <button className="p-1 hover:text-red-600"><Trash2 size={16} /></button>
+              <button className="p-1 hover:text-gray-900"><ExternalLink size={16} /></button>
+            </>
+          )}
         </div>
       </td>
     </tr>
