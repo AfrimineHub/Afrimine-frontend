@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { DashboardSidebar } from '../components/DashboardSidebar';
-import { DashboardHeader } from '../components/DashboardHeader';
+import { DashboardHeader } from '../components/vendor/DashboardHeader';
 import { DashboardOverviewCards } from '../components/DashboardOverviewCards';
 import { DashboardStatsGrid } from '../components/DashboardStatsGrid';
 import { ListingPerformanceTable } from '../components/ListingPerformanceTable';

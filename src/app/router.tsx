@@ -12,9 +12,9 @@ import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
-import { VendorDashboardPage } from "@/features/dashboard/pages/VendorDashboardPage";
-import { QuotesListPage } from "@/features/dashboard/pages/quotes/QuotesListPage";
-import { QuoteDetailsPage } from "@/features/dashboard/pages/quotes/QuoteDetailsPage";
+import { VendorDashboardPage } from "@/features/vendor/pages/VendorDashboardPage";
+import { QuotesListPage } from "@/features/vendor/pages/quotes/QuotesListPage";
+import { QuoteDetailsPage } from "@/features/vendor/pages/quotes/QuoteDetailsPage";
 
 export const router = createBrowserRouter([
   { 

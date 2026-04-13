@@ -1,5 +1,5 @@
 export * from './DashboardSidebar';
-export * from './DashboardHeader';
+export * from './vendor/DashboardHeader';
 export * from './DashboardOverviewCards';
 export * from './DashboardStatsGrid';
 export * from './ListingPerformanceTable';
