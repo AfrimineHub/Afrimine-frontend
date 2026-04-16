@@ -3,6 +3,10 @@ html, body, #root {
   height: 100%;
 }
 
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   @apply text-gray-900 font-sans;
   background-image: url("");

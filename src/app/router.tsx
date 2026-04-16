@@ -1,8 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import AuthLayout from '../layouts/AuthLayout';
 import LoginPage from '../features/auth/pages/LoginPage';
 import AccountRegistrationPage from '../features/auth/pages/AccountRegistrationPage';
-import KycPage from '../features/auth/pages/KycPage';
+import { KycPage } from '@/features/vendor/pages/profile';
 import ProfileSetupPage from '../features/auth/pages/ProfileSetupPage';
 import AccountCreatedPage from '../features/auth/pages/AccountCreatedPage';
 import AccountSetupSuccessPage from '../features/auth/pages/AccountSetupSuccessPage';
@@ -15,6 +15,8 @@ import LandingPage from "@/features/landing/pages/LandingPage";
 import { VendorDashboardPage } from "@/features/vendor/pages/VendorDashboardPage";
 import { QuotesListPage } from "@/features/vendor/pages/quotes/QuotesListPage";
 import { QuoteDetailsPage } from "@/features/vendor/pages/quotes/QuoteDetailsPage";
+import VendorProfilePage from "@/features/vendor/pages/profile/VendorProfilePage";
+import CompanyDetailsPage from "@/features/vendor/pages/profile/CompanyDetails";
 
 export const router = createBrowserRouter([
   { 
@@ -57,6 +59,9 @@ export const router = createBrowserRouter([
       { path: "/dashboard/my-subscription", element: <VendorDashboardPage /> },
       { path: "/dashboard/my-payouts", element: <VendorDashboardPage /> },
       { path: "/dashboard/my-kyc", element: <KycPage /> },
+      { path: "/vendor-profile", element: <VendorProfilePage /> },
+      { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
+      {path: "/vendor", element: <Navigate to="/vendor-profile" replace />},
     ]
   }
 ]);
