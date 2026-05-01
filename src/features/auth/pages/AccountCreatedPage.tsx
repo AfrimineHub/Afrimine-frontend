@@ -1,5 +1,5 @@
 import { CheckCircle2 } from 'lucide-react';
-import { Button } from '../components/buttons/Button';
+import { Button } from '@/shared/buttons/Button';
 
 const AccountCreatedPage = () => {
   return (

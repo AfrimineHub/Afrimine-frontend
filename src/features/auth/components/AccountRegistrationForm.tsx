@@ -1,8 +1,15 @@
 import type { SubmitEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input } from '../components/inputs/Input';
-import { Select } from '../components/Select';
-import { Button } from '../components/buttons/Button';
+import { Input } from '@/shared/inputs/Input';
+import { Select } from '@/shared/Select';
+import { Button } from '@/shared/buttons/Button';
+
+const userTypes = [
+  { label: "Miner / Site Owner", value: "miner" },
+  { label: "Mineral Seller / Trader", value: "seller" },
+  { label: "Equipment Supplier", value: "supplier" },
+  { label: "Investor / JV Partner", value: "investor" }
+];
 
 export const AccountRegistrationForm = () => {
   const navigate = useNavigate();
@@ -13,12 +20,6 @@ export const AccountRegistrationForm = () => {
     // API call logic here
     navigate('/auth/created');
   }
-  const userTypes = [
-    { label: "Miner / Site Owner", value: "miner" },
-    { label: "Mineral Seller / Trader", value: "seller" },
-    { label: "Equipment Supplier", value: "supplier" },
-    { label: "Investor / JV Partner", value: "investor" }
-  ];
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>

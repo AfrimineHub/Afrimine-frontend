@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { Input } from '../components/inputs/Input';
-import { Button } from '../components/buttons/Button';
+import { Input } from '@/shared/inputs/Input';
+import { Button } from '@/shared/buttons/Button';
 
 export const LoginForm = () => {
   const navigate = useNavigate();

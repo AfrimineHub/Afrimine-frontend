@@ -17,6 +17,12 @@ import { QuotesListPage } from "@/features/vendor/pages/quotes/QuotesListPage";
 import { QuoteDetailsPage } from "@/features/vendor/pages/quotes/QuoteDetailsPage";
 import VendorProfilePage from "@/features/vendor/pages/profile/VendorProfilePage";
 import CompanyDetailsPage from "@/features/vendor/pages/profile/CompanyDetails";
+import PayoutPage from "@/features/vendor/pages/payouts/PayoutsPage";
+import SubscriptionPage from "@/features/subscription/pages/SubscriptionPage";
+import RfqPage from "@/features/rfq/pages/RfqPage";
+import NotificationsPage from "@/features/notification/pages/NotificationPage";
+import AdminDashboard from "@/features/admin/pages/AdminDashboardPage";
+import UsersManagementPage from "@/features/admin/pages/UsersManagementPage";
 
 export const router = createBrowserRouter([
   { 
@@ -56,11 +62,15 @@ export const router = createBrowserRouter([
       { path: "vendor-dashboard", element: <VendorDashboardPage /> },
       { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
       { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
-      { path: "/dashboard/my-subscription", element: <VendorDashboardPage /> },
-      { path: "/dashboard/my-payouts", element: <VendorDashboardPage /> },
+      { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
+      { path: "/dashboard/my-payouts", element: <PayoutPage /> },
       { path: "/dashboard/my-kyc", element: <KycPage /> },
       { path: "/vendor-profile", element: <VendorProfilePage /> },
       { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
+      { path: "/rfq", element: <RfqPage /> },
+      { path: "/notification", element: <NotificationsPage /> },
+      { path: "/admin", element: <AdminDashboard /> },
+      { path: "/admin/user-management", element: <UsersManagementPage /> },
       {path: "/vendor", element: <Navigate to="/vendor-profile" replace />},
     ]
   }

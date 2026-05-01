@@ -1,4 +1,4 @@
-import { File, Upload } from "lucide-react";
+import { File } from "lucide-react";
 import { StatusTag } from "./StatusTag";
 
 interface Props {

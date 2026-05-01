@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const mockListings = [
   { id: 1, title: 'Gold Mining Claim', location: 'Osun, Nigeria', price: '$2,500,000', tag: 'Verified', image: '/images/gold-mine.png' },
@@ -8,6 +9,8 @@ const mockListings = [
 ];
 
 const FeaturedListings: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl px-4 mx-auto sm:px-6 lg:px-8">
@@ -30,7 +33,10 @@ const FeaturedListings: React.FC = () => {
                 <p className="mb-4 text-sm text-gray-500">{listing.location}</p>
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-slate-900">{listing.price}</span>
-                  <button className="px-4 py-2 text-sm font-medium text-white transition-colors rounded bg-slate-900 hover:bg-slate-800">
+                  <button 
+                    className="px-4 py-2 text-sm font-medium text-white transition-colors rounded bg-slate-900 hover:bg-slate-800 cursor-pointer"
+                    onClick={() => navigate('/marketplace')}
+                  >
                     View Details
                   </button>
                 </div>
@@ -40,7 +46,10 @@ const FeaturedListings: React.FC = () => {
         </div>
         
         <div className="flex justify-center mt-10">
-          <button className="px-6 py-3 font-semibold text-slate-900 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
+          <button 
+            className="px-6 py-3 font-semibold text-slate-900 transition-colors bg-gray-100 rounded-md hover:bg-gray-200 cursor-pointer"
+            onClick={() => navigate('/marketplace')}
+          >
             View All Listings
           </button>
         </div>

@@ -1,8 +1,8 @@
 import type { SubmitEvent } from 'react';
 import { useNavigate, } from 'react-router-dom';
-import { Input } from '../components/inputs/Input';
-import { Select } from '../components/Select';
-import { Button } from '../components/buttons/Button';
+import { Input } from '@/shared/inputs/Input';
+import { Select } from '@/shared/Select';
+import { Button } from '@/shared/buttons/Button';
 
 export const BusinessProfileForm = () => {
   const navigate = useNavigate();

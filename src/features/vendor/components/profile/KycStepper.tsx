@@ -12,8 +12,6 @@ export const KycStepper = () => {
   return (
     <div className="bg-gray-100 rounded-full h-8 flex items-center text-xs overflow-hidden">
       {STEPS.map((step) => {
-        // A step is active if the path matches exactly, 
-        // OR if we are at the root and this is the designated "root" step.
         const isActive = pathname === step.path || (pathname === step.root);
 
         return (
