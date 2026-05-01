@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Select } from '../components/Select';
-import { Button } from '../components/buttons/Button';
+import { Button } from '@/shared/buttons/Button';
 import { UploadCloud, FileText } from 'lucide-react';
 
 export const KycForm = () => {

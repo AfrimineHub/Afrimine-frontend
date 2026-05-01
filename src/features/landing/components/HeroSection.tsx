@@ -1,6 +1,8 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const HeroSection: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section 
       className="relative flex items-center justify-center min-h-[calc(100svh-4rem)] bg-cover bg-center py-12 sm:py-16 lg:py-20"
@@ -26,11 +28,23 @@ const HeroSection: React.FC = () => {
         </p>
         
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
-          <button className="px-8 py-3 font-semibold text-slate-900 transition-colors bg-yellow-500 rounded-md hover:bg-yellow-400">
+          <button 
+            className="px-8 py-3 font-semibold text-slate-900 transition-colors bg-yellow-500 rounded-md hover:bg-yellow-400 cursor-pointer"
+            onClick={() => navigate('/marketplace')}
+          >
             Browse Listings
           </button>
-          <button className="px-8 py-3 font-semibold text-white transition-colors border border-white rounded-md hover:bg-white/10">
+          <button 
+            className="px-8 py-3 font-semibold text-white transition-colors border border-white rounded-md hover:bg-white/10 cursor-pointer"
+            onClick={() => navigate('#')}
+          >
             Post a Request
+          </button>
+          <button 
+            className="px-8 py-3 font-semibold text-white transition-colors bg-blue-500 rounded-md hover:bg-blue-400 cursor-pointer"
+            onClick={() => navigate('/rfq')}
+          >
+            View All Requests
           </button>
         </div>
 

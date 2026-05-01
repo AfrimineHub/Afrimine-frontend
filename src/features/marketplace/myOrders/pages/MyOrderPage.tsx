@@ -1,63 +1,107 @@
-import React, { useState } from 'react';
-import { Home, Plus } from 'lucide-react';
-import { OrderStatusStepper } from '../components/OrderStatusStepper';
-import { OrdersFilterBar } from '../components/OrdersFilterBar';
-import { OrderListItem, type Order } from '../components/OrderListItem';
+import { useState } from "react";
+import { OrderTable } from "@/features/marketplace/myOrders";
+import { OrderFilters } from "@/features/marketplace/myOrders";
+import { OrdersSummary } from "@/features/marketplace/myOrders";
+import { type Order } from "@/features/marketplace/myOrders/types";
+import { OrderCard } from "@/features/marketplace/myOrders";
 
-const mockOrders: Order[] = [
+export const orders: Order[] = [
   {
-    id: 'ORD-001',
-    title: 'Gold Dores Bars for Sale',
-    location: 'Tarauni, Kano, Nigeria',
-    price: '$300,000',
-    status: 'Negotiation',
-    statusLabel: 'Reviewing Terms',
-    seller: { name: 'Zinc Mining Corp', country: 'Nigeria', rate: '$55,000/Kg' },
-    lastUpdated: 'Two days ago',
+    id: "#ORD-1023",
+    buyer: "Goldfield Mining Co.",
+    listing: "Gold Nuggets - 500g",
+    amount: 45000,
+    status: "paid",
+    date: "Mar 25, 2026",
   },
   {
-    id: 'ORD-002',
-    title: 'Lithium Concentrate 6%',
-    location: 'Kogi State, Nigeria',
-    price: '$120,000',
-    status: 'Agreement',
-    statusLabel: 'Funds in Escrow',
-    seller: { name: 'Alpha Resources', country: 'Nigeria', rate: '$1,200/Ton' },
-    lastUpdated: 'Three hours ago',
+    id: "#ORD-1024",
+    buyer: "Diamond Traders Ltd",
+    listing: "Raw Diamonds - 2ct",
+    amount: 64000,
+    status: "delivered",
+    date: "Mar 26, 2026",
+  },
+  {
+    id: "#ORD-1025",
+    buyer: "Copper Solutions Inc",
+    listing: "Copper Ore - 10 tons",
+    amount: 54000,
+    status: "pending",
+    date: "Mar 27, 2026",
+  },
+  {
+    id: "#ORD-1026",
+    buyer: "Platinum Group SA",
+    listing: "Platinum Samples",
+    amount: 54000,
+    status: "completed",
+    date: "Mar 20, 2026",
+  },
+  {
+    id: "#ORD-1027",
+    buyer: "Emerald Exports",
+    listing: "Emerald Rough - 50ct",
+    amount: 54000,
+    status: "paid",
+    date: "Mar 20, 2026",
+  },
+  {
+    id: "#ORD-1028",
+    buyer: "Silver Mine Holdings",
+    listing: "Silver Bars - 100oz",
+    amount: 54000,
+    status: "paid",
+    date: "Mar 20, 2026",
+  },
+  {
+    id: "#ORD-1029",
+    buyer: "Rare Earth Minerals",
+    listing: "Cobalt Concentrate",
+    amount: 54000,
+    status: "frozen",
+    date: "Mar 22, 2026",
   },
 ];
 
-const MyOrdersPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('All Orders');
+export default function OrdersPage() {
+  const [filter, setFilter] = useState("all");
+
+  const filteredOrders =
+    filter === "all"
+      ? orders
+      : orders.filter((o) => o.status === filter);
 
   return (
-    <main className="min-h-screen bg-[#FDFDFD] py-8 px-4 md:px-16">
-      <div className="max-w-7xl mx-auto">
-        <header className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6 mb-8">
-          <div>
-            <nav className="flex items-center gap-2 text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
-              <Home size={14} /> <span className="mx-1">/</span> Marketplace <span className="mx-1">/</span> <span className="text-slate-900">My Order</span>
-            </nav>
-            <h1 className="text-2xl font-black text-slate-900">My Order</h1>
-          </div>
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 px-5 py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-bold shadow-sm transition-all">
-            <Plus size={18} /> Add New Listing
-          </button>
-        </header>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Left side */}
+        <div>
+          <h1 className="text-xl md:text-2xl font-semibold">My Orders</h1>
+          <p className="text-gray-500 text-sm">
+            Track and manage all transactions
+          </p>
+        </div>
 
-        <OrderStatusStepper currentStatus="Negotiation" />
-
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-gray-50">
-            <OrdersFilterBar activeTab={activeTab} onTabChange={setActiveTab} />
-          </div>
-          <div className="flex flex-col">
-            {mockOrders.map((order) => <OrderListItem key={order.id} order={order} />)}
-          </div>
+        {/* Right side (Filters) */}
+        <div className="overflow-x-auto">
+          <OrderFilters active={filter} onChange={setFilter} />
         </div>
       </div>
-    </main>
-  );
-};
 
-export default MyOrdersPage;
+      {/* Desktop Table */}
+      <OrderTable orders={filteredOrders} />
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-4">
+        {filteredOrders.map((order) => (
+          <OrderCard key={order.id} order={order} />
+        ))}
+      </div>
+
+      {/* Summary */}
+      <OrdersSummary orders={orders} />
+    </div>
+  );
+}
