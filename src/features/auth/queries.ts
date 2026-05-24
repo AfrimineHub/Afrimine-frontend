@@ -1,8 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AUTH_SESSION_QUERY_KEY } from '@/features/auth/config';
-import { bootstrapSession, login, register } from '@/features/auth/api';
+import {
+  bootstrapSession,
+  login,
+  register,
+  requestPasswordReset,
+  resetPassword,
+} from '@/features/auth/api';
 import { endSession, setSessionUser } from '@/features/auth/session';
-import type { LoginPayload, RegisterPayload } from '@/features/auth/types';
+import type {
+  LoginPayload,
+  RegisterPayload,
+  RequestPasswordResetPayload,
+  ResetPasswordPayload,
+} from '@/features/auth/types';
 
 export function useSessionQuery() {
   return useQuery({
@@ -40,5 +51,17 @@ export function useLogoutMutation() {
 
   return useMutation({
     mutationFn: () => endSession(queryClient),
+  });
+}
+
+export function useRequestPasswordResetMutation() {
+  return useMutation({
+    mutationFn: (payload: RequestPasswordResetPayload) => requestPasswordReset(payload),
+  });
+}
+
+export function useResetPasswordMutation() {
+  return useMutation({
+    mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload),
   });
 }

@@ -14,8 +14,9 @@ export const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const returnTo =
-    (location.state as { from?: string } | null)?.from ?? '/vendor-dashboard';
+  const locationState = location.state as { from?: string; message?: string } | null;
+  const returnTo = locationState?.from ?? '/vendor-dashboard';
+  const successMessage = locationState?.message ?? null;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,6 +32,11 @@ export const LoginForm = () => {
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+      {successMessage && (
+        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700" role="status">
+          {successMessage}
+        </p>
+      )}
       {error && (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
           {error}
@@ -64,9 +70,9 @@ export const LoginForm = () => {
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" className="accent-yellow-500" /> Remember me
         </label>
-        <a href="#" className="hover:text-yellow-600">
+        <Link to="/auth/forgot-password" className="hover:text-yellow-600">
           Forgot Password?
-        </a>
+        </Link>
       </div>
 
       <Button

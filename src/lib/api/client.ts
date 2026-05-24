@@ -46,7 +46,9 @@ function isAuthEndpoint(url: string | undefined): boolean {
   return (
     normalized.includes(authPaths.refresh) ||
     normalized.includes(authPaths.login) ||
-    normalized.includes(authPaths.register)
+    normalized.includes(authPaths.register) ||
+    normalized.includes(authPaths.resetPassword) ||
+    normalized.includes(authPaths.forgotPassword)
   );
 }
 

@@ -2,7 +2,14 @@ import { apiClient, performTokenRefresh } from '@/lib/api/client';
 import { extractAccessToken, extractUser } from '@/lib/api/normalize';
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/lib/auth/tokenStore';
 import { authPaths } from '@/features/auth/config';
-import type { AuthResponse, AuthUser, LoginPayload, RegisterPayload } from '@/features/auth/types';
+import type {
+  AuthResponse,
+  AuthUser,
+  LoginPayload,
+  RegisterPayload,
+  RequestPasswordResetPayload,
+  ResetPasswordPayload,
+} from '@/features/auth/types';
 
 async function fetchCurrentUser(): Promise<AuthUser> {
   const { data } = await apiClient.get(authPaths.me);
@@ -29,6 +36,14 @@ export async function register(payload: RegisterPayload): Promise<AuthResponse> 
   setAccessToken(accessToken);
   const user = extractUser(record) ?? (await fetchCurrentUser());
   return { accessToken, user };
+}
+
+export async function requestPasswordReset(payload: RequestPasswordResetPayload): Promise<void> {
+  await apiClient.post(authPaths.resetPassword, payload);
+}
+
+export async function resetPassword(payload: ResetPasswordPayload): Promise<void> {
+  await apiClient.post(authPaths.forgotPassword, payload);
 }
 
 export async function logout(): Promise<void> {
