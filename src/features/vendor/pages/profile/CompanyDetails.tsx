@@ -92,7 +92,7 @@ const CompanyDetailsPage = () => {
                 </p>
               </div>
             </div>
-            <button className="text-xs font-semibold text-gray-600 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50">
+            <button className="text-xs font-semibold text-gray-600 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
               Replace
             </button>
           </div>
@@ -111,7 +111,7 @@ const CompanyDetailsPage = () => {
                 </p>
               </div>
             </div>
-            <button className="text-xs font-semibold text-gray-600 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50">
+            <button className="text-xs font-semibold text-gray-600 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
               Replace
             </button>
           </div>
@@ -120,19 +120,19 @@ const CompanyDetailsPage = () => {
           <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 bg-gray-50">
             <div className="flex flex-col items-center justify-center space-y-4">
                <div className="flex items-center justify-between w-full">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-gray-100 rounded-lg text-gray-400">📤</div>
+                  <div className="flex items-center gap-4 cursor-pointer">
+                    <div className="p-2 bg-gray-100 rounded-lg text-gray-400 ">📤</div>
                     <div>
                       <h4 className="text-sm font-semibold">EFCC Permit</h4>
                       <p className="text-xs text-gray-400">Not Uploaded</p>
                     </div>
                   </div>
-                  <button className="bg-yellow-500 text-white text-xs font-bold py-2 px-6 rounded-lg hover:bg-yellow-600">
+                  <button className="bg-yellow-500 text-white text-xs font-bold py-2 px-6 rounded-lg hover:bg-yellow-600 cursor-pointer">
                     Upload
                   </button>
                </div>
                
-               <div className="pt-4 flex flex-col items-center">
+               <div className="pt-4 flex flex-col items-center cursor-pointer">
                   <div className="text-blue-500 text-3xl mb-2">☁️</div>
                   <p className="text-sm text-gray-600">Drag & drop your file here</p>
                   <p className="text-xs text-gray-400">or <span className="text-blue-500 cursor-pointer">click to browse</span></p>
@@ -145,7 +145,7 @@ const CompanyDetailsPage = () => {
 
       {/* Footer Button */}
       <div className="flex justify-end pt-4">
-        <button className="bg-yellow-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-yellow-600 transition-colors">
+        <button className="bg-yellow-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-yellow-600 transition-colors cursor-pointer">
           Save Company Details
         </button>
       </div>

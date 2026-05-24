@@ -4,26 +4,26 @@ export const sidebarNavigation = [
     {
       section: 'CORE MONITORING',
       links: [
-        { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', active: true },
-        { id: 'users', label: 'Users', icon: 'users' },
-        { id: 'listings', label: 'Listings', icon: 'listings' },
+        { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', active: true, path: '/admin' },
+        { id: 'users', label: 'Users', icon: 'users', path: '/admin/user-management' },
+        { id: 'listings', label: 'Listings', icon: 'listings', path: '/admin/listings' },
       ]
     },
     {
       section: 'TRANSACTIONS',
       links: [
-        { id: 'quotes', label: 'Quotes', icon: 'quotes' },
-        { id: 'orders', label: 'Orders', icon: 'orders' },
+        { id: 'quotes', label: 'Quotes', icon: 'quotes', path: '/admin/all-quotes' },
+        { id: 'orders', label: 'Orders', icon: 'orders', path: '/admin/order-tracker', },
         { id: 'payments', label: 'Payments', icon: 'payments' },
       ]
     },
     {
       section: 'RISK / CONTROL',
       links: [
-        { id: 'disputes', label: 'Disputes', icon: 'disputes' },
+        { id: 'disputes', label: 'Disputes', icon: 'disputes', path: '/admin/dispute', },
         { id: 'flagged', label: 'Flagged Content', icon: 'flagged' },
         { id: 'subscriptions', label: 'Subscriptions', icon: 'subscriptions' },
-        { id: 'kyc', label: 'KYC Verification', icon: 'kyc' },
+        { id: 'kyc', label: 'KYC Verification', icon: 'kyc', path: '/admin/kyc/verification-queue', },
         { id: 'settings', label: 'Settings', icon: 'settings' },
       ]
     }

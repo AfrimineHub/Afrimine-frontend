@@ -23,10 +23,10 @@ export const RfqCard = ({ rfq }) => {
   
         {/* Action Buttons pushed to the bottom */}
         <div className="mt-auto flex items-center justify-between pt-2">
-          <button className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors">
+          <button className="text-sm font-bold text-gray-600 hover:text-gray-900 transition-colors cursor-pointer">
             View Request
           </button>
-          <button className="bg-yellow-500 hover:bg-[#C29E4A] text-white text-sm font-bold py-2.5 px-6 rounded transition-colors shadow-sm">
+          <button className="bg-yellow-600 hover:bg-[#C29E4A] text-white text-sm font-bold py-2.5 px-6 rounded transition-colors shadow-sm cursor-pointer">
             Submit Quote
           </button>
         </div>

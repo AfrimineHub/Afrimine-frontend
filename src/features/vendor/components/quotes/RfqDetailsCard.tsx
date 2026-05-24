@@ -57,7 +57,7 @@ export const RfqDetailsCard: React.FC = () => {
           <p className="text-sm text-slate-600">We need this urgently for our refinery operation.</p>
         </div>
         <div className="mt-3 flex justify-center border-b border-gray-100 pb-8">
-           <button className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-slate-900 transition-colors">
+           <button className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-slate-900 transition-colors cursor-pointer">
              <MessageSquare size={14} /> Open Full Chat
            </button>
         </div>

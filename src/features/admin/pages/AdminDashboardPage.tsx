@@ -1,5 +1,4 @@
 import { 
-  sidebarNavigation, 
   statCardsData, 
   priorityAlerts, 
   liveActivityFeed, 
@@ -8,37 +7,15 @@ import {
 import { StatCard } from '../components/AdminStatsCard';
 import { PriorityAlert } from '../components/PriorityAlertComponent';
 import { ActivityItem } from '../components/AdminActivityItem';
+import AdminSidebar from '../components/AdminSidebar';
 
-const AdminDashboard = () => {
+const AdminDashboardPage = () => {
+
   return (
-    <div className="flex h-full bg-[#F4F5F7] font-sans overflow-hidden">
+    <div className="flex w-full h-full bg-[#F4F5F7] font-sans overflow-hidden">
       
-      {/* Sidebar - Fixed Left */}
-      <aside className="w-64 bg-[#F8F9FA] border-r border-gray-200 flex flex-col h-full overflow-y-auto hidden md:flex">
-        <div className="flex-1 px-4 pb-6 space-y-6 p-6">
-          {sidebarNavigation.map((group, idx) => (
-            <div key={idx}>
-              <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2 pl-3">
-                {group.section}
-              </h3>
-              <ul className="space-y-1">
-                {group.links.map((link) => (
-                  <li key={link.id}>
-                    <button className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      link.active 
-                        ? 'bg-[#B89047] text-white shadow-sm' 
-                        : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                    }`}>
-                      <div className={`w-4 h-4 rounded-sm ${link.active ? 'bg-white/30' : 'bg-gray-300'}`} />
-                      {link.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </aside>
+      {/* Sidebar */}
+      <AdminSidebar />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col h-full overflow-hidden">
@@ -70,7 +47,9 @@ const AdminDashboard = () => {
               <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-bold text-gray-900">Live Activity Feed</h2>
-                  <button className="text-xs font-bold text-[#B89047] hover:text-[#9A7639]">View All</button>
+                  <button className="text-xs font-bold text-[#B89047] hover:text-[#9A7639] cursor-pointer">
+                    View All
+                  </button>
                 </div>
                 <div className="divide-y divide-gray-100">
                   {liveActivityFeed.map(activity => (
@@ -83,7 +62,9 @@ const AdminDashboard = () => {
               <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-lg font-bold text-gray-900">Ongoing Transactions</h2>
-                  <button className="text-xs font-bold text-[#B89047] hover:text-[#9A7639]">View All Orders</button>
+                  <button className="text-xs font-bold text-[#B89047] hover:text-[#9A7639] cursor-pointer">
+                    View All Orders
+                  </button>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
@@ -109,7 +90,9 @@ const AdminDashboard = () => {
                               {tx.status}
                             </span>
                           </td>
-                          <td className="py-3 text-xs font-bold text-blue-500 cursor-pointer hover:text-blue-700">
+                          <td 
+                            className="py-3 text-xs font-bold text-blue-500 cursor-pointer hover:text-blue-700 cursor-pointer"
+                          >
                             View Details
                           </td>
                         </tr>
@@ -118,7 +101,6 @@ const AdminDashboard = () => {
                   </table>
                 </div>
               </section>
-
             </div>
           </div>
         </div>
@@ -127,4 +109,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AdminDashboardPage;

@@ -75,10 +75,10 @@ const MyAdsPage = () => {
           </tbody>
         </table>
         
-        {/* Simple Pagination Footer as seen in image */}
+        {/* Simple Pagination Footer */}
         <div className="flex justify-end mt-6 gap-2">
-           <button className="px-3 py-1 rounded bg-yellow-500 text-white text-xs font-bold">1</button>
-           <button className="px-3 py-1 rounded border border-gray-200 text-gray-500 text-xs hover:bg-gray-50">2</button>
+           <button className="px-3 py-1 rounded bg-yellow-500 text-white text-xs font-bold cursor-pointer">1</button>
+           <button className="px-3 py-1 rounded border border-gray-200 text-gray-500 text-xs hover:bg-gray-50 cursor-pointer">2</button>
         </div>
       </div>
     </div>

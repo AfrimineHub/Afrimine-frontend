@@ -20,7 +20,7 @@ export const PriorityAlert = ({ type, title, description, time, actionText }) =>
         <div className="flex items-center gap-4 self-start sm:self-center">
           <span className="text-xs text-gray-400 whitespace-nowrap">{time}</span>
           {actionText && (
-            <button className={`${btnColor} text-white text-xs font-bold py-1.5 px-4 rounded transition-colors whitespace-nowrap`}>
+            <button className={`${btnColor} text-white text-xs font-bold py-1.5 px-4 rounded transition-colors whitespace-nowrap cursor-pointer`}>
               {actionText}
             </button>
           )}

@@ -11,7 +11,7 @@ export const ProfileForm = () => {
 
       {/* Button spans full width */}
       <div className="md:col-span-2">
-        <button className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm">
+        <button className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm cursor-pointer">
           Save Changes
         </button>
       </div>

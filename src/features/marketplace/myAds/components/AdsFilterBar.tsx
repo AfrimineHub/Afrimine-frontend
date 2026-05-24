@@ -8,7 +8,7 @@ export const AdsFilterBar = () => {
           <h2 className="text-2xl font-bold text-slate-900">My Listings</h2>
           <p className="text-sm text-gray-500">Manage and track your assets</p>
         </div>
-        <button className="bg-[#22272B] hover:bg-black text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-bold transition-all shadow-sm">
+        <button className="bg-[#22272B] hover:bg-black text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-bold transition-all shadow-sm cursor-pointer">
           <Plus size={18} /> Create New Listing
         </button>
       </div>

@@ -23,31 +23,50 @@ import RfqPage from "@/features/rfq/pages/RfqPage";
 import NotificationsPage from "@/features/notification/pages/NotificationPage";
 import AdminDashboard from "@/features/admin/pages/AdminDashboardPage";
 import UsersManagementPage from "@/features/admin/pages/UsersManagementPage";
+import AdminListingsManagement from "@/features/admin/pages/AdminListingsManagement";
+import AdminAllQuotesPage from "@/features/admin/pages/AdminAllQuotesPage";
+import AdminOrderTrackingPage from "@/features/admin/pages/AdminOrderTrackingPage";
+import AdminDisputePage from "@/features/admin/pages/AdminDisputePage";
+import KYCVerificationQueue from "@/features/admin/pages/KYCVerificationQueue";
+import KYCReviewDetail from "@/features/admin/components/KYCReviewDetail";
+import { GuestOnly } from "@/features/auth/components/GuestRoute";
+import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 
 export const router = createBrowserRouter([
-  { 
-    path: "/auth", 
+  {
+    path: "/auth",
     element: <AuthLayout />,
     children: [
-      { path: "login", element: <LoginPage /> },
-      { 
-        path: "register", 
-        element: <AccountRegistrationPage />, 
-        handle: { step: '1/3' }, 
+      {
+        path: "login",
+        element: (
+          <GuestOnly>
+            <LoginPage />
+          </GuestOnly>
+        ),
       },
-      { 
-        path: "kyc", 
+      {
+        path: "register",
+        element: (
+          <GuestOnly>
+            <AccountRegistrationPage />
+          </GuestOnly>
+        ),
+        handle: { step: '1/3' },
+      },
+      {
+        path: "kyc",
         element: <KycPage />,
         handle: { step: '2/3' },
       },
-      { 
-        path: "profile-setup", 
+      {
+        path: "profile-setup",
         element: <ProfileSetupPage />,
         handle: { step: '3/3' },
       },
       { path: "created", element: <AccountCreatedPage /> },
       { path: "setup-successful", element: <AccountSetupSuccessPage /> },
-    ]
+    ],
   },
   {
     path: "/",
@@ -56,24 +75,35 @@ export const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: "home", element: <LandingPage /> },
       { path: "marketplace", element: <MarketplacePage /> },
-      { path: "my-ad", element: <MyAdsPage /> },
-      { path: "my-order", element: <MyOrdersPage /> },
-      { path: "messages", element: <MessagesPage /> },
-      { path: "vendor-dashboard", element: <VendorDashboardPage /> },
-      { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
-      { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
-      { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
-      { path: "/dashboard/my-payouts", element: <PayoutPage /> },
-      { path: "/dashboard/my-kyc", element: <KycPage /> },
-      { path: "/vendor-profile", element: <VendorProfilePage /> },
-      { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
-      { path: "/rfq", element: <RfqPage /> },
-      { path: "/notification", element: <NotificationsPage /> },
-      { path: "/admin", element: <AdminDashboard /> },
-      { path: "/admin/user-management", element: <UsersManagementPage /> },
-      {path: "/vendor", element: <Navigate to="/vendor-profile" replace />},
-    ]
-  }
+      {
+        element: <ProtectedRoute />,
+        children: [
+          { path: "my-ad", element: <MyAdsPage /> },
+          { path: "my-order", element: <MyOrdersPage /> },
+          { path: "messages", element: <MessagesPage /> },
+          { path: "vendor-dashboard", element: <VendorDashboardPage /> },
+          { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
+          { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
+          { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
+          { path: "/dashboard/my-payouts", element: <PayoutPage /> },
+          { path: "/dashboard/my-kyc", element: <KycPage /> },
+          { path: "/vendor-profile", element: <VendorProfilePage /> },
+          { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
+          { path: "/rfq", element: <RfqPage /> },
+          { path: "/notification", element: <NotificationsPage /> },
+          { path: "/admin", element: <AdminDashboard /> },
+          { path: "/admin/listings", element: <AdminListingsManagement /> },
+          { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
+          { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
+          { path: "/admin/dispute", element: <AdminDisputePage /> },
+          { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },
+          { path: "/admin/kyc/review", element: <KYCReviewDetail /> },
+          { path: "/admin/user-management", element: <UsersManagementPage /> },
+          { path: "/vendor", element: <Navigate to="/vendor-profile" replace /> },
+        ],
+      },
+    ],
+  },
 ]);
 
 export function AppRouter() {

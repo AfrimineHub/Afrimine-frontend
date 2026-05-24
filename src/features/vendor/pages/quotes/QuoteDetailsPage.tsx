@@ -15,7 +15,7 @@ export const QuoteDetailsPage: React.FC = () => {
             <p className="text-sm text-gray-500 mt-1">Manage and respond to buyer request</p>
           </div>
           <div className="relative">
-            <button className="flex items-center justify-between gap-8 px-4 py-2 bg-gray-100/80 hover:bg-gray-200/80 rounded-lg text-sm font-medium text-slate-700 transition-colors w-32">
+            <button className="flex items-center justify-between gap-8 px-4 py-2 bg-gray-100/80 hover:bg-gray-200/80 rounded-lg text-sm font-medium text-slate-700 transition-colors w-32 cursor-pointer">
               All <ChevronDown size={16} className="text-gray-500" />
             </button>
           </div>

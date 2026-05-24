@@ -68,7 +68,7 @@ export const AdListItem = ({ image, title, category, status, price, stats, date 
         <div className="flex items-center gap-2 text-gray-400">
           <button 
             onClick={toggleActions} 
-            className="p-1 hover:text-blue-600 transition-colors"
+            className="p-1 hover:text-blue-600 transition-colors cursor-pointer"
             title={showActions ? "Hide actions" : "Show actions"}
           >
             {/* Optional: Switch icon based on state */}

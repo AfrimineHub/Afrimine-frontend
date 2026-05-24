@@ -1,23 +1,25 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react'; // Using lucide-react for the icon
 
-interface Option {
+export interface Option<T extends string> {
   label: string;
-  value: string;
+  value: T;
 }
 
-interface SelectProps {
+interface SelectProps<T extends string> {
   label: string;
-  options: Option[];
+  options: Option<T>[];
   placeholder?: string;
-  onChange: (value: string) => void;
+  onChange: (value: T) => void;
 }
 
-export const Select = ({ label, options, placeholder, onChange }: SelectProps) => {
+export const Select = <T extends string>({
+  label, options, placeholder, onChange 
+}: SelectProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<Option | null>(null);
+  const [selected, setSelected] = useState<Option<T> | null>(null);
 
-  const handleSelect = (option: Option) => {
+  const handleSelect = (option: Option<T>) => {
     setSelected(option);
     setIsOpen(false);
     onChange(option.value);

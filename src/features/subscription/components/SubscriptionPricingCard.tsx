@@ -59,14 +59,14 @@ export const SubscriptionPricingCard = ({ plan }) => {
             {feature.included ? (
               <CheckIcon colorClass={iconColor} />
             ) : (
-              <span className="w-4 h-4 mr-3 flex-shrink-0 block" /> // Spacer for alignment
+              <span className="w-4 h-4 mr-3 flex-shrink-0 block" />
             )}
             {feature.text}
           </li>
         ))}
       </ul>
 
-      <button className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${buttonClass}`}>
+      <button className={`w-full py-3 px-4 rounded-lg font-bold transition-colors cursor-pointer ${buttonClass}`}>
         Get Started
       </button>
     </div>

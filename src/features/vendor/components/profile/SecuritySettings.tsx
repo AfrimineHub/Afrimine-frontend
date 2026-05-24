@@ -15,7 +15,7 @@ export const SecuritySettings = () => {
           </div>
         </div>
 
-        <button className="text-sm text-blue-600">Update</button>
+        <button className="text-sm text-blue-600 cursor-pointer">Update</button>
       </div>
 
       {/* 2FA */}
@@ -32,7 +32,7 @@ export const SecuritySettings = () => {
           </div>
         </div>
 
-        <button className="text-sm text-blue-600">Enable</button>
+        <button className="text-sm text-blue-600 cursor-pointer">Enable</button>
       </div>
     </div>
   );
