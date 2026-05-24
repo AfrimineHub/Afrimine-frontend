@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import AuthLayout from '../layouts/AuthLayout';
 import LoginPage from '../features/auth/pages/LoginPage';
+import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage';
 import AccountRegistrationPage from '../features/auth/pages/AccountRegistrationPage';
 import { KycPage } from '@/features/vendor/pages/profile';
 import ProfileSetupPage from '../features/auth/pages/ProfileSetupPage';
@@ -42,6 +43,14 @@ export const router = createBrowserRouter([
         element: (
           <GuestOnly>
             <LoginPage />
+          </GuestOnly>
+        ),
+      },
+      {
+        path: "forgot-password",
+        element: (
+          <GuestOnly>
+            <ForgotPasswordPage />
           </GuestOnly>
         ),
       },
