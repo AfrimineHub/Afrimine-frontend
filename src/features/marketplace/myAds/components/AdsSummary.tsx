@@ -13,7 +13,7 @@ export const AdsSummary = () => (
         </p>
       </div>
     </div>
-    <button className="bg-[#22272B] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition-all cursor-pointer w-full sm:w-auto">
+    <button className="bg-[#22272B] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition-all cursor-pointer w-full sm:w-auto cursor-pointer">
       Get Verified
     </button>
   </div>

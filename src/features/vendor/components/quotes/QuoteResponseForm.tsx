@@ -63,10 +63,10 @@ export const QuoteResponseForm: React.FC = () => {
 
         {/* Footer Actions */}
         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4">
-          <button type="button" className="w-full sm:w-auto flex-1 px-8 py-3.5 bg-[#DE9D2B] hover:bg-[#c98e26] text-white text-sm font-bold rounded-lg transition-colors shadow-sm">
+          <button type="button" className="w-full sm:w-auto flex-1 px-8 py-3.5 bg-[#DE9D2B] hover:bg-[#c98e26] text-white text-sm font-bold rounded-lg transition-colors shadow-sm cursor-pointer">
             Send Quote
           </button>
-          <button type="button" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-gray-500 hover:text-slate-900 transition-colors">
+          <button type="button" className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-gray-500 hover:text-slate-900 transition-colors cursor-pointer">
             Save as Draft
           </button>
         </div>

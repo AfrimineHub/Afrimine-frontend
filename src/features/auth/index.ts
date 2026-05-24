@@ -1,5 +1,4 @@
-export * from './components';
-export * from './hooks';
-export * from './api';
-export * from './pages';
-export * from './types'
+export { AuthProvider } from './AuthProvider';
+export { useAuth } from './hooks/useAuth';
+export { AUTH_SESSION_QUERY_KEY, authPaths } from './config';
+export type { AuthUser, LoginPayload, RegisterPayload } from './types';

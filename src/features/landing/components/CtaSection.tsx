@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { use } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const CtaSection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-20 bg-slate-900">
       <div className="max-w-4xl px-4 mx-auto text-center">
@@ -14,7 +17,10 @@ const CtaSection: React.FC = () => {
             placeholder="Enter your email address" 
             className="flex-1 px-4 py-3 rounded-md bg-slate-800 text-white border border-slate-700 focus:outline-none focus:border-yellow-500"
           />
-          <button className="px-6 py-3 font-semibold text-slate-900 bg-yellow-500 rounded-md hover:bg-yellow-400">
+          <button 
+            className="px-6 py-3 font-semibold text-slate-900 bg-yellow-500 rounded-md hover:bg-yellow-400 cursor-pointer"
+            onClick={() => navigate('/auth/register')}
+          >
             Get Started →
           </button>
         </div>

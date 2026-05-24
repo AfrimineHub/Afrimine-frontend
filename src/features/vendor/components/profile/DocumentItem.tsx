@@ -23,7 +23,7 @@ export const DocumentItem = ({
           <p className="text-sm font-medium">{title}</p>
         </div>
 
-        <button className="text-sm border px-3 py-1 rounded-lg">
+        <button className="text-sm border px-3 py-1 rounded-lg cursor-pointer">
           Replace
         </button>
       </div>

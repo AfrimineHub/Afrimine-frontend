@@ -59,7 +59,7 @@ export const KycPage = () => {
             </p>
           </div>
 
-          <button className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm">
+          <button className="bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm cursor-pointer">
             Upload
           </button>
         </div>
@@ -69,7 +69,7 @@ export const KycPage = () => {
 
       {/* Submit */}
       <div className="flex justify-end">
-        <button className="bg-yellow-600 text-white px-6 py-3 rounded-xl">
+        <button className="bg-yellow-600 text-white px-6 py-3 rounded-xl cursor-pointer">
           Submit for Verification
         </button>
       </div>

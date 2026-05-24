@@ -1,49 +1,127 @@
-import type { SubmitEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/shared/inputs/Input';
 import { Select } from '@/shared/Select';
 import { Button } from '@/shared/buttons/Button';
+import { useRegisterMutation } from '@/features/auth/queries';
+import { getApiErrorMessage } from '@/lib/api/errors';
+import { USER_TYPES, type UserType } from '../types';
+import { type Option } from '@/shared/Select';
 
-const userTypes = [
-  { label: "Miner / Site Owner", value: "miner" },
-  { label: "Mineral Seller / Trader", value: "seller" },
-  { label: "Equipment Supplier", value: "supplier" },
-  { label: "Investor / JV Partner", value: "investor" }
+const userTypes: Option<UserType>[] = [
+  { label: 'Individual', value: USER_TYPES.individual },
+  { label: 'Miner / Site Owner', value: USER_TYPES.miner },
+  { label: 'Mineral Trader', value: USER_TYPES.trader },
+  { label: 'Equipment Supplier', value: USER_TYPES.supplier },
+  { label: 'Investor / JV Partner', value: USER_TYPES.investor },
 ];
 
 export const AccountRegistrationForm = () => {
   const navigate = useNavigate();
+  const registerMutation = useRegisterMutation();
 
-  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
+  const [userType, setUserType] = useState<UserType | ''>('');
+  const [fullName, setFullName] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
 
-    // API call logic here
-    navigate('/auth/created');
-  }
+    if (!userType) {
+      setError('Please choose a user type');
+      return;
+    }
+
+    try {
+      await registerMutation.mutateAsync({
+        userType,
+        fullName,
+        companyName: companyName || undefined,
+        email,
+        phone,
+        password,
+      });
+      navigate('/auth/created');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Registration failed'));
+    }
+  };
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
-      <Select 
-        label="Choose user type" 
-        placeholder="How do you want to use Afrimine" 
-        options={userTypes} 
-        onChange={(val) => console.log(val)} 
+      {error && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+          {error}
+        </p>
+      )}
+
+      <Select<UserType>
+        label="Choose user type"
+        placeholder="How do you want to use Afrimine"
+        options={userTypes}
+        onChange={setUserType}
       />
-      
-      <Input label="Full Name" placeholder="Enter your full name" />
-      <Input label="Company name (optional)" placeholder="Enter your company name" />
-      
+
+      <Input
+        label="Full Name"
+        placeholder="Enter your full name"
+        name="fullName"
+        required
+        value={fullName}
+        onChange={(e) => setFullName(e.target.value)}
+      />
+      <Input
+        label="Company name (optional)"
+        placeholder="Enter your company name"
+        name="companyName"
+        value={companyName}
+        onChange={(e) => setCompanyName(e.target.value)}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input label="Email Address" placeholder="Enter your email" type="email" />
-        <Input label="Phone number" placeholder="000 000 0000" type="tel" />
+        <Input
+          label="Email Address"
+          placeholder="Enter your email"
+          type="email"
+          name="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <Input
+          label="Phone number"
+          placeholder="000 000 0000"
+          type="tel"
+          name="phone"
+          required
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+        />
       </div>
 
       <div className="relative">
-        <Input label="Password" placeholder="Create a password" type="password" />
-        {/* Eye icon would be positioned absolute here */}
+        <Input
+          label="Password"
+          placeholder="Create a password"
+          type="password"
+          name="password"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </div>
 
-      <Button type="submit" className="mt-4">Continue</Button>
+      <Button type="submit" className="mt-4 w-full" disabled={registerMutation.isPending}>
+        {registerMutation.isPending ? 'Creating account…' : 'Continue'}
+      </Button>
     </form>
   );
 };

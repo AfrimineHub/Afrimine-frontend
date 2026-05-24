@@ -31,7 +31,7 @@ const SubscriptionPage = () => {
           <p className="text-gray-500 mb-6 text-sm">
             We understand that every mining operation is unique. Contact our sales team to discuss a custom plan tailored to your specific needs.
           </p>
-          <button className="bg-[#1E293B] hover:bg-slate-800 text-white py-2.5 px-8 rounded-lg font-bold transition-colors">
+          <button className="bg-[#1E293B] hover:bg-slate-800 text-white py-2.5 px-8 rounded-lg font-bold transition-colors cursor-pointer">
             Contact Sales
           </button>
         </div>
