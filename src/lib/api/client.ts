@@ -3,7 +3,15 @@ import { authPaths } from '@/features/auth/config';
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/lib/auth/tokenStore';
 import { extractAccessToken } from '@/lib/api/normalize';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL ?? '';
+const baseURL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
+
+if (!baseURL && import.meta.env.PROD) {
+  console.error(
+    '[api] VITE_API_BASE_URL was not set at build time. API calls will hit this site instead of the backend. ' +
+      'Set VITE_API_BASE_URL when running `npm run build` or `docker build --build-arg VITE_API_BASE_URL=...`.',
+  );
+}
+console.log('baseURL', baseURL);
 
 /** Sends httpOnly refresh cookie only — no Bearer interceptor. */
 export const refreshClient = axios.create({
