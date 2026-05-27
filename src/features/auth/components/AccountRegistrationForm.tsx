@@ -26,6 +26,7 @@ export const AccountRegistrationForm = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -34,6 +35,11 @@ export const AccountRegistrationForm = () => {
 
     if (!userType) {
       setError('Please choose a user type');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
       return;
     }
 
@@ -116,6 +122,20 @@ export const AccountRegistrationForm = () => {
           minLength={8}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      <div className="relative">
+        <Input
+          label="Confirm Password"
+          placeholder="Confirm your password"
+          type="password"
+          name="confirmPassword"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
         />
       </div>
 
