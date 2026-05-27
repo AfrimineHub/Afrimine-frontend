@@ -51,6 +51,7 @@ export const AccountRegistrationForm = () => {
         email,
         phone,
         password,
+        confirmPassword,
       });
       navigate('/auth/created');
     } catch (err) {
