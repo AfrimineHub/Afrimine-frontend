@@ -130,9 +130,9 @@ export const AccountRegistrationForm = () => {
         <Input
           label="Confirm Password"
           placeholder="Confirm your password"
-          type="password"
+          type="confirmPassword"
           name="confirmPassword"
-          autoComplete="new-password"
+          autoComplete="confirm-password"
           required
           minLength={8}
           value={confirmPassword}
