@@ -5,8 +5,10 @@ import { authPaths } from '@/features/auth/config';
 import type {
   AuthResponse,
   AuthUser,
+  ConfirmEmailPayload,
   LoginPayload,
   RegisterPayload,
+  ResendOtpPayload,
   RequestPasswordResetPayload,
   ResetPasswordPayload,
 } from '@/features/auth/types';
@@ -44,6 +46,14 @@ export async function requestPasswordReset(payload: RequestPasswordResetPayload)
 
 export async function resetPassword(payload: ResetPasswordPayload): Promise<void> {
   await apiClient.post(authPaths.forgotPassword, payload);
+}
+
+export async function confirmEmail(payload: ConfirmEmailPayload): Promise<void> {
+  await apiClient.post(authPaths.confirmEmail, payload);
+}
+
+export async function resendOtp(payload: ResendOtpPayload): Promise<void> {
+  await apiClient.post(authPaths.resendOtp, payload);
 }
 
 export async function logout(): Promise<void> {

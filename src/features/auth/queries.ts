@@ -2,15 +2,19 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AUTH_SESSION_QUERY_KEY } from '@/features/auth/config';
 import {
   bootstrapSession,
+  confirmEmail,
   login,
   register,
+  resendOtp,
   requestPasswordReset,
   resetPassword,
 } from '@/features/auth/api';
 import { endSession, setSessionUser } from '@/features/auth/session';
 import type {
+  ConfirmEmailPayload,
   LoginPayload,
   RegisterPayload,
+  ResendOtpPayload,
   RequestPasswordResetPayload,
   ResetPasswordPayload,
 } from '@/features/auth/types';
@@ -63,5 +67,17 @@ export function useRequestPasswordResetMutation() {
 export function useResetPasswordMutation() {
   return useMutation({
     mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload),
+  });
+}
+
+export function useConfirmEmailMutation() {
+  return useMutation({
+    mutationFn: (payload: ConfirmEmailPayload) => confirmEmail(payload),
+  });
+}
+
+export function useResendOtpMutation() {
+  return useMutation({
+    mutationFn: (payload: ResendOtpPayload) => resendOtp(payload),
   });
 }

@@ -9,6 +9,8 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_ME_PATH?: string;
   readonly VITE_AUTH_FORGOT_PASSWORD_PATH?: string;
   readonly VITE_AUTH_RESET_PASSWORD_PATH?: string;
+  readonly VITE_AUTH_CONFIRM_EMAIL_PATH?: string;
+  readonly VITE_AUTH_RESEND_OTP_PATH?: string;
 }
 
 interface ImportMeta {
