@@ -7,6 +7,7 @@ import { KycPage } from '@/features/vendor/pages/profile';
 import ProfileSetupPage from '../features/auth/pages/ProfileSetupPage';
 import AccountCreatedPage from '../features/auth/pages/AccountCreatedPage';
 import AccountSetupSuccessPage from '../features/auth/pages/AccountSetupSuccessPage';
+import ConfirmEmailPage from '../features/auth/pages/ConfirmEmailPage';
 import MainLayout from "@/layouts/Mainlayout/MainLayout";
 import MarketplacePage from "@/features/marketplace/pages/MarketplacePage";
 import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
@@ -51,6 +52,14 @@ export const router = createBrowserRouter([
         element: (
           <GuestOnly>
             <ForgotPasswordPage />
+          </GuestOnly>
+        ),
+      },
+      {
+        path: "confirm-email",
+        element: (
+          <GuestOnly>
+            <ConfirmEmailPage />
           </GuestOnly>
         ),
       },

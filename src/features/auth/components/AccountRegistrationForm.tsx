@@ -53,7 +53,7 @@ export const AccountRegistrationForm = () => {
         password,
         confirmPassword,
       });
-      navigate('/auth/created');
+      navigate(`/auth/created?email=${encodeURIComponent(email)}`);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Registration failed'));
     }

@@ -38,15 +38,23 @@ export interface AuthResponse {
   user?: AuthUser;
 }
 
-/** Sends OTP to the user's email (`POST auth/reset-password`). */
 export interface RequestPasswordResetPayload {
   email: string;
 }
 
-/** Completes reset with OTP from email (`POST auth/forgot-password`). */
 export interface ResetPasswordPayload {
   email: string;
   otp: string;
   newPassword: string;
   confirmNewPassword: string;
+}
+
+export interface ConfirmEmailPayload {
+  email: string;
+  type: number;
+  otp: string;
+}
+
+export interface ResendOtpPayload {
+  email: string;
 }
