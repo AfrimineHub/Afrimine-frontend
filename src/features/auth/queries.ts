@@ -40,13 +40,8 @@ export function useLoginMutation() {
 }
 
 export function useRegisterMutation() {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (payload: RegisterPayload) => register(payload),
-    onSuccess: ({ user }) => {
-      if (user) setSessionUser(queryClient, user);
-    },
   });
 }
 
