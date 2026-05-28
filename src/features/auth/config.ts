@@ -9,7 +9,7 @@ export const authPaths = {
   resetPassword: trimSlash(import.meta.env.VITE_AUTH_RESET_PASSWORD_PATH ?? 'auth/reset-password'),
   forgotPassword: trimSlash(import.meta.env.VITE_AUTH_FORGOT_PASSWORD_PATH ?? 'auth/forgot-password'),
   confirmEmail: trimSlash(import.meta.env.VITE_AUTH_CONFIRM_EMAIL_PATH ?? 'auth/confirm-email'),
-  resendOtp: trimSlash(import.meta.env.VITE_AUTH_RESEND_OTP_PATH ?? 'auth/resent-otp'),
+  resendOtp: trimSlash(import.meta.env.VITE_AUTH_RESEND_OTP_PATH ?? 'auth/resend-otp'),
 } as const;
 
 export const AUTH_SESSION_QUERY_KEY = ['auth', 'session'] as const;
