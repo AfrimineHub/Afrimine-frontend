@@ -44,7 +44,7 @@ export const AccountRegistrationForm = () => {
 
     try {
       await registerMutation.mutateAsync({
-        role: userType,
+        type: userType,
         fullName,
         companyName: companyName || undefined,
         email,
@@ -129,7 +129,7 @@ export const AccountRegistrationForm = () => {
         <Input
           label="Confirm Password"
           placeholder="Confirm your password"
-          type="confirmPassword"
+          type="password"
           name="confirmPassword"
           autoComplete="confirm-password"
           required
