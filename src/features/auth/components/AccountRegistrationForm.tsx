@@ -44,7 +44,7 @@ export const AccountRegistrationForm = () => {
 
     try {
       await registerMutation.mutateAsync({
-        userType,
+        role: userType,
         fullName,
         companyName: companyName || undefined,
         email,
