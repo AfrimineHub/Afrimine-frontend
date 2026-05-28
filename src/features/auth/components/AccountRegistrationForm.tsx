@@ -62,10 +62,15 @@ export const AccountRegistrationForm = () => {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
         const data = err.response?.data;
-        const message =
-          data && typeof data === 'object'
-            ? (data as Record<string, unknown>).message
-            : undefined;
+        const record = data && typeof data === 'object' ? (data as Record<string, unknown>) : null;
+        const appStatusCode = record && typeof record.statusCode === 'number' ? record.statusCode : undefined;
+
+        if ((status === 409 || appStatusCode === 409) && email) {
+          navigate(`/auth/resend-otp?email=${encodeURIComponent(email)}`);
+          return;
+        }
+
+        const message = record ? record.message : undefined;
         const text = typeof message === 'string' ? message.toLowerCase() : '';
 
         // Common backend pattern: account already exists but isn't verified yet.
