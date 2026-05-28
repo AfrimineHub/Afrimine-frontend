@@ -9,11 +9,10 @@ import { USER_TYPES, type UserType } from '../types';
 import { type Option } from '@/shared/Select';
 
 const userTypes: Option<UserType>[] = [
-  { label: 'Individual', value: USER_TYPES.individual },
-  { label: 'Miner / Site Owner', value: USER_TYPES.miner },
-  { label: 'Mineral Trader', value: USER_TYPES.trader },
-  { label: 'Equipment Supplier', value: USER_TYPES.supplier },
-  { label: 'Investor / JV Partner', value: USER_TYPES.investor },
+  { label: 'Vendor', value: USER_TYPES.vendor },
+  { label: 'Buyer', value: USER_TYPES.buyer },
+  { label: 'Investor', value: USER_TYPES.investor },
+  { label: 'Supplier', value: USER_TYPES.supplier },
 ];
 
 export const AccountRegistrationForm = () => {

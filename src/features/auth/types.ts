@@ -1,12 +1,16 @@
+/**
+ * Backend enum:
+ * Vendor = 1, Buyer = 2, Investor = 3, Supplier = 4, SuperAdmin = 5
+ */
 export const USER_TYPES = {
-  individual: 'individual',
-  miner: 'miner',
-  trader: 'trader',
-  supplier: 'supplier',
-  investor: 'investor',
+  vendor: 1,
+  buyer: 2,
+  investor: 3,
+  supplier: 4,
+  superAdmin: 5,
 } as const;
 
-export type UserType = typeof USER_TYPES[keyof typeof USER_TYPES];
+export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
 
 export interface AuthUser {
   id: string;
@@ -15,7 +19,7 @@ export interface AuthUser {
   companyName?: string;
   phone?: string;
   role?: string;
-  userType?: string;
+  userType?: number;
 }
 
 export interface LoginPayload {
