@@ -18,8 +18,7 @@ export interface AuthUser {
   fullName?: string;
   companyName?: string;
   phone?: string;
-  role?: string;
-  userType?: number;
+  role?: UserType;
 }
 
 export interface LoginPayload {
@@ -28,7 +27,7 @@ export interface LoginPayload {
 }
 
 export interface RegisterPayload {
-  userType: UserType;
+  role: UserType;
   fullName: string;
   companyName?: string;
   email: string;
