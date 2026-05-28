@@ -41,6 +41,13 @@ export interface AuthResponse {
   user?: AuthUser;
 }
 
+export interface RegisterResponse {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: string;
+}
+
 export interface RequestPasswordResetPayload {
   email: string;
 }

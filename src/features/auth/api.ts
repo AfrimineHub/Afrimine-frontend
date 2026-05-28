@@ -8,6 +8,7 @@ import type {
   ConfirmEmailPayload,
   LoginPayload,
   RegisterPayload,
+  RegisterResponse,
   ResendOtpPayload,
   RequestPasswordResetPayload,
   ResetPasswordPayload,
@@ -31,13 +32,9 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
   return { accessToken, user };
 }
 
-export async function register(payload: RegisterPayload): Promise<AuthResponse> {
+export async function register(payload: RegisterPayload): Promise<RegisterResponse> {
   const { data } = await apiClient.post(authPaths.register, payload);
-  const record = data as Record<string, unknown>;
-  const accessToken = extractAccessToken(record);
-  setAccessToken(accessToken);
-  const user = extractUser(record) ?? (await fetchCurrentUser());
-  return { accessToken, user };
+  return data as RegisterResponse;
 }
 
 export async function requestPasswordReset(payload: RequestPasswordResetPayload): Promise<void> {

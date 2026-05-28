@@ -7,6 +7,7 @@ import { useRegisterMutation } from '@/features/auth/queries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import { USER_TYPES, type UserType } from '../types';
 import { type Option } from '@/shared/Select';
+import axios from 'axios';
 
 const userTypes: Option<UserType>[] = [
   { label: 'Vendor', value: USER_TYPES.vendor },
@@ -14,6 +15,8 @@ const userTypes: Option<UserType>[] = [
   { label: 'Investor', value: USER_TYPES.investor },
   { label: 'Supplier', value: USER_TYPES.supplier },
 ];
+
+const PHONE_COUNTRY_PREFIX = '+234';
 
 export const AccountRegistrationForm = () => {
   const navigate = useNavigate();
@@ -23,7 +26,7 @@ export const AccountRegistrationForm = () => {
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phoneLocal, setPhoneLocal] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +46,8 @@ export const AccountRegistrationForm = () => {
     }
 
     try {
-      await registerMutation.mutateAsync({
+      const phone = `${PHONE_COUNTRY_PREFIX}${phoneLocal.replace(/\D/g, '')}`;
+      const res = await registerMutation.mutateAsync({
         type: userType,
         fullName,
         companyName: companyName || undefined,
@@ -52,8 +56,30 @@ export const AccountRegistrationForm = () => {
         password,
         confirmPassword,
       });
-      navigate(`/auth/created?email=${encodeURIComponent(email)}`);
+      const targetEmail = res?.data || email;
+      navigate(`/auth/created?email=${encodeURIComponent(targetEmail)}`);
     } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+        const data = err.response?.data;
+        const message =
+          data && typeof data === 'object'
+            ? (data as Record<string, unknown>).message
+            : undefined;
+        const text = typeof message === 'string' ? message.toLowerCase() : '';
+
+        // Common backend pattern: account already exists but isn't verified yet.
+        if (
+          (status === 400 || status === 409) &&
+          (text.includes('not verified') ||
+            text.includes('unverified') ||
+            text.includes('verify your email') ||
+            text.includes('otp'))
+        ) {
+          navigate(`/auth/resend-otp?email=${encodeURIComponent(email)}`);
+          return;
+        }
+      }
       setError(getApiErrorMessage(err, 'Registration failed'));
     }
   };
@@ -100,15 +126,25 @@ export const AccountRegistrationForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <Input
-          label="Phone number"
-          placeholder="000 000 0000"
-          type="tel"
-          name="phone"
-          required
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
+        <div className="flex flex-col gap-1 w-full mb-4">
+          <label className="text-sm font-semibold text-gray-700">Phone number</label>
+          <div className="flex items-center bg-gray-50 border border-gray-200 rounded-xl overflow-hidden focus-within:border-yellow-500 focus-within:ring-1 focus-within:ring-yellow-500">
+            <span className="px-3 text-sm text-gray-600 border-r border-gray-200">
+              {PHONE_COUNTRY_PREFIX}
+            </span>
+            <input
+              className="w-full p-3 bg-transparent outline-none"
+              placeholder="000 000 0000"
+              type="tel"
+              name="phone"
+              autoComplete="tel"
+              inputMode="numeric"
+              required
+              value={phoneLocal}
+              onChange={(e) => setPhoneLocal(e.target.value.replace(/[^\d\s-]/g, ''))}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="relative">
