@@ -3,7 +3,10 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Provider as ReduxProvider } from "react-redux";
 import { queryClient } from "@/app/queryClient";
 import { AuthProvider } from "@/features/auth/AuthProvider";
+import { hydrateAccessToken } from "@/lib/auth/tokenStore";
 import store from "../store";
+
+hydrateAccessToken();
 
 export const AppProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <ReduxProvider store={store}>

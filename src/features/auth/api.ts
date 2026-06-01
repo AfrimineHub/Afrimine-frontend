@@ -1,6 +1,11 @@
 import { apiClient, performTokenRefresh } from '@/lib/api/client';
 import { extractAccessToken, extractUser } from '@/lib/api/normalize';
-import { clearAccessToken, getAccessToken, setAccessToken } from '@/lib/auth/tokenStore';
+import {
+  clearAccessToken,
+  getAccessToken,
+  hydrateAccessToken,
+  setAccessToken,
+} from '@/lib/auth/tokenStore';
 import { authPaths } from '@/features/auth/config';
 import type {
   AuthResponse,
@@ -62,20 +67,22 @@ export async function logout(): Promise<void> {
 }
 
 export async function bootstrapSession(): Promise<AuthUser | null> {
+  hydrateAccessToken();
+
   if (!getAccessToken()) {
-    try {
-      await performTokenRefresh();
-    } catch {
-      clearAccessToken();
-      return null;
-    }
+    return null;
   }
 
   try {
     return await fetchCurrentUser();
   } catch {
-    clearAccessToken();
-    return null;
+    try {
+      await performTokenRefresh();
+      return await fetchCurrentUser();
+    } catch {
+      clearAccessToken();
+      return null;
+    }
   }
 }
 
