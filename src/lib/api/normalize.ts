@@ -25,7 +25,8 @@ export function extractUser(data: JsonRecord): AuthUser | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
 
   const record = raw as JsonRecord;
-  const id = record.id ?? record._id;
+  
+  const id = record.id ?? record._id ?? record.userId ?? record.user_id ?? record.email;
   const email = record.email;
 
   if (typeof id !== 'string' && typeof id !== 'number') return undefined;
@@ -48,7 +49,14 @@ export function extractUser(data: JsonRecord): AuthUser | undefined {
         : typeof record.company_name === 'string'
           ? record.company_name
           : undefined,
-    phone: typeof record.phone === 'string' ? record.phone : undefined,
+    phone:
+      typeof record.phone === 'string'
+        ? record.phone
+        : typeof record.phoneNumber === 'string'
+          ? record.phoneNumber
+          : typeof record.phone_number === 'string'
+            ? record.phone_number
+            : undefined,
     type: typeof record.type === 'number' ? record.type as UserType : undefined,
   };
 }
