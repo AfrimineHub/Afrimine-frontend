@@ -11,9 +11,7 @@ if (!baseURL && import.meta.env.PROD) {
       'Set VITE_API_BASE_URL when running `npm run build` or `docker build --build-arg VITE_API_BASE_URL=...`.',
   );
 }
-console.log('baseURL', baseURL);
-
-/** Sends httpOnly refresh cookie only — no Bearer interceptor. */
+/** Refresh calls — no Bearer interceptor; body carries the token per API contract. */
 export const refreshClient = axios.create({
   baseURL,
   withCredentials: true,
@@ -61,7 +59,14 @@ function isAuthEndpoint(url: string | undefined): boolean {
 }
 
 export async function performTokenRefresh(): Promise<string> {
-  const { data } = await refreshClient.post(authPaths.refresh);
+  const currentToken = getAccessToken();
+  if (!currentToken) {
+    throw new Error('No access token available to refresh');
+  }
+
+  const { data } = await refreshClient.post(authPaths.refresh, {
+    accessToken: currentToken,
+  });
   const token = extractAccessToken(data as Record<string, unknown>);
   setAccessToken(token);
   return token;
