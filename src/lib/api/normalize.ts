@@ -1,10 +1,20 @@
-import type { AuthUser } from '@/features/auth/types';
+import type { AuthUser, UserType } from '@/features/auth/types';
 
 type JsonRecord = Record<string, unknown>;
 
+function readAccessToken(record: JsonRecord): string | undefined {
+  const token = record.accessToken ?? record.access_token ?? record.token;
+  return typeof token === 'string' && token ? token : undefined;
+}
+
 export function extractAccessToken(data: JsonRecord): string {
-  const token = data.accessToken ?? data.access_token ?? data.token;
-  if (typeof token !== 'string' || !token) {
+  const token =
+    readAccessToken(data) ??
+    (typeof data.data === 'object' && data.data !== null
+      ? readAccessToken(data.data as JsonRecord)
+      : undefined);
+
+  if (!token) {
     throw new Error('Invalid auth response: missing access token');
   }
   return token;
@@ -39,12 +49,6 @@ export function extractUser(data: JsonRecord): AuthUser | undefined {
           ? record.company_name
           : undefined,
     phone: typeof record.phone === 'string' ? record.phone : undefined,
-    role: typeof record.role === 'string' ? record.role : undefined,
-    userType:
-      typeof record.userType === 'string'
-        ? record.userType
-        : typeof record.user_type === 'string'
-          ? record.user_type
-          : undefined,
+    type: typeof record.type === 'number' ? record.type as UserType : undefined,
   };
 }
