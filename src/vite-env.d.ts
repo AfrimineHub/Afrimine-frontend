@@ -11,6 +11,11 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_RESET_PASSWORD_PATH?: string;
   readonly VITE_AUTH_CONFIRM_EMAIL_PATH?: string;
   readonly VITE_AUTH_RESEND_OTP_PATH?: string;
+  readonly VITE_DASHBOARD_SUMMARY_PATH?: string;
+  readonly VITE_DASHBOARD_NOTIFICATIONS_PATH?: string;
+  readonly VITE_DASHBOARD_NOTIFICATIONS_READ_PATH?: string;
+  readonly VITE_VENDOR_LISTINGS_PATH?: string;
+  readonly VITE_LISTINGS_CATEGORIES_PATH?: string;
 }
 
 interface ImportMeta {

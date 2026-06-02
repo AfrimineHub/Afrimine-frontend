@@ -1,86 +1,104 @@
+import { useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { AdsFilterBar } from '../components/AdsFilterBar';
 import { AdListItem } from '../components/AdListItem';
+import { useVendorListingsQuery } from '@/features/listings/queries';
+import {
+  formatListingDate,
+  formatListingPrice,
+  getCategoryLabel,
+  mapListingStatusToDisplay,
+} from '@/features/listings/utils';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
-const mockAds = [
-  {
-    image: '/images/listings/gold-ore.png',
-    title: 'Premium Gold Ore - High Grade',
-    category: 'Mineral',
-    status: 'Active' as const,
-    price: '₦900,000',
-    stats: { views: 1247, inquiries: 34 },
-    date: 'March 15, 2026',
-  },
-  {
-    image: '/images/listings/heavy-duty-excavator.png',
-    title: 'Heavy Duty Mining Excavator',
-    category: 'Equipment',
-    status: 'Active' as const,
-    price: '₦500,000',
-    stats: { views: 832, inquiries: 18 },
-    date: 'March 10, 2026',
-  },
-  {
-    image: '/images/listings/copper-min-conc.png',
-    title: 'Copper Mineral Concentrate',
-    category: 'Mineral',
-    status: 'Pending' as const,
-    price: '₦800,000',
-    stats: { views: 458, inquiries: 12 },
-    date: 'March 20, 2026',
-  },
-  {
-    image: '/images/listings/diamond-mine-site.png',
-    title: 'Diamond Mining Site - Lease',
-    category: 'Site',
-    status: 'Active' as const,
-    price: '₦1000,000',
-    stats: { views: 2543, inquiries: 90 },
-    date: 'March 5, 2026',
-  },
-  {
-    image: '/images/listings/industrial-rock-crusher.png',
-    title: 'Industrial Rock Crusher Equipment',
-    category: 'Equipment',
-    status: 'Rejected' as const,
-    price: '₦270,000',
-    stats: { views: 123, inquiries: 2 },
-    date: 'March 18, 2026',
-  },
-  // Add more items matching the image...
-];
+const PLACEHOLDER_IMAGE = '/images/listings/gold-ore.png';
 
 const MyAdsPage = () => {
+  const location = useLocation();
+  const listingCreated = Boolean((location.state as { listingCreated?: boolean } | null)?.listingCreated);
+
+  const listingsQuery = useVendorListingsQuery({ page: 1, pageSize: 20 });
+  const listings = listingsQuery.data?.items ?? [];
+
+  const rows = useMemo(
+    () =>
+      listings.map((listing) => ({
+        id: listing.id,
+        image: listing.imageUrl ?? PLACEHOLDER_IMAGE,
+        title: listing.title,
+        category: getCategoryLabel(listing),
+        status: mapListingStatusToDisplay(listing.status),
+        price: formatListingPrice(listing),
+        stats: {
+          views: listing.viewsCount ?? 0,
+          inquiries: listing.inquiriesCount ?? 0,
+        },
+        date: formatListingDate(listing.createdAt),
+      })),
+    [listings],
+  );
+
+  const loadError =
+    listingsQuery.isError &&
+    getApiErrorMessage(listingsQuery.error, 'Could not load your listings.');
+
   return (
     <div className="min-h-screen bg-white p-6 md:p-10">
+      {listingCreated ? (
+        <p className="mb-4 text-sm text-emerald-700 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
+          Listing submitted successfully. It will appear here once reviewed.
+        </p>
+      ) : null}
+
       <AdsFilterBar />
 
-      <div className="mt-8 overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-              <th className="pb-4 px-4">Listings</th>
-              <th className="pb-4 px-4">Status</th>
-              <th className="pb-4 px-4">Category</th>
-              <th className="pb-4 px-4">Price</th>
-              <th className="pb-4 px-4">Performance</th>
-              <th className="pb-4 px-4">Date Created</th>
-              <th className="pb-4 px-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockAds.map((ad, index) => (
-              <AdListItem key={index} {...ad} />
-            ))}
-          </tbody>
-        </table>
-        
-        {/* Simple Pagination Footer */}
-        <div className="flex justify-end mt-6 gap-2">
-           <button className="px-3 py-1 rounded bg-yellow-500 text-white text-xs font-bold cursor-pointer">1</button>
-           <button className="px-3 py-1 rounded border border-gray-200 text-gray-500 text-xs hover:bg-gray-50 cursor-pointer">2</button>
+      {listingsQuery.isLoading ? (
+        <div className="mt-8 space-y-4" aria-busy="true">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
+          ))}
         </div>
-      </div>
+      ) : loadError ? (
+        <div className="mt-8 rounded-xl border border-amber-100 bg-amber-50 px-4 py-6 text-center">
+          <p className="text-sm text-amber-800 mb-2">{loadError}</p>
+          <p className="text-xs text-amber-700">
+            If the listings API is not deployed yet, you can still create a listing — it will be sent to{' '}
+            <code className="text-[11px]">POST /vendor/listings</code> when the backend is ready.
+          </p>
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="mt-8 rounded-xl border border-dashed border-gray-200 px-6 py-12 text-center">
+          <p className="text-slate-700 font-medium mb-1">No listings yet</p>
+          <p className="text-sm text-gray-500 mb-4">Create your first mineral, site, or equipment listing.</p>
+          <Link
+            to="/my-ad/new"
+            className="inline-flex items-center justify-center px-5 py-2.5 text-sm font-bold text-white bg-yellow-600 rounded-xl hover:bg-yellow-700"
+          >
+            Create listing
+          </Link>
+        </div>
+      ) : (
+        <div className="mt-8 overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+                <th className="pb-4 px-4">Listings</th>
+                <th className="pb-4 px-4">Status</th>
+                <th className="pb-4 px-4">Category</th>
+                <th className="pb-4 px-4">Price</th>
+                <th className="pb-4 px-4">Performance</th>
+                <th className="pb-4 px-4">Date Created</th>
+                <th className="pb-4 px-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((ad) => (
+                <AdListItem key={ad.id} {...ad} />
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
