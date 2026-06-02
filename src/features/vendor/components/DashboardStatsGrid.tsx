@@ -1,27 +1,47 @@
 import React from 'react';
 import { FileText, ShoppingCart, Package, Clock, Check, Wallet } from 'lucide-react';
+import type { DashboardSummary } from '@/features/vendor/types';
 
-const stats = [
-  { label: 'Total Listings', value: '24', icon: Package, color: 'text-white', bg: 'bg-blue-400' },
-  { label: 'Active Quotes', value: '12', icon: FileText, color: 'text-white', bg: 'bg-purple-400' },
-  { label: 'Ongoing Orders', value: '8', icon: ShoppingCart, color: 'text-white', bg: 'bg-green-400' },
-  { label: 'Total Earnings', value: '₦45,280', icon: Wallet, color: 'text-white', bg: 'bg-yellow-600' },
-  { label: 'Pending Payout', value: '₦8,450', icon: Clock, color: 'text-white', bg: 'bg-orange-600' },
-  { label: 'Successful Orders', value: '10', icon: Check, color: 'text-white', bg: 'bg-emerald-500' },
-];
+const PLACEHOLDER_STATS = [
+  { key: 'totalListings', label: 'Total Listings', value: '24', icon: Package, color: 'text-white', bg: 'bg-blue-400' },
+  { key: 'activeQuotes', label: 'Active Quotes', value: '12', icon: FileText, color: 'text-white', bg: 'bg-purple-400' },
+  { key: 'ongoingOrders', label: 'Ongoing Orders', value: '—', icon: ShoppingCart, color: 'text-white', bg: 'bg-green-400', fromApi: true },
+  { key: 'totalEarnings', label: 'Total Earnings', value: '₦45,280', icon: Wallet, color: 'text-white', bg: 'bg-yellow-600' },
+  { key: 'pendingPayout', label: 'Pending Payout', value: '₦8,450', icon: Clock, color: 'text-white', bg: 'bg-orange-600' },
+  { key: 'successfulOrders', label: 'Successful Orders', value: '10', icon: Check, color: 'text-white', bg: 'bg-emerald-500' },
+] as const;
 
-export const DashboardStatsGrid: React.FC = () => {
+interface DashboardStatsGridProps {
+  summary?: DashboardSummary;
+  isLoading?: boolean;
+}
+
+export const DashboardStatsGrid: React.FC<DashboardStatsGridProps> = ({ summary, isLoading }) => {
+  const stats = PLACEHOLDER_STATS.map((stat) => {
+    if (stat.key === 'ongoingOrders' && summary) {
+      return { ...stat, value: String(summary.ongoingOrdersCount) };
+    }
+    return stat;
+  });
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
-      {stats.map((stat, idx) => (
-        <div key={idx} className="flex flex-col justify-between min-w-0 p-3 sm:p-4 bg-white border border-gray-100 shadow-sm rounded-xl min-h-[7rem] sm:h-28 hover:shadow-md transition-shadow">
+      {stats.map((stat) => (
+        <div
+          key={stat.key}
+          className="flex flex-col justify-between min-w-0 p-3 sm:p-4 bg-white border border-gray-100 shadow-sm rounded-xl min-h-[7rem] sm:h-28 hover:shadow-md transition-shadow"
+        >
           <div className="flex items-start justify-between gap-2 min-w-0">
             <p className="text-[11px] leading-tight sm:text-xs font-medium text-gray-500 line-clamp-2">{stat.label}</p>
             <div className={`p-1.5 rounded-md shrink-0 ${stat.bg} ${stat.color}`}>
               <stat.icon size={16} aria-hidden />
             </div>
           </div>
-          <h4 className="text-lg sm:text-xl font-bold text-slate-900 tabular-nums truncate">{stat.value}</h4>
+          {isLoading && stat ? (
+            <div className="h-7 w-12 bg-gray-100 rounded animate-pulse" aria-hidden />
+          ) : (
+            <h4 className="text-lg sm:text-xl font-bold text-slate-900 tabular-nums truncate">{stat.value}</h4>
+          )}
         </div>
       ))}
     </div>

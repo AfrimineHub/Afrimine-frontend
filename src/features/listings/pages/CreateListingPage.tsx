@@ -1,0 +1,31 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
+import { CreateListingForm } from '@/features/listings/components/CreateListingForm';
+
+const CreateListingPage: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <Link
+          to="/my-ad"
+          className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-yellow-700 mb-6"
+        >
+          <ArrowLeft size={16} aria-hidden />
+          Back to My Listings
+        </Link>
+
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Create listing</h1>
+          <p className="text-sm text-gray-500 mt-2">
+            List minerals, mining sites, equipment, or manpower for buyers on Afrimine.
+          </p>
+        </div>
+
+        <CreateListingForm />
+      </div>
+    </div>
+  );
+};
+
+export default CreateListingPage;

@@ -6,9 +6,20 @@ import { DashboardOverviewCards } from '../components/DashboardOverviewCards';
 import { DashboardStatsGrid } from '../components/DashboardStatsGrid';
 import { ListingPerformanceTable } from '../components/ListingPerformanceTable';
 import { RecentActivityFeed } from '../components/RecentActivityFeed';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { useDashboardNotificationsQuery, useDashboardSummaryQuery } from '@/features/vendor/queries';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 export const VendorDashboardPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { user } = useAuth();
+
+  const summaryQuery = useDashboardSummaryQuery();
+  const notificationsQuery = useDashboardNotificationsQuery();
+
+  const displayName = user?.fullName ?? user?.companyName;
+  const summaryError =
+    summaryQuery.isError && getApiErrorMessage(summaryQuery.error, 'Could not load dashboard summary.');
 
   useEffect(() => {
     if (!isSidebarOpen) return;
@@ -21,7 +32,6 @@ export const VendorDashboardPage: React.FC = () => {
 
   return (
     <div className="flex w-full bg-gray-50">
-      {/* Sidebar - Hidden on mobile, Drawer on click */}
       <div
         className={`
         fixed inset-y-0 left-0 z-50 w-64 max-w-[min(16rem,100vw)] bg-white transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 lg:max-w-none
@@ -31,18 +41,15 @@ export const VendorDashboardPage: React.FC = () => {
         <DashboardSidebar onClose={() => setIsSidebarOpen(false)} />
       </div>
 
-      {/* Mobile Overlay */}
       {isSidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden overscroll-none touch-none" 
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden overscroll-none touch-none"
           onClick={() => setIsSidebarOpen(false)}
           aria-hidden
         />
       )}
-      
-      {/* Main Content Area */}
+
       <main className="flex-1 flex flex-col min-w-0">
-        {/* Mobile Top Bar */}
         <div className="lg:hidden shrink-0 flex items-center justify-between gap-3 px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4 bg-white border-b border-gray-100">
           <button
             type="button"
@@ -55,13 +62,31 @@ export const VendorDashboardPage: React.FC = () => {
         </div>
 
         <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full pb-[max(1.5rem,calc(1.5rem+env(safe-area-inset-bottom)))]">
-          <DashboardHeader />
+          {summaryError ? (
+            <p className="mb-4 text-sm text-red-600 rounded-lg border border-red-100 bg-red-50 px-4 py-3" role="alert">
+              {summaryError}
+            </p>
+          ) : null}
+
+          <DashboardHeader
+            displayName={displayName}
+            unreadMessagesCount={summaryQuery.data?.unreadMessagesCount}
+          />
           <DashboardOverviewCards />
-          <DashboardStatsGrid />
-          
+          <DashboardStatsGrid summary={summaryQuery.data} isLoading={summaryQuery.isLoading} />
+
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <ListingPerformanceTable />
-            <RecentActivityFeed />
+            <RecentActivityFeed
+              notifications={notificationsQuery.data}
+              isLoading={notificationsQuery.isLoading}
+              isError={notificationsQuery.isError}
+              errorMessage={
+                notificationsQuery.isError
+                  ? getApiErrorMessage(notificationsQuery.error, 'Could not load recent activity.')
+                  : undefined
+              }
+            />
           </div>
         </div>
       </main>

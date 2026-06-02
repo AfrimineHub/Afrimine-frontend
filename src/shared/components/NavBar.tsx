@@ -72,7 +72,7 @@ const Navbar = () => {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
+                className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer"
                 aria-label="Log out"
               >
                 <LogOut size={18} />
@@ -141,7 +141,7 @@ const Navbar = () => {
                 setIsOpen(false);
                 void handleLogout();
               }}
-              className="text-left text-gray-300 py-2 flex items-center gap-2"
+              className="text-left text-gray-300 py-2 flex items-center gap-2 cursor-pointer"
             >
               <LogOut size={16} /> Log out
             </button>

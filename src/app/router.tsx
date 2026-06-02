@@ -12,6 +12,7 @@ import ResendOtpPage from '../features/auth/pages/ResendOtpPage';
 import MainLayout from "@/layouts/Mainlayout/MainLayout";
 import MarketplacePage from "@/features/marketplace/pages/MarketplacePage";
 import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
+import CreateListingPage from "@/features/listings/pages/CreateListingPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
@@ -106,6 +107,7 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute />,
         children: [
           { path: "my-ad", element: <MyAdsPage /> },
+          { path: "my-ad/new", element: <CreateListingPage /> },
           { path: "my-order", element: <MyOrdersPage /> },
           { path: "messages", element: <MessagesPage /> },
           { path: "vendor-dashboard", element: <VendorDashboardPage /> },
