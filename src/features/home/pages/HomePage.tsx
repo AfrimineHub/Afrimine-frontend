@@ -1,18 +1,22 @@
 import { Search, Bell, Bookmark, MessageSquare, Package, ChevronRight, Home } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import DataListSection from '../components/DataListSection';
 import ProjectCard from '../components/ProjectCard';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 
 const HomePage = () => {
+  const { user } = useAuth();
+  const displayName = user?.fullName ?? user?.companyName ?? 'there';
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
-      {/* HEADER SECTION */}
       <div className="mb-8">
       <nav className="flex items-center gap-2 text-[10px] text-gray-400 mb-2">
-          <span><Home size={16} /></span> <span>Home</span>  
+          <span><Home size={16} /></span> <span>Dashboard</span>
         </nav>
-        <h1 className="text-2xl font-bold text-gray-900">Welcome Back, John</h1>
-        <p className="text-gray-500 text-sm">Find mining opportunities that match your interest.</p>
+        <h1 className="text-2xl font-bold text-gray-900">Welcome back, {displayName}</h1>
+        <p className="text-gray-500 text-sm">Find mining opportunities that match your interests.</p>
         
         <div className="mt-6 flex gap-4 max-w-4xl">
           <div className="relative flex-1">
@@ -31,27 +35,41 @@ const HomePage = () => {
 
       {/* STATS / ACTION BAR */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-10">
-        <StatCard 
-          icon={<Bookmark size={18} className='fill-yellow-500' />} 
-          label="Saved Listings" count={30} 
+        <Link to="/marketplace" className="block hover:opacity-90 transition-opacity">
+          <StatCard
+            icon={<Bookmark size={18} className="fill-yellow-500" />}
+            label="Saved Listings"
+            count={30}
           />
-        <StatCard 
-          icon={<MessageSquare size={18} 
-          className='fill-yellow-500' />} 
-          label="Messages" 
-          count={5} badge="new" 
+        </Link>
+        <Link to="/messages" className="block hover:opacity-90 transition-opacity">
+          <StatCard
+            icon={<MessageSquare size={18} className="fill-yellow-500" />}
+            label="Messages"
+            count={5}
+            badge="new"
           />
-        <StatCard 
-          icon={<MessageSquare size={18} className='fill-yellow-500' />} 
-          label="Messages" count={10} />
-        <StatCard 
-          icon={<Package size={18} className='fill-yellow-500'/>} 
-          label="Ongoing Order" count={10} />
-        <button 
-          className="bg-yellow-500 text-white rounded-xl flex items-center justify-center gap-2 font-bold hover:bg-orange-600 cursor-pointer"
-          >
-          List Item
-        </button>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+        </Link>
+        <Link to="/rfq" className="block hover:opacity-90 transition-opacity">
+          <StatCard
+            icon={<Search size={18} className="text-yellow-500" />}
+            label="Open RFQs"
+            count={10}
+          />
+        </Link>
+        <Link to="/my-order" className="block hover:opacity-90 transition-opacity">
+          <StatCard
+            icon={<Package size={18} className="fill-yellow-500" />}
+            label="Ongoing Orders"
+            count={10}
+          />
+        </Link>
+        <Link
+          to="/marketplace"
+          className="bg-yellow-500 text-white rounded-xl flex items-center justify-center gap-2 font-bold hover:bg-orange-600 min-h-[72px]"
+        >
+          Browse marketplace
+        </Link>
       </div>
 
       {/* RECOMMENDED FOR YOU */}

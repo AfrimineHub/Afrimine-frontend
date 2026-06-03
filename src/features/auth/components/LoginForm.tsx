@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Input } from '@/shared/inputs/Input';
 import { Button } from '@/shared/buttons/Button';
 import { useLoginMutation } from '@/features/auth/queries';
+import { resolvePostAuthPath } from '@/features/auth/routes';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 export const LoginForm = () => {
@@ -15,7 +16,7 @@ export const LoginForm = () => {
   const [error, setError] = useState<string | null>(null);
 
   const locationState = location.state as { from?: string; message?: string } | null;
-  const returnTo = locationState?.from ?? '/vendor-dashboard';
+  const requestedPath = locationState?.from;
   const successMessage = locationState?.message ?? null;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -23,8 +24,8 @@ export const LoginForm = () => {
     setError(null);
 
     try {
-      await loginMutation.mutateAsync({ email, password });
-      navigate(returnTo, { replace: true });
+      const { user } = await loginMutation.mutateAsync({ email, password });
+      navigate(resolvePostAuthPath(user, requestedPath), { replace: true });
     } catch (err) {
       setError(getApiErrorMessage(err, 'Login failed'));
     }

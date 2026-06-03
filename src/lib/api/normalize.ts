@@ -20,17 +20,27 @@ export function extractAccessToken(data: JsonRecord): string {
   return token;
 }
 
+function readUserType(record: JsonRecord): UserType | undefined {
+  const rawType = record.type ?? record.userType ?? record.user_type;
+  return typeof rawType === 'number' ? (rawType as UserType) : undefined;
+}
+
+function isAuthTokenPayload(record: JsonRecord): boolean {
+  return Boolean(readAccessToken(record)) && typeof record.email !== 'string';
+}
+
 export function extractUser(data: JsonRecord): AuthUser | undefined {
   const raw = data.user ?? (typeof data.data === 'object' && data.data !== null ? data.data : undefined);
   if (!raw || typeof raw !== 'object') return undefined;
 
   const record = raw as JsonRecord;
-  
-  const id = record.id ?? record._id ?? record.userId ?? record.user_id ?? record.email;
-  const email = record.email;
+  if (isAuthTokenPayload(record)) return undefined;
 
-  if (typeof id !== 'string' && typeof id !== 'number') return undefined;
+  const email = record.email;
   if (typeof email !== 'string') return undefined;
+
+  const id = record.id ?? record._id ?? record.userId ?? record.user_id ?? email;
+  if (typeof id !== 'string' && typeof id !== 'number') return undefined;
 
   return {
     id: String(id),
@@ -57,6 +67,6 @@ export function extractUser(data: JsonRecord): AuthUser | undefined {
           : typeof record.phone_number === 'string'
             ? record.phone_number
             : undefined,
-    type: typeof record.type === 'number' ? record.type as UserType : undefined,
+    type: readUserType(record),
   };
 }

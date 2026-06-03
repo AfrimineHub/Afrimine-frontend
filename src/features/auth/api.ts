@@ -30,10 +30,10 @@ async function fetchCurrentUser(): Promise<AuthUser> {
 
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const { data } = await apiClient.post(authPaths.login, payload);
-  const record = data as Record<string, unknown>;
-  const accessToken = extractAccessToken(record);
+  const accessToken = extractAccessToken(data as Record<string, unknown>);
   setAccessToken(accessToken);
-  const user = extractUser(record) ?? (await fetchCurrentUser());
+  // Login only returns an access token — load the session profile from auth/current.
+  const user = await fetchCurrentUser();
   return { accessToken, user };
 }
 
