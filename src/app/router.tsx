@@ -35,6 +35,10 @@ import KYCVerificationQueue from "@/features/admin/pages/KYCVerificationQueue";
 import KYCReviewDetail from "@/features/admin/components/KYCReviewDetail";
 import { GuestOnly } from "@/features/auth/components/GuestRoute";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
+import { RoleGuard } from "@/features/auth/components/RoleGuard";
+import { USER_TYPES } from "@/features/auth/types";
+import BuyerDashboardPage from "@/features/buyer/pages/BuyerDashboardPage";
+import InvestorDashboardPage from "@/features/investor/pages/InvestorDashboardPage";
 
 export const router = createBrowserRouter([
   {
@@ -106,29 +110,47 @@ export const router = createBrowserRouter([
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "my-ad", element: <MyAdsPage /> },
-          { path: "my-ad/new", element: <CreateListingPage /> },
-          { path: "my-order", element: <MyOrdersPage /> },
           { path: "messages", element: <MessagesPage /> },
-          { path: "vendor-dashboard", element: <VendorDashboardPage /> },
-          { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
-          { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
-          { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
-          { path: "/dashboard/my-payouts", element: <PayoutPage /> },
-          { path: "/dashboard/my-kyc", element: <KycPage /> },
-          { path: "/vendor-profile", element: <VendorProfilePage /> },
-          { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
-          { path: "/rfq", element: <RfqPage /> },
-          { path: "/notification", element: <NotificationsPage /> },
-          { path: "/admin", element: <AdminDashboard /> },
-          { path: "/admin/listings", element: <AdminListingsManagement /> },
-          { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
-          { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
-          { path: "/admin/dispute", element: <AdminDisputePage /> },
-          { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },
-          { path: "/admin/kyc/review", element: <KYCReviewDetail /> },
-          { path: "/admin/user-management", element: <UsersManagementPage /> },
-          { path: "/vendor", element: <Navigate to="/vendor-profile" replace /> },
+          { path: "my-order", element: <MyOrdersPage /> },
+          { path: "rfq", element: <RfqPage /> },
+          { path: "notification", element: <NotificationsPage /> },
+          {
+            element: <RoleGuard allowed={[USER_TYPES.buyer]} />,
+            children: [{ path: "buyer-dashboard", element: <BuyerDashboardPage /> }],
+          },
+          {
+            element: <RoleGuard allowed={[USER_TYPES.investor]} />,
+            children: [{ path: "investor-dashboard", element: <InvestorDashboardPage /> }],
+          },
+          {
+            element: <RoleGuard allowed={[USER_TYPES.vendor, USER_TYPES.supplier]} />,
+            children: [
+              { path: "vendor-dashboard", element: <VendorDashboardPage /> },
+              { path: "my-ad", element: <MyAdsPage /> },
+              { path: "my-ad/new", element: <CreateListingPage /> },
+              { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
+              { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
+              { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
+              { path: "/dashboard/my-payouts", element: <PayoutPage /> },
+              { path: "/dashboard/my-kyc", element: <KycPage /> },
+              { path: "/vendor-profile", element: <VendorProfilePage /> },
+              { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
+              { path: "/vendor", element: <Navigate to="/vendor-profile" replace /> },
+            ],
+          },
+          {
+            element: <RoleGuard allowed={[USER_TYPES.superAdmin]} />,
+            children: [
+              { path: "/admin", element: <AdminDashboard /> },
+              { path: "/admin/listings", element: <AdminListingsManagement /> },
+              { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
+              { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
+              { path: "/admin/dispute", element: <AdminDisputePage /> },
+              { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },
+              { path: "/admin/kyc/review", element: <KYCReviewDetail /> },
+              { path: "/admin/user-management", element: <UsersManagementPage /> },
+            ],
+          },
         ],
       },
     ],

@@ -1,12 +1,11 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-
-const DEFAULT_AUTH_REDIRECT = '/vendor-dashboard';
+import { getHomePathForUser } from '@/features/auth/routes';
 
 /** Redirects authenticated users away from login/register only. */
 export function GuestOnly({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -17,7 +16,7 @@ export function GuestOnly({ children }: { children: ReactNode }) {
   }
 
   if (isAuthenticated) {
-    return <Navigate to={DEFAULT_AUTH_REDIRECT} replace />;
+    return <Navigate to={getHomePathForUser(user)} replace />;
   }
 
   return <>{children}</>;
