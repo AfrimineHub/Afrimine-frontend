@@ -31,6 +31,8 @@ import AdminListingsManagement from "@/features/admin/pages/AdminListingsManagem
 import AdminAllQuotesPage from "@/features/admin/pages/AdminAllQuotesPage";
 import AdminOrderTrackingPage from "@/features/admin/pages/AdminOrderTrackingPage";
 import AdminDisputePage from "@/features/admin/pages/AdminDisputePage";
+import RevenueDashboard from "@/features/admin/pages/RevenueDashboard";
+import AdminVendorWithdrawals from "@/features/admin/pages/AdminVendorWithdrawals";
 import KYCVerificationQueue from "@/features/admin/pages/KYCVerificationQueue";
 import KYCReviewDetail from "@/features/admin/components/KYCReviewDetail";
 import { GuestOnly } from "@/features/auth/components/GuestRoute";
@@ -146,6 +148,8 @@ export const router = createBrowserRouter([
               { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
               { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
               { path: "/admin/dispute", element: <AdminDisputePage /> },
+              { path: "/admin/revenue", element: <RevenueDashboard /> },
+              { path: "/admin/vendor-withdrawals", element: <AdminVendorWithdrawals /> },
               { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },
               { path: "/admin/kyc/review", element: <KYCReviewDetail /> },
               { path: "/admin/user-management", element: <UsersManagementPage /> },

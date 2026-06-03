@@ -7,7 +7,8 @@ import { DashboardStatsGrid } from '../components/DashboardStatsGrid';
 import { ListingPerformanceTable } from '../components/ListingPerformanceTable';
 import { RecentActivityFeed } from '../components/RecentActivityFeed';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useDashboardNotificationsQuery, useDashboardSummaryQuery } from '@/features/vendor/queries';
+import { useDashboardNotificationsQuery, useDashboardSummaryQuery } from '@/features/dashboard/queries';
+import { useVendorListingsQuery } from '@/features/listings/queries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 export const VendorDashboardPage: React.FC = () => {
@@ -16,6 +17,7 @@ export const VendorDashboardPage: React.FC = () => {
 
   const summaryQuery = useDashboardSummaryQuery();
   const notificationsQuery = useDashboardNotificationsQuery();
+  const listingsQuery = useVendorListingsQuery({ page: 1, pageSize: 1 });
 
   const displayName = user?.fullName ?? user?.companyName;
   const summaryError =
@@ -73,7 +75,11 @@ export const VendorDashboardPage: React.FC = () => {
             unreadMessagesCount={summaryQuery.data?.unreadMessagesCount}
           />
           <DashboardOverviewCards />
-          <DashboardStatsGrid summary={summaryQuery.data} isLoading={summaryQuery.isLoading} />
+          <DashboardStatsGrid
+            summary={summaryQuery.data}
+            totalListings={listingsQuery.data?.totalCount ?? null}
+            isLoading={summaryQuery.isLoading || listingsQuery.isLoading}
+          />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <ListingPerformanceTable />

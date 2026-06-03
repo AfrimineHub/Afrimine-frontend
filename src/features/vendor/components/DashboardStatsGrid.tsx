@@ -1,28 +1,81 @@
 import React from 'react';
-import { FileText, ShoppingCart, Package, Clock, Check, Wallet } from 'lucide-react';
-import type { DashboardSummary } from '@/features/vendor/types';
+import { FileText, ShoppingCart, Package, Clock, Check, MessageSquare } from 'lucide-react';
+import type { DashboardSummary } from '@/features/dashboard/types';
 
-const PLACEHOLDER_STATS = [
-  { key: 'totalListings', label: 'Total Listings', value: '24', icon: Package, color: 'text-white', bg: 'bg-blue-400' },
-  { key: 'activeQuotes', label: 'Active Quotes', value: '12', icon: FileText, color: 'text-white', bg: 'bg-purple-400' },
-  { key: 'ongoingOrders', label: 'Ongoing Orders', value: '—', icon: ShoppingCart, color: 'text-white', bg: 'bg-green-400', fromApi: true },
-  { key: 'totalEarnings', label: 'Total Earnings', value: '₦45,280', icon: Wallet, color: 'text-white', bg: 'bg-yellow-600' },
-  { key: 'pendingPayout', label: 'Pending Payout', value: '₦8,450', icon: Clock, color: 'text-white', bg: 'bg-orange-600' },
-  { key: 'successfulOrders', label: 'Successful Orders', value: '10', icon: Check, color: 'text-white', bg: 'bg-emerald-500' },
-] as const;
+interface StatItem {
+  key: string;
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ size?: number; className?: string; 'aria-hidden'?: boolean }>;
+  color: string;
+  bg: string;
+  fromApi?: boolean;
+}
 
 interface DashboardStatsGridProps {
   summary?: DashboardSummary;
+  totalListings?: number | null;
   isLoading?: boolean;
 }
 
-export const DashboardStatsGrid: React.FC<DashboardStatsGridProps> = ({ summary, isLoading }) => {
-  const stats = PLACEHOLDER_STATS.map((stat) => {
-    if (stat.key === 'ongoingOrders' && summary) {
-      return { ...stat, value: String(summary.ongoingOrdersCount) };
-    }
-    return stat;
-  });
+export const DashboardStatsGrid: React.FC<DashboardStatsGridProps> = ({
+  summary,
+  totalListings,
+  isLoading,
+}) => {
+  const stats: StatItem[] = [
+    {
+      key: 'totalListings',
+      label: 'Total Listings',
+      value: totalListings != null ? String(totalListings) : '—',
+      icon: Package,
+      color: 'text-white',
+      bg: 'bg-blue-400',
+      fromApi: totalListings != null,
+    },
+    {
+      key: 'activeQuotes',
+      label: 'Active Quotes',
+      value: '—',
+      icon: FileText,
+      color: 'text-white',
+      bg: 'bg-purple-400',
+    },
+    {
+      key: 'ongoingOrders',
+      label: 'Ongoing Orders',
+      value: summary ? String(summary.ongoingOrdersCount) : '—',
+      icon: ShoppingCart,
+      color: 'text-white',
+      bg: 'bg-green-400',
+      fromApi: true,
+    },
+    {
+      key: 'unreadMessages',
+      label: 'Unread Messages',
+      value: summary ? String(summary.unreadMessagesCount) : '—',
+      icon: MessageSquare,
+      color: 'text-white',
+      bg: 'bg-sky-500',
+      fromApi: true,
+    },
+    {
+      key: 'pendingPayout',
+      label: 'Pending Payout',
+      value: '—',
+      icon: Clock,
+      color: 'text-white',
+      bg: 'bg-orange-600',
+    },
+    {
+      key: 'successfulOrders',
+      label: 'Successful Orders',
+      value: '—',
+      icon: Check,
+      color: 'text-white',
+      bg: 'bg-emerald-500',
+    },
+  ];
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
@@ -37,7 +90,7 @@ export const DashboardStatsGrid: React.FC<DashboardStatsGridProps> = ({ summary,
               <stat.icon size={16} aria-hidden />
             </div>
           </div>
-          {isLoading && stat ? (
+          {isLoading && stat.fromApi ? (
             <div className="h-7 w-12 bg-gray-100 rounded animate-pulse" aria-hidden />
           ) : (
             <h4 className="text-lg sm:text-xl font-bold text-slate-900 tabular-nums truncate">{stat.value}</h4>

@@ -8,7 +8,7 @@ import {
   CreditCard,
   type LucideIcon,
 } from 'lucide-react';
-import type { DashboardNotification } from '@/features/vendor/types';
+import type { DashboardNotification } from '@/features/dashboard/types';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 interface RecentActivityFeedProps {
   notifications?: DashboardNotification[];
