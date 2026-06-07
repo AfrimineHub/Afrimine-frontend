@@ -15,7 +15,9 @@ const PLACEHOLDER_IMAGE = '/images/listings/gold-ore.png';
 
 const MyAdsPage = () => {
   const location = useLocation();
-  const listingCreated = Boolean((location.state as { listingCreated?: boolean } | null)?.listingCreated);
+  const locationState = location.state as { listingCreated?: boolean; listingUpdated?: boolean } | null;
+  const listingCreated = Boolean(locationState?.listingCreated);
+  const listingUpdated = Boolean(locationState?.listingUpdated);
 
   const listingsQuery = useVendorListingsQuery({ page: 1, pageSize: 20 });
   const listings = listingsQuery.data?.items ?? [];
@@ -47,6 +49,11 @@ const MyAdsPage = () => {
       {listingCreated ? (
         <p className="mb-4 text-sm text-emerald-700 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
           Listing submitted successfully. It will appear here once reviewed.
+        </p>
+      ) : null}
+      {listingUpdated ? (
+        <p className="mb-4 text-sm text-emerald-700 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
+          Listing updated successfully.
         </p>
       ) : null}
 

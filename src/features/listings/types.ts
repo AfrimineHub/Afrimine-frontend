@@ -1,5 +1,12 @@
 import type { ListingCategoryType, ListingStatus } from '@/features/listings/constants';
 
+export interface ListingImage {
+  id: string;
+  url: string;
+  isPrimary?: boolean;
+  sortOrder?: number;
+}
+
 export interface VendorListing {
   id: string;
   title: string;
@@ -14,12 +21,26 @@ export interface VendorListing {
   priceCurrency?: string | null;
   priceUnit?: string | null;
   priceDisplay?: string | null;
+  contactInfo?: string | null;
+  adminReviewNote?: string | null;
   imageUrl?: string | null;
+  images?: ListingImage[];
   viewsCount?: number;
   inquiriesCount?: number;
   savesCount?: number;
   createdAt: string;
   updatedAt?: string;
+  publishedAt?: string | null;
+}
+
+export interface UpdateListingPayload {
+  title?: string;
+  description?: string;
+  location?: string;
+  country?: string;
+  priceDescription?: string;
+  contactInfo?: string;
+  category?: ListingCategoryType;
 }
 
 export interface CreateListingPayload {
