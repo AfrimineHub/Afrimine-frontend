@@ -159,7 +159,7 @@ export const CreateListingForm: React.FC = () => {
                   setCategoryType(option.value);
                   setErrors((prev) => ({ ...prev, categoryType: undefined }));
                 }}
-                className={`text-left p-4 rounded-xl border-2 transition-all ${
+                className={`text-left p-4 rounded-xl border-2 transition-all cursor-pointer ${
                   selected
                     ? 'border-yellow-500 bg-yellow-50/50 shadow-sm'
                     : 'border-gray-100 bg-white hover:border-gray-200'
