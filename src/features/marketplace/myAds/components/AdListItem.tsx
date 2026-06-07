@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Edit2, Trash2, ExternalLink, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, Edit2, Trash2, View, EyeOff, Loader2 } from 'lucide-react';
 import { useDeleteListingMutation } from '@/features/listings/queries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
@@ -45,7 +45,7 @@ export const AdListItem = ({
 
   const handleView = () => {
     setActionError(null);
-    window.open(`/my-ad/${id}`, '_blank', 'noopener,noreferrer');
+    navigate(`/my-ad/${id}`);
   };
 
   const handleDelete = async () => {
@@ -149,11 +149,11 @@ export const AdListItem = ({
                 <button
                   type="button"
                   onClick={handleView}
-                  className="p-1 hover:text-gray-900 transition-colors cursor-pointer"
+                  className="p-1 hover:text-blue-600 transition-colors cursor-pointer"
                   title="View listing"
                   disabled={deleteMutation.isPending}
                 >
-                  <ExternalLink size={16} />
+                  <View size={16} />
                 </button>
               </>
             )}
