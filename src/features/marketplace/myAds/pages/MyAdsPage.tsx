@@ -26,7 +26,7 @@ const MyAdsPage = () => {
     () =>
       listings.map((listing) => ({
         id: listing.id,
-        image: listing.imageUrl ?? PLACEHOLDER_IMAGE,
+        image: listing.imageUrl ?? listing.images?.[0]?.url ?? PLACEHOLDER_IMAGE,
         title: listing.title,
         category: getCategoryLabel(listing),
         status: mapListingStatusToDisplay(listing.status),
