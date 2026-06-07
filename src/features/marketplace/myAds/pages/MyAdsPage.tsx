@@ -7,11 +7,10 @@ import {
   formatListingDate,
   formatListingPrice,
   getCategoryLabel,
+  getListingImageUrl,
   mapListingStatusToDisplay,
 } from '@/features/listings/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
-
-const PLACEHOLDER_IMAGE = '/images/listings/gold-ore.png';
 
 const MyAdsPage = () => {
   const location = useLocation();
@@ -26,7 +25,7 @@ const MyAdsPage = () => {
     () =>
       listings.map((listing) => ({
         id: listing.id,
-        image: listing.imageUrl ?? listing.pimaryImageUrl ?? PLACEHOLDER_IMAGE,
+        image: getListingImageUrl(listing),
         title: listing.title,
         category: getCategoryLabel(listing),
         status: mapListingStatusToDisplay(listing.status),

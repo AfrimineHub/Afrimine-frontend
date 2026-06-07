@@ -24,7 +24,6 @@ export interface VendorListing {
   contactInfo?: string | null;
   adminReviewNote?: string | null;
   imageUrl?: string | null;
-  pimaryImageUrl?: string | null;
   images?: ListingImage[];
   viewsCount?: number;
   inquiriesCount?: number;

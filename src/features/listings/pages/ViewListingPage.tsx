@@ -6,11 +6,10 @@ import {
   formatListingDate,
   formatListingPrice,
   getCategoryLabel,
+  getListingImageUrl,
   mapListingStatusToDisplay,
 } from '@/features/listings/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
-
-const PLACEHOLDER_IMAGE = '/images/listings/gold-ore.png';
 
 const ViewListingPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -64,7 +63,7 @@ const ViewListingPage: React.FC = () => {
         ) : listing ? (
           <article className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden">
             <img
-              src={listing.imageUrl ?? PLACEHOLDER_IMAGE}
+              src={getListingImageUrl(listing)}
               alt={listing.title}
               className="w-full h-56 object-cover bg-gray-100"
             />
