@@ -6,6 +6,7 @@ import {
   fetchListingCategories,
   fetchVendorListing,
   fetchVendorListings,
+  publishVendorListing,
   updateVendorListing,
 } from '@/features/listings/api';
 import type {
@@ -76,6 +77,18 @@ export function useDeleteListingMutation() {
     mutationFn: (id: string) => deleteVendorListing(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: VENDOR_LISTINGS_QUERY_KEY });
+    },
+  });
+}
+
+export function usePublishListingMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => publishVendorListing(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: VENDOR_LISTINGS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: vendorListingQueryKey(id) });
     },
   });
 }

@@ -60,14 +60,6 @@ const Navbar = () => {
               <span className="absolute top-2 right-2 w-2 h-2 bg-yellow-500 rounded-full border-2 border-[#1A1A1A]" />
             </Link>
             <UserMenu user={user} onLogout={() => void handleLogout()} />
-            <button
-              type="button"
-              onClick={() => void handleLogout()}
-              className="md:hidden p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white cursor-pointer"
-              aria-label="Log out"
-            >
-              <LogOut size={18} />
-            </button>
           </>
         ) : (
           <div className="hidden md:flex items-center gap-4">
@@ -117,13 +109,20 @@ const Navbar = () => {
 
           {isAuthenticated ? (
             <>
-              <div className="my-2 border-t border-gray-700" />
+              <div className="mt-3 pt-3 border-t border-gray-700">
+                <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  Account
+                </p>
+                <p className="px-1 pb-3 text-sm font-medium text-white truncate">
+                  {user?.fullName ?? user?.email}
+                </p>
+              </div>
               {accountMenuLinks.map((link) => (
                 <Link
                   key={`account-${link.path}`}
                   to={link.path}
                   onClick={() => setIsOpen(false)}
-                  className="py-2.5 text-sm text-gray-400"
+                  className="block rounded-lg px-1 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white"
                 >
                   {link.label}
                 </Link>
@@ -134,9 +133,10 @@ const Navbar = () => {
                   setIsOpen(false);
                   void handleLogout();
                 }}
-                className="text-left py-2.5 text-sm text-gray-300 flex items-center gap-2 cursor-pointer"
+                className="mt-2 flex w-full items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-3 text-sm font-semibold text-red-300 transition-colors hover:bg-red-500/20 hover:text-red-200 cursor-pointer"
               >
-                <LogOut size={16} aria-hidden /> Log out
+                <LogOut size={16} aria-hidden />
+                Log out
               </button>
             </>
           ) : (

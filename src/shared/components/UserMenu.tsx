@@ -69,7 +69,7 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
               setIsOpen(false);
               onLogout();
             }}
-            className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white cursor-pointer"
+            className="mx-2 flex w-[calc(100%-1rem)] items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-red-300 transition-colors hover:bg-red-500/10 hover:text-red-200 cursor-pointer"
           >
             <LogOut size={16} aria-hidden />
             Log out
