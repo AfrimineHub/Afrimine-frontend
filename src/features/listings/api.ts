@@ -87,6 +87,10 @@ export function normalizeVendorListing(raw: RawListing): VendorListing {
       (raw.imageUrl as string | null | undefined) ??
       images?.[0]?.url ??
       null,
+    pimaryImageUrl:
+      (raw.primaryImageUrl as string | null | undefined) ??
+      (raw.imageUrl as string | null | undefined) ??
+      null,
     images,
     viewsCount: typeof raw.viewsCount === 'number' ? raw.viewsCount : 0,
     inquiriesCount: typeof raw.inquiriesCount === 'number' ? raw.inquiriesCount : 0,
