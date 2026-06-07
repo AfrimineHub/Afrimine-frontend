@@ -13,6 +13,8 @@ import MainLayout from "@/layouts/Mainlayout/MainLayout";
 import MarketplacePage from "@/features/marketplace/pages/MarketplacePage";
 import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
 import CreateListingPage from "@/features/listings/pages/CreateListingPage";
+import EditListingPage from "@/features/listings/pages/EditListingPage";
+import ViewListingPage from "@/features/listings/pages/ViewListingPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
@@ -130,6 +132,8 @@ export const router = createBrowserRouter([
               { path: "vendor-dashboard", element: <VendorDashboardPage /> },
               { path: "my-ad", element: <MyAdsPage /> },
               { path: "my-ad/new", element: <CreateListingPage /> },
+              { path: "my-ad/:id", element: <ViewListingPage /> },
+              { path: "my-ad/:id/edit", element: <EditListingPage /> },
               { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
               { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
               { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },

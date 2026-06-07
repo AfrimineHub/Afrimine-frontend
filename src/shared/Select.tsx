@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 export type SelectValue = string | number;
@@ -12,14 +12,25 @@ interface SelectProps<T extends SelectValue> {
   label: string;
   options: Option<T>[];
   placeholder?: string;
+  value?: T;
   onChange: (value: T) => void;
 }
 
 export const Select = <T extends SelectValue>({
-  label, options, placeholder, onChange 
+  label, options, placeholder, value, onChange 
 }: SelectProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<Option<T> | null>(null);
+  const [selected, setSelected] = useState<Option<T> | null>(
+    value != null ? options.find((option) => option.value === value) ?? null : null,
+  );
+
+  useEffect(() => {
+    if (value == null) {
+      setSelected(null);
+      return;
+    }
+    setSelected(options.find((option) => option.value === value) ?? null);
+  }, [value, options]);
 
   const handleSelect = (option: Option<T>) => {
     setSelected(option);
