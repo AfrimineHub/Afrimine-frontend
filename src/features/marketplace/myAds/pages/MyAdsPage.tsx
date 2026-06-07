@@ -8,15 +8,21 @@ import {
   formatListingPrice,
   getCategoryLabel,
   getListingImageUrl,
+  isDraftListing,
   mapListingStatusToDisplay,
 } from '@/features/listings/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 const MyAdsPage = () => {
   const location = useLocation();
-  const locationState = location.state as { listingCreated?: boolean; listingUpdated?: boolean } | null;
+  const locationState = location.state as {
+    listingCreated?: boolean;
+    listingUpdated?: boolean;
+    listingPublished?: boolean;
+  } | null;
   const listingCreated = Boolean(locationState?.listingCreated);
   const listingUpdated = Boolean(locationState?.listingUpdated);
+  const listingPublished = Boolean(locationState?.listingPublished);
 
   const listingsQuery = useVendorListingsQuery({ page: 1, pageSize: 20 });
   const listings = listingsQuery.data?.items ?? [];
@@ -29,6 +35,7 @@ const MyAdsPage = () => {
         title: listing.title,
         category: getCategoryLabel(listing),
         status: mapListingStatusToDisplay(listing.status),
+        isDraft: isDraftListing(listing.status),
         price: formatListingPrice(listing),
         stats: {
           views: listing.viewsCount ?? 0,
@@ -53,6 +60,11 @@ const MyAdsPage = () => {
       {listingUpdated ? (
         <p className="mb-4 text-sm text-emerald-700 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
           Listing updated successfully.
+        </p>
+      ) : null}
+      {listingPublished ? (
+        <p className="mb-4 text-sm text-emerald-700 rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3">
+          Listing submitted for review. It will be published once approved.
         </p>
       ) : null}
 
@@ -88,8 +100,8 @@ const MyAdsPage = () => {
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-                <th className="pb-4 px-4">Listings</th>
-                <th className="pb-4 px-4">Status</th>
+                <th className="pb-4 pl-3 pr-5 sm:px-4 min-w-[10.5rem]">Listings</th>
+                <th className="hidden sm:table-cell pb-4 px-4 min-w-[5.5rem]">Status</th>
                 <th className="pb-4 px-4">Category</th>
                 <th className="pb-4 px-4">Price</th>
                 <th className="pb-4 px-4">Performance</th>

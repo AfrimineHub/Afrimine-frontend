@@ -30,7 +30,7 @@ export function getListingImageUrl(listing: VendorListing): string {
   );
 }
 
-export type AdDisplayStatus = 'Active' | 'Pending' | 'Rejected';
+export type AdDisplayStatus = 'Active' | 'Draft' | 'Pending' | 'Rejected';
 
 export function mapListingStatusToDisplay(status: ListingStatus | string): AdDisplayStatus {
   switch (status) {
@@ -39,11 +39,16 @@ export function mapListingStatusToDisplay(status: ListingStatus | string): AdDis
     case 'rejected':
       return 'Rejected';
     case 'draft':
+      return 'Draft';
     case 'pending_review':
     case 'archived':
     default:
       return 'Pending';
   }
+}
+
+export function isDraftListing(status: ListingStatus | string): boolean {
+  return status === 'draft';
 }
 
 export function formatListingPrice(listing: VendorListing): string {
