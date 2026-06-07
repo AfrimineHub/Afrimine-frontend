@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, Edit2, Trash2, View, EyeOff, Loader2 } from 'lucide-react';
 import { useDeleteListingMutation } from '@/features/listings/queries';
+import { LISTING_PLACEHOLDER_IMAGE } from '@/features/listings/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface AdItemProps {
@@ -29,6 +30,11 @@ export const AdListItem = ({
   const deleteMutation = useDeleteListingMutation();
   const [showActions, setShowActions] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [imageSrc, setImageSrc] = useState(image);
+
+  useEffect(() => {
+    setImageSrc(image);
+  }, [image]);
 
   const toggleActions = () => setShowActions(!showActions);
 
@@ -68,7 +74,12 @@ export const AdListItem = ({
       {/* Listing Column */}
       <td className="py-4 px-4">
         <div className="flex items-center gap-3">
-          <img src={image} alt={title} className="w-12 h-10 rounded-lg object-cover bg-gray-100" />
+          <img
+            src={imageSrc}
+            alt={title}
+            className="w-12 h-10 rounded-lg object-cover bg-gray-100"
+            onError={() => setImageSrc(LISTING_PLACEHOLDER_IMAGE)}
+          />
           <span className="text-sm font-semibold text-slate-800 max-w-[150px] leading-tight">
             {title}
           </span>

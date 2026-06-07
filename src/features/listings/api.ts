@@ -3,6 +3,7 @@ import { extractApiData } from '@/lib/api/extractApiData';
 import { vendorListingPaths } from '@/features/listings/config';
 import { LISTING_CATEGORY_TYPES, LISTING_STATUS } from '@/features/listings/constants';
 import type { ListingCategoryType, ListingStatus } from '@/features/listings/constants';
+import { resolveListingImageUrl } from '@/features/listings/utils';
 import type {
   CreateListingPayload,
   ListingCategoryOption,
@@ -14,6 +15,18 @@ import type {
 } from '@/features/listings/types';
 
 type RawListing = Record<string, unknown>;
+
+type VendorListingsApiPage = {
+  items?: unknown[];
+  page?: number;
+  pageSize?: number;
+  totalCount?: number;
+  totalPages?: number;
+};
+
+function asRawListing(value: unknown): RawListing {
+  return value as RawListing;
+}
 
 const STATUS_BY_CODE: Record<number, ListingStatus> = {
   0: LISTING_STATUS.draft,
@@ -50,9 +63,12 @@ function normalizeCategoryType(category: unknown): ListingCategoryType {
 }
 
 function normalizeListingImage(raw: RawListing): ListingImage {
+  const url =
+    resolveListingImageUrl(String(raw.url ?? raw.imageUrl ?? '')) ?? '';
+
   return {
     id: String(raw.id ?? raw.imageId ?? ''),
-    url: String(raw.url ?? raw.imageUrl ?? ''),
+    url,
     isPrimary: Boolean(raw.isPrimary),
     sortOrder: typeof raw.sortOrder === 'number' ? raw.sortOrder : undefined,
   };
@@ -83,13 +99,10 @@ export function normalizeVendorListing(raw: RawListing): VendorListing {
     contactInfo: (raw.contactInfo as string | null | undefined) ?? null,
     adminReviewNote: (raw.adminReviewNote as string | null | undefined) ?? null,
     imageUrl:
-      (raw.primaryImageUrl as string | null | undefined) ??
-      (raw.imageUrl as string | null | undefined) ??
+      resolveListingImageUrl(raw.primaryImageUrl as string | null | undefined) ??
+      resolveListingImageUrl(raw.imageUrl as string | null | undefined) ??
+      images?.find((image) => image.isPrimary)?.url ??
       images?.[0]?.url ??
-      null,
-    pimaryImageUrl:
-      (raw.primaryImageUrl as string | null | undefined) ??
-      (raw.imageUrl as string | null | undefined) ??
       null,
     images,
     viewsCount: typeof raw.viewsCount === 'number' ? raw.viewsCount : 0,
@@ -112,11 +125,11 @@ export async function fetchVendorListings(
   params: VendorListingsQueryParams = {},
 ): Promise<VendorListingsPage> {
   const { data } = await apiClient.get(vendorListingPaths.listings, { params });
-  const extracted = extractApiData<VendorListingsPage | VendorListing[] | RawListing>(data);
+  const extracted = extractApiData<unknown>(data);
 
   if (Array.isArray(extracted)) {
     return {
-      items: extracted.map((item) => normalizeVendorListing(item as unknown as RawListing)),
+      items: extracted.map((item) => normalizeVendorListing(asRawListing(item))),
       page: params.page ?? 1,
       pageSize: params.pageSize ?? 10,
       totalCount: extracted.length,
@@ -124,10 +137,15 @@ export async function fetchVendorListings(
     };
   }
 
-  const page = extracted as VendorListingsPage & { items?: RawListing[] };
+  const page = extracted as VendorListingsApiPage;
+  const items = page.items ?? [];
+
   return {
-    ...page,
-    items: (page.items ?? []).map((item) => normalizeVendorListing(item as unknown as RawListing)),
+    page: page.page ?? params.page ?? 1,
+    pageSize: page.pageSize ?? params.pageSize ?? 10,
+    totalCount: page.totalCount ?? items.length,
+    totalPages: page.totalPages ?? 1,
+    items: items.map((item) => normalizeVendorListing(asRawListing(item))),
   };
 }
 
