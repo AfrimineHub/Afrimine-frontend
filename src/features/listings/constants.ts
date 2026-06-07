@@ -1,8 +1,8 @@
 export const LISTING_CATEGORY_TYPES = {
-  mineral: 'mineral',
-  equipment: 'equipment',
-  miningSite: 'mining_site',
-  manpower: 'manpower',
+  mineral: 1,
+  equipment: 2,
+  miningSite: 3,
+  manpower: 4,
 } as const;
 
 export type ListingCategoryType = (typeof LISTING_CATEGORY_TYPES)[keyof typeof LISTING_CATEGORY_TYPES];
