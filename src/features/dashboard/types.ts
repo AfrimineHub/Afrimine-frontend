@@ -2,6 +2,11 @@ export interface DashboardSummary {
   savedListingsCount: number;
   unreadMessagesCount: number;
   ongoingOrdersCount: number;
+  totalListingsCount?: number;
+  activeQuotesCount?: number;
+  pendingPayoutAmount?: number;
+  pendingPayoutCurrency?: string | null;
+  successfulOrdersCount?: number;
 }
 
 export interface DashboardNotification {

@@ -8,7 +8,10 @@ export const dashboardPaths = {
   ),
   recommended: trimSlash(import.meta.env.VITE_DASHBOARD_RECOMMENDED_PATH ?? 'dashboard/recommended'),
   savedListings: trimSlash(import.meta.env.VITE_DASHBOARD_SAVED_LISTINGS_PATH ?? 'dashboard/saved-listings'),
+  subscription: trimSlash(import.meta.env.VITE_DASHBOARD_SUBSCRIPTION_PATH ?? 'dashboard/subscription'),
 } as const;
+
+export const DASHBOARD_SUBSCRIPTION_QUERY_KEY = ['dashboard', 'subscription'] as const;
 
 export const DASHBOARD_SUMMARY_QUERY_KEY = ['dashboard', 'summary'] as const;
 export const DASHBOARD_NOTIFICATIONS_QUERY_KEY = ['dashboard', 'notifications'] as const;

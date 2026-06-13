@@ -16,8 +16,14 @@ interface ImportMetaEnv {
   readonly VITE_DASHBOARD_NOTIFICATIONS_READ_PATH?: string;
   readonly VITE_DASHBOARD_RECOMMENDED_PATH?: string;
   readonly VITE_DASHBOARD_SAVED_LISTINGS_PATH?: string;
+  readonly VITE_DASHBOARD_SUBSCRIPTION_PATH?: string;
   readonly VITE_VENDOR_LISTINGS_PATH?: string;
   readonly VITE_LISTINGS_CATEGORIES_PATH?: string;
+  readonly VITE_VENDOR_REVENUE_SUMMARY_PATH?: string;
+  readonly VITE_VENDOR_LISTING_PERFORMANCE_PATH?: string;
+  readonly VITE_VENDOR_QUOTES_PATH?: string;
+  readonly VITE_VENDOR_ORDERS_PATH?: string;
+  readonly VITE_VENDOR_PAYOUTS_SUMMARY_PATH?: string;
 }
 
 interface ImportMeta {
