@@ -9,19 +9,18 @@ import { RecentActivityFeed } from '../components/RecentActivityFeed';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useDashboardNotificationsQuery, useDashboardSummaryQuery } from '@/features/dashboard/queries';
 import { useVendorListingsQuery } from '@/features/listings/queries';
-import { getApiErrorMessage } from '@/lib/api/errors';
+....import { getApiErrorMessage } from '@/lib/api/errors';
 
 export const VendorDashboardPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
-
-  const summaryQuery = useDashboardSummaryQuery();
-  const notificationsQuery = useDashboardNotificationsQuery();
-  const listingsQuery = useVendorListingsQuery({ page: 1, pageSize: 1 });
+  const dashboardQuery = useVendorDashboardQuery();
 
   const displayName = user?.fullName ?? user?.companyName;
-  const summaryError =
-    summaryQuery.isError && getApiErrorMessage(summaryQuery.error, 'Could not load dashboard summary.');
+  const dashboard = dashboardQuery.data;
+  const loadError =
+    dashboardQuery.isError &&
+    getApiErrorMessage(dashboardQuery.error, 'Could not load vendor dashboard.');
 
   useEffect(() => {
     if (!isSidebarOpen) return;
@@ -64,34 +63,39 @@ export const VendorDashboardPage: React.FC = () => {
         </div>
 
         <div className="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full pb-[max(1.5rem,calc(1.5rem+env(safe-area-inset-bottom)))]">
-          {summaryError ? (
+          {loadError ? (
             <p className="mb-4 text-sm text-red-600 rounded-lg border border-red-100 bg-red-50 px-4 py-3" role="alert">
-              {summaryError}
+              {loadError}
             </p>
           ) : null}
 
           <DashboardHeader
             displayName={displayName}
-            unreadMessagesCount={summaryQuery.data?.unreadMessagesCount}
+            unreadMessagesCount={dashboard?.stats.unreadMessagesCount}
           />
-          <DashboardOverviewCards />
+          <DashboardOverviewCards
+            subscription={dashboard?.subscription}
+            revenue={dashboard?.revenue}
+            isLoading={dashboardQuery.isLoading}
+          />
           <DashboardStatsGrid
-            summary={summaryQuery.data}
-            totalListings={listingsQuery.data?.totalCount ?? null}
-            isLoading={summaryQuery.isLoading || listingsQuery.isLoading}
+            stats={dashboard?.stats}
+            revenueCurrency={dashboard?.revenue.currency}
+            isLoading={dashboardQuery.isLoading}
           />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-            <ListingPerformanceTable />
+            <ListingPerformanceTable
+              items={dashboard?.listingPerformance}
+              isLoading={dashboardQuery.isLoading}
+              isError={dashboardQuery.isError}
+              errorMessage={loadError || undefined}
+            />
             <RecentActivityFeed
-              notifications={notificationsQuery.data}
-              isLoading={notificationsQuery.isLoading}
-              isError={notificationsQuery.isError}
-              errorMessage={
-                notificationsQuery.isError
-                  ? getApiErrorMessage(notificationsQuery.error, 'Could not load recent activity.')
-                  : undefined
-              }
+              notifications={dashboard?.recentNotifications}
+              isLoading={dashboardQuery.isLoading}
+              isError={dashboardQuery.isError}
+              errorMessage={loadError || undefined}
             />
           </div>
         </div>

@@ -1,0 +1,80 @@
+import { useQuery } from '@tanstack/react-query';
+import {
+  fetchVendorDashboard,
+  fetchVendorListingPerformance,
+  fetchVendorOrders,
+  fetchVendorPayoutSummary,
+  fetchVendorQuotes,
+  fetchVendorRevenueSummary,
+  fetchVendorSubscription,
+} from '@/features/vendor/dashboardApi';
+import {
+  VENDOR_DASHBOARD_QUERY_KEY,
+  VENDOR_LISTING_PERFORMANCE_QUERY_KEY,
+  VENDOR_ORDERS_QUERY_KEY,
+  VENDOR_PAYOUTS_SUMMARY_QUERY_KEY,
+  VENDOR_QUOTES_QUERY_KEY,
+  VENDOR_REVENUE_SUMMARY_QUERY_KEY,
+  VENDOR_SUBSCRIPTION_QUERY_KEY,
+} from '@/features/vendor/dashboardConfig';
+import type {
+  ListingPerformanceQueryParams,
+  VendorOrdersQueryParams,
+  VendorQuotesQueryParams,
+} from '@/features/vendor/dashboardTypes';
+
+export function useVendorDashboardQuery() {
+  return useQuery({
+    queryKey: VENDOR_DASHBOARD_QUERY_KEY,
+    queryFn: fetchVendorDashboard,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useVendorSubscriptionQuery() {
+  return useQuery({
+    queryKey: VENDOR_SUBSCRIPTION_QUERY_KEY,
+    queryFn: fetchVendorSubscription,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useVendorRevenueSummaryQuery() {
+  return useQuery({
+    queryKey: VENDOR_REVENUE_SUMMARY_QUERY_KEY,
+    queryFn: fetchVendorRevenueSummary,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useVendorListingPerformanceQuery(params: ListingPerformanceQueryParams = {}) {
+  return useQuery({
+    queryKey: [...VENDOR_LISTING_PERFORMANCE_QUERY_KEY, params],
+    queryFn: () => fetchVendorListingPerformance(params),
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useVendorPayoutSummaryQuery() {
+  return useQuery({
+    queryKey: VENDOR_PAYOUTS_SUMMARY_QUERY_KEY,
+    queryFn: fetchVendorPayoutSummary,
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useVendorQuotesQuery(params: VendorQuotesQueryParams = {}) {
+  return useQuery({
+    queryKey: [...VENDOR_QUOTES_QUERY_KEY, params],
+    queryFn: () => fetchVendorQuotes(params),
+    staleTime: 60 * 1000,
+  });
+}
+
+export function useVendorOrdersQuery(params: VendorOrdersQueryParams = {}) {
+  return useQuery({
+    queryKey: [...VENDOR_ORDERS_QUERY_KEY, params],
+    queryFn: () => fetchVendorOrders(params),
+    staleTime: 60 * 1000,
+  });
+}
