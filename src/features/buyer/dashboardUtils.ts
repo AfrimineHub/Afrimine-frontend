@@ -68,6 +68,8 @@ export function mapBuyerRfqToCard(rfq: BuyerRfqListItem) {
       ? formatBuyerAmount(rfq.budgetAmount, rfq.budgetCurrency)
       : '—');
 
+  const status = (rfq.status ?? 'open').toLowerCase();
+
   return {
     id: rfq.id,
     resource: rfq.resource,
@@ -75,8 +77,14 @@ export function mapBuyerRfqToCard(rfq: BuyerRfqListItem) {
     location: rfq.location?.trim() || '—',
     budget,
     posted: formatRelativeTime(rfq.createdAt) || 'Recently',
+    status,
+    statusLabel: status.includes('close') ? 'Closed' : status.includes('respond') ? 'Responded' : 'Open',
+    responseCount: rfq.responseCount ?? 0,
+    notes: rfq.notes?.trim() || null,
   };
 }
+
+export type BuyerRfqCardData = ReturnType<typeof mapBuyerRfqToCard>;
 
 function resolveCategoryBadge(category: string | null): string {
   const key = (category ?? '').toLowerCase();

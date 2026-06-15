@@ -26,6 +26,7 @@ import CompanyDetailsPage from "@/features/vendor/pages/profile/CompanyDetails";
 import PayoutPage from "@/features/vendor/pages/payouts/PayoutsPage";
 import SubscriptionPage from "@/features/subscription/pages/SubscriptionPage";
 import RfqPage from "@/features/rfq/pages/RfqPage";
+import VendorOpenRfqsPage from "@/features/vendor/pages/rfqs/VendorOpenRfqsPage";
 import NotificationsPage from "@/features/notification/pages/NotificationPage";
 import AdminDashboard from "@/features/admin/pages/AdminDashboardPage";
 import UsersManagementPage from "@/features/admin/pages/UsersManagementPage";
@@ -135,6 +136,7 @@ export const router = createBrowserRouter([
               { path: "my-ad/:id", element: <ViewListingPage /> },
               { path: "my-ad/:id/edit", element: <EditListingPage /> },
               { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
+              { path: "/dashboard/buyer-rfqs", element: <VendorOpenRfqsPage /> },
               { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
               { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
               { path: "/dashboard/my-payouts", element: <PayoutPage /> },

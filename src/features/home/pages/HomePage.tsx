@@ -131,7 +131,7 @@ const HomePage = () => {
           ) : (
             <StatCard
               icon={<Search size={18} className="text-yellow-500" />}
-              label="Open RFQs"
+              label="My RFQs"
               count={summary?.openRfqsCount ?? 0}
             />
           )}

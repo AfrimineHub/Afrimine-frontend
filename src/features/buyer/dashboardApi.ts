@@ -174,6 +174,13 @@ export async function sendConversationMessage(
   return extractApiData<MessageItem>(data);
 }
 
+export async function startConversationFromRfq(
+  rfqId: string,
+): Promise<{ conversationId: string }> {
+  const { data } = await apiClient.post(buyerDashboardApiPaths.conversations, { rfqId });
+  return extractApiData<{ conversationId: string }>(data);
+}
+
 export async function fetchConversationContext(
   conversationId: string,
 ): Promise<ConversationContext> {

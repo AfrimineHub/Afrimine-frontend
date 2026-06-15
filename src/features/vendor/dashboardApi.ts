@@ -15,6 +15,11 @@ import type {
   VendorRevenueSummary,
   VendorSubscription,
 } from '@/features/vendor/dashboardTypes';
+import type {
+  BuyerRfqListItem,
+  BuyerRfqsPage,
+  BuyerRfqsQueryParams,
+} from '@/features/buyer/dashboardTypes';
 
 type PagedResult<T> = {
   items?: T[];
@@ -108,4 +113,16 @@ export async function fetchVendorOrders(
     pageSize: params.PageSize,
   });
   return page;
+}
+
+/** Open buyer RFQs marketplace — vendors browse and message buyers. */
+export async function fetchOpenBuyerRfqs(
+  params: BuyerRfqsQueryParams = {},
+): Promise<BuyerRfqsPage> {
+  const { data } = await apiClient.get(vendorDashboardApiPaths.openBuyerRfqs, { params });
+  const extracted = extractApiData<PagedResult<BuyerRfqListItem> | BuyerRfqListItem[]>(data);
+  return normalizePagedResult(extracted, {
+    page: params.Page,
+    pageSize: params.PageSize,
+  });
 }

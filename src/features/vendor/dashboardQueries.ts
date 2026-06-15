@@ -7,11 +7,13 @@ import {
   fetchVendorQuotes,
   fetchVendorRevenueSummary,
   fetchVendorSubscription,
+  fetchOpenBuyerRfqs,
 } from '@/features/vendor/dashboardApi';
 import {
   VENDOR_DASHBOARD_QUERY_KEY,
   VENDOR_LISTING_PERFORMANCE_QUERY_KEY,
   VENDOR_ORDERS_QUERY_KEY,
+  VENDOR_OPEN_BUYER_RFQS_QUERY_KEY,
   VENDOR_PAYOUTS_SUMMARY_QUERY_KEY,
   VENDOR_QUOTES_QUERY_KEY,
   VENDOR_REVENUE_SUMMARY_QUERY_KEY,
@@ -22,6 +24,7 @@ import type {
   VendorOrdersQueryParams,
   VendorQuotesQueryParams,
 } from '@/features/vendor/dashboardTypes';
+import type { BuyerRfqsQueryParams } from '@/features/buyer/dashboardTypes';
 
 export function useVendorDashboardQuery() {
   return useQuery({
@@ -80,5 +83,13 @@ export function useVendorOrdersQuery(
     queryFn: () => fetchVendorOrders(params),
     staleTime: 60 * 1000,
     enabled: options?.enabled ?? true,
+  });
+}
+
+export function useOpenBuyerRfqsQuery(params: BuyerRfqsQueryParams = {}) {
+  return useQuery({
+    queryKey: [...VENDOR_OPEN_BUYER_RFQS_QUERY_KEY, params],
+    queryFn: () => fetchOpenBuyerRfqs(params),
+    staleTime: 60 * 1000,
   });
 }

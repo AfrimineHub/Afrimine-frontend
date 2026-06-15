@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { ListingCard } from './ListingCard';
 import { useMarketplaceListingsQuery } from '@/features/buyer/dashboardQueries';
@@ -95,7 +96,16 @@ export const ListingsGrid = ({
           ))}
         </div>
       ) : listings.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-16">No listings found.</p>
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
+          <p className="text-sm text-gray-500 mb-2">No listings found.</p>
+          <p className="text-xs text-gray-400">
+            Can&apos;t find what you need?{' '}
+            <Link to="/rfq" className="text-yellow-700 font-semibold hover:underline">
+              Post a buying request (RFQ)
+            </Link>{' '}
+            and vendors will message you.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {listings.map((listing) => (

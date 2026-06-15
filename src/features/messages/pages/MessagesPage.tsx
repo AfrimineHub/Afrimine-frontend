@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Home } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { ChatSidebar } from '../components/ChatSidebar';
 import { ChatWindow } from '../components/ChatWindow';
 import { OrderContextCard } from '../components/OrderContextCard';
@@ -13,8 +14,11 @@ import { mapConversationToSidebarItem } from '@/features/buyer/dashboardUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 const MessagesPage = () => {
+  const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedId, setSelectedId] = useState<string | undefined>();
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    searchParams.get('conversationId') ?? undefined,
+  );
 
   const conversationsQuery = useConversationsQuery({
     q: searchQuery || undefined,
@@ -28,10 +32,15 @@ const MessagesPage = () => {
   );
 
   useEffect(() => {
+    const conversationId = searchParams.get('conversationId');
+    if (conversationId) {
+      setSelectedId(conversationId);
+      return;
+    }
     if (!selectedId && conversations.length > 0) {
       setSelectedId(conversations[0].id);
     }
-  }, [conversations, selectedId]);
+  }, [conversations, searchParams, selectedId]);
 
   const selectedConversation = conversations.find((c) => c.id === selectedId);
 
