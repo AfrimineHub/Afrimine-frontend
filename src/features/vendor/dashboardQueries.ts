@@ -71,10 +71,14 @@ export function useVendorQuotesQuery(params: VendorQuotesQueryParams = {}) {
   });
 }
 
-export function useVendorOrdersQuery(params: VendorOrdersQueryParams = {}) {
+export function useVendorOrdersQuery(
+  params: VendorOrdersQueryParams = {},
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: [...VENDOR_ORDERS_QUERY_KEY, params],
     queryFn: () => fetchVendorOrders(params),
     staleTime: 60 * 1000,
+    enabled: options?.enabled ?? true,
   });
 }

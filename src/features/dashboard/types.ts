@@ -2,6 +2,7 @@ export interface DashboardSummary {
   savedListingsCount: number;
   unreadMessagesCount: number;
   ongoingOrdersCount: number;
+  openRfqsCount?: number;
   totalListingsCount?: number;
   activeQuotesCount?: number;
   pendingPayoutAmount?: number;

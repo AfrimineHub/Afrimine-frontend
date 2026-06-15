@@ -1,7 +1,13 @@
 import { type Order } from "../types";
 import { OrderRow } from "./OrderRow";
 
-export const OrderTable = ({ orders }: { orders: Order[] }) => {
+export const OrderTable = ({
+  orders,
+  counterpartyLabel = "Buyer",
+}: {
+  orders: Order[];
+  counterpartyLabel?: string;
+}) => {
   return (
     <div className="hidden md:block">
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -9,7 +15,7 @@ export const OrderTable = ({ orders }: { orders: Order[] }) => {
           <thead className="bg-gray-50 text-gray-600">
             <tr>
               <th className="p-4">Order ID</th>
-              <th>Buyer</th>
+              <th>{counterpartyLabel}</th>
               <th>Listing</th>
               <th>Amount</th>
               <th>Status</th>
