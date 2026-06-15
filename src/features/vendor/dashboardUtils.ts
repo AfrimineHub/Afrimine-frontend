@@ -92,7 +92,7 @@ export function mapVendorOrderToOrder(order: VendorOrderListItem): Order {
 
   return {
     id: order.id,
-    buyer: order.buyerName?.trim() || 'Buyer',
+    counterparty: order.buyerName?.trim() || 'Buyer',
     listing: order.listingTitle?.trim() || 'Listing',
     amount: 0,
     status: mapOrderStatus(order.status),

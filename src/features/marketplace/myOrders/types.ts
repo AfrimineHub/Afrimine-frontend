@@ -8,9 +8,10 @@ export type OrderStatus =
 
 export interface Order {
   id: string;
-  buyer: string;
+  counterparty: string;
   listing: string;
   amount: number;
+  currency?: string | null;
   status: OrderStatus;
   date: string;
 }

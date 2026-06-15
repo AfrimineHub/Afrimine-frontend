@@ -1,48 +1,115 @@
+import { useState, type FormEvent } from 'react';
 import { Paperclip, Send } from 'lucide-react';
-export const ChatWindow = () => (
+import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
+import type { MessageItem } from '@/features/buyer/dashboardTypes';
+
+interface ChatWindowProps {
+  participantName?: string;
+  participantLocation?: string;
+  participantAvatarUrl?: string;
+  messages: MessageItem[];
+  isLoading?: boolean;
+  isSending?: boolean;
+  onSend: (body: string) => void;
+}
+
+export const ChatWindow = ({
+  participantName,
+  participantLocation,
+  participantAvatarUrl,
+  messages,
+  isLoading,
+  isSending,
+  onSend,
+}: ChatWindowProps) => {
+  const [draft, setDraft] = useState('');
+
+  const handleSubmit = (event: FormEvent) => {
+    event.preventDefault();
+    const body = draft.trim();
+    if (!body || isSending) return;
+    onSend(body);
+    setDraft('');
+  };
+
+  if (!participantName) {
+    return (
+      <section className="flex-1 flex flex-col bg-white min-h-0 items-center justify-center">
+        <p className="text-sm text-gray-500">Select a conversation to start messaging.</p>
+      </section>
+    );
+  }
+
+  return (
     <section className="flex-1 flex flex-col bg-white min-h-0">
-      {/* Header */}
       <div className="bg-[#1C2126] p-3 flex items-center gap-3 text-white">
-        <img src="/images/categories/buyer.png" className="w-8 h-8 rounded-full" alt="Seller" />
+        <img
+          src={participantAvatarUrl || '/images/categories/buyer.png'}
+          className="w-8 h-8 rounded-full object-cover"
+          alt={participantName}
+        />
         <div>
-          <h4 className="text-xs font-bold">Zinc Mining Corp</h4>
-          <p className="text-[10px] text-gray-400">Nigeria</p>
+          <h4 className="text-xs font-bold">{participantName}</h4>
+          {participantLocation ? (
+            <p className="text-[10px] text-gray-400">{participantLocation}</p>
+          ) : null}
         </div>
       </div>
-  
-      {/* Messages Area */}
+
       <div className="flex-1 p-3 sm:p-6 overflow-y-auto flex flex-col gap-4 sm:gap-6">
-        {/* Order Context Box */}
-        <div className="bg-[#F4F7FF] border border-[#DCE4FF] p-4 rounded-xl self-center w-full max-w-md">
-          <h5 className="text-xs font-bold text-gray-900 mb-3">Order #37333772 Gold Dore Bars</h5>
-          <ul className="space-y-2 text-[10px] text-gray-600">
-            <li className="flex items-center gap-2">📦 5 kg initially</li>
-            <li className="flex items-center gap-2">🚢 FOB Harare - $55,000/kg</li>
-          </ul>
-        </div>
-  
-        <span className="text-center text-[10px] text-gray-400 uppercase font-bold tracking-widest">Yesterday</span>
-  
-        {/* Received Message */}
-        <div className="max-w-[90%] sm:max-w-[70%] bg-gray-100 p-4 rounded-2xl rounded-tl-none self-start">
-          <p className="text-xs text-gray-700 leading-relaxed">
-            Hey, what can be the price if we reduce the quantity to 10kg? please provide a quote and include your delivery timeline as well.
-          </p>
-          <span className="block text-[9px] text-gray-400 mt-2 text-right">Just now</span>
-        </div>
+        {isLoading ? (
+          <div className="space-y-3" aria-busy="true">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-12 bg-gray-100 rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        ) : messages.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-8">No messages in this conversation yet.</p>
+        ) : (
+          messages.map((message) => (
+            <div
+              key={message.id}
+              className={`max-w-[90%] sm:max-w-[70%] p-4 rounded-2xl ${
+                message.isOwn
+                  ? 'bg-yellow-50 self-end rounded-tr-none'
+                  : 'bg-gray-100 self-start rounded-tl-none'
+              }`}
+            >
+              <p className="text-xs text-gray-700 leading-relaxed">{message.body}</p>
+              <span className="block text-[9px] text-gray-400 mt-2 text-right">
+                {formatRelativeTime(message.sentAt) || 'Just now'}
+              </span>
+            </div>
+          ))
+        )}
       </div>
-  
-      {/* Input Area */}
-      <div className="p-3 sm:p-4">
-         <div className="flex gap-2 items-center bg-gray-50 p-2 rounded-xl">
-         <button className="text-gray-400 hover:text-gray-600 p-1 transition-colors cursor-pointer">
-          <Paperclip size={20} />
-         </button>
-         <input type="text" placeholder="Write message..." className="flex-1 bg-transparent border-none outline-none text-xs px-2" />
-         <button className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg shadow-sm transition-all flex items-center justify-center cursor-pointer">
-          <Send size={18} />
-         </button>
-         </div>
-      </div>
+
+      <form onSubmit={handleSubmit} className="p-3 sm:p-4">
+        <div className="flex gap-2 items-center bg-gray-50 p-2 rounded-xl">
+          <button
+            type="button"
+            className="text-gray-400 hover:text-gray-600 p-1 transition-colors cursor-pointer"
+            aria-label="Attach file"
+          >
+            <Paperclip size={20} />
+          </button>
+          <input
+            type="text"
+            placeholder="Write message..."
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            className="flex-1 bg-transparent border-none outline-none text-xs px-2"
+          />
+          <button
+            type="submit"
+            disabled={isSending || !draft.trim()}
+            className="bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white p-2 rounded-lg shadow-sm transition-all flex items-center justify-center cursor-pointer"
+            aria-label="Send message"
+          >
+            <Send size={18} />
+          </button>
+        </div>
+      </form>
     </section>
   );
+};

@@ -1,4 +1,5 @@
-import { Search, Bell, Bookmark, MessageSquare, Package, ChevronRight, Home } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Search, Bookmark, MessageSquare, Package, ChevronRight, Home } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import DataListSection from '../components/DataListSection';
@@ -14,18 +15,33 @@ import {
   useRecommendedListingsQuery,
   useSavedListingsQuery,
 } from '@/features/dashboard/queries';
+import {
+  useInvestmentInsightsQuery,
+  useMarketTrendsQuery,
+} from '@/features/buyer/dashboardQueries';
+import {
+  mapInvestmentInsightToRow,
+  mapMarketTrendToRow,
+} from '@/features/buyer/dashboardUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 const HomePage = () => {
   const { user } = useAuth();
   const displayName = user?.fullName ?? user?.companyName ?? 'there';
+  const [searchQuery, setSearchQuery] = useState('');
 
   const summaryQuery = useDashboardSummaryQuery();
   const notificationsQuery = useDashboardNotificationsQuery();
   const recommendedQuery = useRecommendedListingsQuery();
   const savedQuery = useSavedListingsQuery({ page: 1, pageSize: 5 });
+  const trendsQuery = useMarketTrendsQuery();
+  const insightsQuery = useInvestmentInsightsQuery();
 
   const summary = summaryQuery.data;
+  const marketplaceSearchUrl = searchQuery.trim()
+    ? `/marketplace?q=${encodeURIComponent(searchQuery.trim())}`
+    : '/marketplace';
+
   const savedItems =
     savedQuery.data?.items.map((item) => ({
       savedId: item.savedId,
@@ -42,6 +58,20 @@ const HomePage = () => {
       imageUrl: listing.imageUrl,
     })) ?? [];
 
+  const trendItems = useMemo(
+    () => (trendsQuery.data ?? []).map(mapMarketTrendToRow),
+    [trendsQuery.data],
+  );
+
+  const insightItems = useMemo(
+    () =>
+      (insightsQuery.data ?? []).map((insight) => {
+        const row = mapInvestmentInsightToRow(insight);
+        return { label: row.title, timeAgo: row.timeAgo };
+      }),
+    [insightsQuery.data],
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       <div className="mb-8">
@@ -57,11 +87,13 @@ const HomePage = () => {
             <input
               type="text"
               placeholder="Search for minerals, sites, or equipment"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-yellow-500 outline-none transition-all"
             />
           </div>
           <Link
-            to="/marketplace"
+            to={marketplaceSearchUrl}
             className="bg-[#0d0d0d] text-white px-8 py-3 rounded-xl font-semibold hover:bg-gray-800 transition-colors inline-flex items-center"
           >
             Search
@@ -94,11 +126,15 @@ const HomePage = () => {
           )}
         </Link>
         <Link to="/rfq" className="block hover:opacity-90 transition-opacity">
-          <StatCard
-            icon={<Search size={18} className="text-yellow-500" />}
-            label="Open RFQs"
-            count="—"
-          />
+          {summaryQuery.isLoading ? (
+            <div className="bg-white border border-gray-100 p-4 rounded-xl h-[72px] animate-pulse" />
+          ) : (
+            <StatCard
+              icon={<Search size={18} className="text-yellow-500" />}
+              label="Open RFQs"
+              count={summary?.openRfqsCount ?? 0}
+            />
+          )}
         </Link>
         <Link to="/my-order" className="block hover:opacity-90 transition-opacity">
           {summaryQuery.isLoading ? (
@@ -154,11 +190,28 @@ const HomePage = () => {
               : undefined
           }
         />
-        <DataListSection title="Market Trends" showTrends />
+        <DataListSection
+          title="Market Trends"
+          showTrends
+          trendItems={trendItems}
+          isLoading={trendsQuery.isLoading}
+          errorMessage={
+            trendsQuery.isError
+              ? getApiErrorMessage(trendsQuery.error, 'Could not load market trends.')
+              : undefined
+          }
+        />
         <DataListSection
           title="Investment Insight"
           isInsight
           icon={<ChevronRight size={16} className="fill-gray-900 text-yellow-500" />}
+          insightItems={insightItems}
+          isLoading={insightsQuery.isLoading}
+          errorMessage={
+            insightsQuery.isError
+              ? getApiErrorMessage(insightsQuery.error, 'Could not load investment insights.')
+              : undefined
+          }
         />
       </div>
     </div>

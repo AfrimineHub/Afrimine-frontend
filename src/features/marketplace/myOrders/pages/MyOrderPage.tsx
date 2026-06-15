@@ -3,6 +3,10 @@ import { OrderTable } from '@/features/marketplace/myOrders';
 import { OrderFilters } from '@/features/marketplace/myOrders';
 import { OrdersSummary } from '@/features/marketplace/myOrders';
 import { OrderCard } from '@/features/marketplace/myOrders';
+import { useAuth } from '@/features/auth/hooks/useAuth';
+import { USER_TYPES } from '@/features/auth/types';
+import { useBuyerOrdersQuery } from '@/features/buyer/dashboardQueries';
+import { mapBuyerOrderToOrder } from '@/features/buyer/dashboardUtils';
 import { useVendorOrdersQuery } from '@/features/vendor/dashboardQueries';
 import { mapVendorOrderToOrder } from '@/features/vendor/dashboardUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
@@ -19,17 +23,25 @@ const ORDER_STATUS_FILTER: Record<string, number | undefined> = {
 
 export default function OrdersPage() {
   const [filter, setFilter] = useState('all');
+  const { user } = useAuth();
+  const isBuyer = user?.type === USER_TYPES.buyer;
 
-  const ordersQuery = useVendorOrdersQuery({
+  const queryParams = {
     Page: 1,
     PageSize: 50,
     Status: ORDER_STATUS_FILTER[filter],
-  });
+  };
 
-  const orders = useMemo(
-    () => (ordersQuery.data?.items ?? []).map(mapVendorOrderToOrder),
-    [ordersQuery.data?.items],
-  );
+  const buyerOrdersQuery = useBuyerOrdersQuery(queryParams, { enabled: isBuyer });
+  const vendorOrdersQuery = useVendorOrdersQuery(queryParams, { enabled: !isBuyer });
+  const ordersQuery = isBuyer ? buyerOrdersQuery : vendorOrdersQuery;
+
+  const orders = useMemo(() => {
+    if (isBuyer) {
+      return (buyerOrdersQuery.data?.items ?? []).map(mapBuyerOrderToOrder);
+    }
+    return (vendorOrdersQuery.data?.items ?? []).map(mapVendorOrderToOrder);
+  }, [isBuyer, buyerOrdersQuery.data?.items, vendorOrdersQuery.data?.items]);
 
   const filteredOrders =
     filter === 'all' ? orders : orders.filter((order) => order.status === filter);
@@ -67,7 +79,10 @@ export default function OrdersPage() {
         <p className="text-sm text-gray-500 text-center py-12">No orders found.</p>
       ) : (
         <>
-          <OrderTable orders={filteredOrders} />
+          <OrderTable
+            orders={filteredOrders}
+            counterpartyLabel={isBuyer ? 'Vendor' : 'Buyer'}
+          />
 
           <div className="md:hidden space-y-4">
             {filteredOrders.map((order) => (

@@ -1,35 +1,50 @@
-import { useState } from 'react';
-import { rfqList } from '../data/rfqData';
+import { useMemo, useState, type ChangeEvent } from 'react';
 import { RfqFilter } from '../components/RfqFilter';
 import { RfqCard } from '../components/RfqCard';
+import { useBuyerRfqsQuery } from '@/features/buyer/dashboardQueries';
+import { mapBuyerRfqToCard } from '@/features/buyer/dashboardUtils';
+import { getApiErrorMessage } from '@/lib/api/errors';
 
 const RfqPage = () => {
-  // State initialization for filters
   const [filters, setFilters] = useState({
     resource: '',
     location: '',
-    minQuantity: ''
+    minQuantity: '',
   });
 
-  const handleFilterChange = (field) => (e) => {
-    setFilters(prev => ({ ...prev, [field]: e.target.value }));
+  const rfqsQuery = useBuyerRfqsQuery({
+    resource: filters.resource || undefined,
+    location: filters.location || undefined,
+    minQuantity: filters.minQuantity || undefined,
+    Page: 1,
+    PageSize: 50,
+  });
+
+  const rfqs = useMemo(
+    () => (rfqsQuery.data?.items ?? []).map(mapBuyerRfqToCard),
+    [rfqsQuery.data?.items],
+  );
+
+  const handleFilterChange = (field: keyof typeof filters) => (e: ChangeEvent<HTMLInputElement>) => {
+    setFilters((prev) => ({ ...prev, [field]: e.target.value }));
   };
+
+  const loadError =
+    rfqsQuery.isError &&
+    getApiErrorMessage(rfqsQuery.error, 'Could not load RFQs.');
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] py-12 px-6 lg:px-12 font-sans">
       <div className="max-w-6xl mx-auto">
-        
-        {/* Header Section */}
         <div className="mb-12">
           <h1 className="text-[28px] font-extrabold text-gray-900 tracking-tight mb-2">
-            Open Requests (RFQs)
+            My Requests (RFQs)
           </h1>
           <p className="text-gray-500 text-sm">
-            Browse and respond to open resource requests
+            View and manage your open resource requests
           </p>
         </div>
 
-        {/* Filter Section */}
         <div className="mb-10 space-y-4">
           <div className="flex items-center gap-2 text-sm text-gray-800 font-bold">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,10 +53,10 @@ const RfqPage = () => {
             <span>Filter:</span>
             <span className="text-gray-400 font-normal ml-1">Resource | Location | Quantity</span>
           </div>
-          
+
           <div className="flex flex-col md:flex-row gap-4 max-w-4xl">
-            <RfqFilter 
-              placeholder="Search resource..." 
+            <RfqFilter
+              placeholder="Search resource..."
               value={filters.resource}
               onChange={handleFilterChange('resource')}
               icon={
@@ -50,8 +65,8 @@ const RfqPage = () => {
                 </svg>
               }
             />
-            <RfqFilter 
-              placeholder="Search location..." 
+            <RfqFilter
+              placeholder="Search location..."
               value={filters.location}
               onChange={handleFilterChange('location')}
               icon={
@@ -61,22 +76,36 @@ const RfqPage = () => {
                 </svg>
               }
             />
-            <RfqFilter 
-              placeholder="Min quantity..." 
+            <RfqFilter
+              placeholder="Min quantity..."
               value={filters.minQuantity}
               onChange={handleFilterChange('minQuantity')}
-              icon=''
+              icon=""
             />
           </div>
         </div>
 
-        {/* RFQ Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          {rfqList.map((rfq) => (
-            <RfqCard key={rfq.id} rfq={rfq} />
-          ))}
-        </div>
-        
+        {loadError ? (
+          <p className="mb-6 text-sm text-red-600 rounded-lg border border-red-100 bg-red-50 px-4 py-3" role="alert">
+            {loadError}
+          </p>
+        ) : null}
+
+        {rfqsQuery.isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6" aria-busy="true">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-48 bg-white border border-gray-100 rounded-xl animate-pulse" />
+            ))}
+          </div>
+        ) : rfqs.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-16">No RFQs found.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            {rfqs.map((rfq) => (
+              <RfqCard key={rfq.id} rfq={rfq} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
