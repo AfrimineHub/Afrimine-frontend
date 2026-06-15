@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Menu } from 'lucide-react';
 import { DashboardSidebar } from '../components/DashboardSidebar';
 import { DashboardHeader } from '../components/DashboardHeader';
@@ -7,20 +7,73 @@ import { DashboardStatsGrid } from '../components/DashboardStatsGrid';
 import { ListingPerformanceTable } from '../components/ListingPerformanceTable';
 import { RecentActivityFeed } from '../components/RecentActivityFeed';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { useDashboardNotificationsQuery, useDashboardSummaryQuery } from '@/features/dashboard/queries';
-import { useVendorListingsQuery } from '@/features/listings/queries';
-....import { getApiErrorMessage } from '@/lib/api/errors';
+import { useDashboardNotificationsQuery } from '@/features/dashboard/queries';
+import {
+  useVendorDashboardQuery,
+  useVendorListingPerformanceQuery,
+  useVendorRevenueSummaryQuery,
+  useVendorSubscriptionQuery,
+} from '@/features/vendor/dashboardQueries';
+import { getApiErrorMessage } from '@/lib/api/errors';
+
+const PERFORMANCE_PARAMS = { page: 1, pageSize: 4 } as const;
 
 export const VendorDashboardPage: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { user } = useAuth();
+
   const dashboardQuery = useVendorDashboardQuery();
+  const subscriptionQuery = useVendorSubscriptionQuery();
+  const revenueQuery = useVendorRevenueSummaryQuery();
+  const performanceQuery = useVendorListingPerformanceQuery(PERFORMANCE_PARAMS);
+  const notificationsQuery = useDashboardNotificationsQuery();
 
   const displayName = user?.fullName ?? user?.companyName;
-  const dashboard = dashboardQuery.data;
-  const loadError =
-    dashboardQuery.isError &&
-    getApiErrorMessage(dashboardQuery.error, 'Could not load vendor dashboard.');
+
+  const subscription = subscriptionQuery.data ?? dashboardQuery.data?.subscription;
+  const revenue = revenueQuery.data ?? dashboardQuery.data?.revenue;
+  const stats = dashboardQuery.data?.stats;
+  const listingPerformance =
+    performanceQuery.data?.items ?? dashboardQuery.data?.listingPerformance ?? [];
+  const notifications =
+    notificationsQuery.data ?? dashboardQuery.data?.recentNotifications ?? [];
+
+  const isOverviewLoading =
+    (dashboardQuery.isLoading && !subscription && !revenue) ||
+    (subscriptionQuery.isLoading && !subscription) ||
+    (revenueQuery.isLoading && !revenue);
+
+  const isStatsLoading = dashboardQuery.isLoading && !stats;
+  const isPerformanceLoading = performanceQuery.isLoading && listingPerformance.length === 0;
+  const isActivityLoading = notificationsQuery.isLoading && notifications.length === 0;
+
+  const loadError = useMemo(() => {
+    const dashboardFailed = dashboardQuery.isError;
+    const hasPartialData = Boolean(subscription || revenue || stats || listingPerformance.length);
+
+    if (dashboardFailed && !hasPartialData) {
+      return getApiErrorMessage(dashboardQuery.error, 'Could not load vendor dashboard.');
+    }
+
+    return false;
+  }, [
+    dashboardQuery.isError,
+    dashboardQuery.error,
+    subscription,
+    revenue,
+    stats,
+    listingPerformance.length,
+  ]);
+
+  const performanceError =
+    performanceQuery.isError &&
+    listingPerformance.length === 0 &&
+    getApiErrorMessage(performanceQuery.error, 'Could not load listing performance.');
+
+  const activityError =
+    notificationsQuery.isError &&
+    notifications.length === 0 &&
+    getApiErrorMessage(notificationsQuery.error, 'Could not load recent activity.');
 
   useEffect(() => {
     if (!isSidebarOpen) return;
@@ -69,33 +122,30 @@ export const VendorDashboardPage: React.FC = () => {
             </p>
           ) : null}
 
-          <DashboardHeader
-            displayName={displayName}
-            unreadMessagesCount={dashboard?.stats.unreadMessagesCount}
-          />
+          <DashboardHeader displayName={displayName} unreadMessagesCount={stats?.unreadMessagesCount} />
           <DashboardOverviewCards
-            subscription={dashboard?.subscription}
-            revenue={dashboard?.revenue}
-            isLoading={dashboardQuery.isLoading}
+            subscription={subscription}
+            revenue={revenue}
+            isLoading={isOverviewLoading}
           />
           <DashboardStatsGrid
-            stats={dashboard?.stats}
-            revenueCurrency={dashboard?.revenue.currency}
-            isLoading={dashboardQuery.isLoading}
+            stats={stats}
+            revenueCurrency={revenue?.currency}
+            isLoading={isStatsLoading}
           />
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <ListingPerformanceTable
-              items={dashboard?.listingPerformance}
-              isLoading={dashboardQuery.isLoading}
-              isError={dashboardQuery.isError}
-              errorMessage={loadError || undefined}
+              items={listingPerformance}
+              isLoading={isPerformanceLoading}
+              isError={Boolean(performanceError)}
+              errorMessage={performanceError || undefined}
             />
             <RecentActivityFeed
-              notifications={dashboard?.recentNotifications}
-              isLoading={dashboardQuery.isLoading}
-              isError={dashboardQuery.isError}
-              errorMessage={loadError || undefined}
+              notifications={notifications}
+              isLoading={isActivityLoading}
+              isError={Boolean(activityError)}
+              errorMessage={activityError || undefined}
             />
           </div>
         </div>
