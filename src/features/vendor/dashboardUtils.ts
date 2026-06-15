@@ -94,7 +94,8 @@ export function mapVendorOrderToOrder(order: VendorOrderListItem): Order {
     id: order.id,
     counterparty: order.buyerName?.trim() || 'Buyer',
     listing: order.listingTitle?.trim() || 'Listing',
-    amount: 0,
+    amount: order.amount ?? 0,
+    currency: order.currency,
     status: mapOrderStatus(order.status),
     date: formattedDate,
   };

@@ -82,11 +82,12 @@ export default function OrdersPage() {
           <OrderTable
             orders={filteredOrders}
             counterpartyLabel={isBuyer ? 'Vendor' : 'Buyer'}
+            isBuyer={isBuyer}
           />
 
           <div className="md:hidden space-y-4">
             {filteredOrders.map((order) => (
-              <OrderCard key={order.id} order={order} />
+              <OrderCard key={order.id} order={order} isBuyer={isBuyer} />
             ))}
           </div>
 

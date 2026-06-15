@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import type { ConversationContext } from '@/features/buyer/dashboardTypes';
 
 interface OrderContextCardProps {
@@ -43,12 +44,21 @@ export const OrderContextCard = ({ context, isLoading }: OrderContextCardProps) 
         ) : null}
         <div className="flex justify-between items-center pt-3 border-t">
           <span className="font-black text-gray-900 text-sm">{context.priceRange || '—'}</span>
-          <button
-            type="button"
-            className="bg-yellow-400 text-black text-[10px] px-4 py-1.5 rounded-lg font-bold cursor-pointer"
-          >
-            View Order
-          </button>
+          {context.orderId ? (
+            <Link
+              to={`/my-order/${context.orderId}`}
+              className="bg-yellow-400 text-black text-[10px] px-4 py-1.5 rounded-lg font-bold"
+            >
+              View Order
+            </Link>
+          ) : context.listingId ? (
+            <Link
+              to={`/marketplace`}
+              className="bg-yellow-400 text-black text-[10px] px-4 py-1.5 rounded-lg font-bold"
+            >
+              View Listing
+            </Link>
+          ) : null}
         </div>
       </div>
     </div>

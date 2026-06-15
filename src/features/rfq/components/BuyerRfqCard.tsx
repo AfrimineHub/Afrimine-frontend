@@ -43,19 +43,29 @@ export const BuyerRfqCard = ({ rfq }: BuyerRfqCardProps) => {
         ) : null}
       </div>
 
-      <div className="mt-auto flex items-center justify-between pt-2 gap-3">
+      <div className="mt-auto flex items-center justify-between pt-2 gap-3 flex-wrap">
         <span className="text-xs text-gray-500">
           {rfq.responseCount > 0
             ? `${rfq.responseCount} vendor${rfq.responseCount === 1 ? '' : 's'} responded`
             : 'Waiting for vendor responses'}
         </span>
-        <Link
-          to={`/messages?rfqId=${rfq.id}`}
-          className="inline-flex items-center gap-1.5 bg-yellow-500 hover:bg-yellow-600 text-black text-sm font-bold py-2.5 px-5 rounded transition-colors shadow-sm"
-        >
-          <MessageSquare size={14} />
-          View messages
-        </Link>
+        <div className="flex items-center gap-2">
+          {rfq.responseCount > 0 ? (
+            <Link
+              to={`/rfq/${rfq.id}/quotes`}
+              className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-2.5 px-4 rounded transition-colors"
+            >
+              View quotes
+            </Link>
+          ) : null}
+          <Link
+            to={`/messages?rfqId=${rfq.id}`}
+            className="inline-flex items-center gap-1.5 bg-yellow-500 hover:bg-yellow-600 text-black text-sm font-bold py-2.5 px-5 rounded transition-colors shadow-sm"
+          >
+            <MessageSquare size={14} />
+            Messages
+          </Link>
+        </div>
       </div>
     </div>
   );

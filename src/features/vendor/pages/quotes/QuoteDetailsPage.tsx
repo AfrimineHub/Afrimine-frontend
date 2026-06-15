@@ -1,9 +1,12 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import { RfqDetailsCard } from '../../components/quotes/RfqDetailsCard';
 import { QuoteResponseForm } from '../../components/quotes/QuoteResponseForm';
 
 export const QuoteDetailsPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+
   return (
     <div className="min-h-screen bg-[#FDFDFD] p-4 md:p-8">
       <div className="max-w-5xl mx-auto">
@@ -26,7 +29,7 @@ export const QuoteDetailsPage: React.FC = () => {
           <RfqDetailsCard />
           
           {/* Bottom Half: Response Form */}
-          <QuoteResponseForm />
+          <QuoteResponseForm rfqId={id} />
         </div>
 
       </div>
