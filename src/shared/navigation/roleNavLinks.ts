@@ -68,6 +68,7 @@ export function getNavLinksForUser(
   if (type === USER_TYPES.vendor || type === USER_TYPES.supplier) {
     links.push(
       { label: 'My Listings', path: '/my-ad' },
+      { label: 'Buyer RFQs', path: '/dashboard/buyer-rfqs' },
       { label: 'Quotes', path: '/dashboard/my-quotes' },
       { label: 'My Orders', path: '/my-order' },
     );

@@ -14,6 +14,7 @@ export const vendorDashboardApiPaths = {
   quotes: trimSlash(import.meta.env.VITE_VENDOR_QUOTES_PATH ?? 'vendor/quotes'),
   orders: trimSlash(import.meta.env.VITE_VENDOR_ORDERS_PATH ?? 'vendor/orders'),
   payoutsSummary: trimSlash(import.meta.env.VITE_VENDOR_PAYOUTS_SUMMARY_PATH ?? 'vendor/payout/summary'),
+  openBuyerRfqs: trimSlash(import.meta.env.VITE_VENDOR_OPEN_RFQS_PATH ?? 'rfqs'),
 } as const;
 
 export const VENDOR_DASHBOARD_QUERY_KEY = ['vendor', 'dashboard'] as const;
@@ -23,3 +24,4 @@ export const VENDOR_LISTING_PERFORMANCE_QUERY_KEY = ['vendor', 'listings', 'perf
 export const VENDOR_QUOTES_QUERY_KEY = ['vendor', 'quotes'] as const;
 export const VENDOR_ORDERS_QUERY_KEY = ['vendor', 'orders'] as const;
 export const VENDOR_PAYOUTS_SUMMARY_QUERY_KEY = ['vendor', 'payout', 'summary'] as const;
+export const VENDOR_OPEN_BUYER_RFQS_QUERY_KEY = ['vendor', 'open-buyer-rfqs'] as const;

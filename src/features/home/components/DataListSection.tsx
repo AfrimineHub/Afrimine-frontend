@@ -26,7 +26,6 @@ interface DataListSectionProps {
 const DataListSection = ({
   title,
   showTrends,
-  isInsight,
   icon,
   trendItems = [],
   insightItems = [],

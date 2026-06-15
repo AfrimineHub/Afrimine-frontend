@@ -19,6 +19,7 @@ import {
   fetchMarketplaceListings,
   openBuyerOrderDispute,
   sendConversationMessage,
+  startConversationFromRfq,
 } from '@/features/buyer/dashboardApi';
 import {
   BUYER_CONVERSATION_CONTEXT_QUERY_KEY,
@@ -231,6 +232,17 @@ export function useSendConversationMessageMutation() {
       sendConversationMessage(conversationId, body),
     onSuccess: (_data, { conversationId }) => {
       queryClient.invalidateQueries({ queryKey: [...BUYER_MESSAGES_QUERY_KEY, conversationId] });
+      queryClient.invalidateQueries({ queryKey: BUYER_CONVERSATIONS_QUERY_KEY });
+    },
+  });
+}
+
+export function useStartRfqConversationMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (rfqId: string) => startConversationFromRfq(rfqId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BUYER_CONVERSATIONS_QUERY_KEY });
     },
   });

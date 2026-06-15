@@ -1,4 +1,4 @@
-import type { DashboardNotification, DashboardSummary, ListingCard } from '@/features/dashboard/types';
+import type { DashboardNotification, ListingCard } from '@/features/dashboard/types';
 
 export type CurrencyCode = 'NGN' | 'USD';
 
@@ -103,6 +103,8 @@ export interface BuyerRfqListItem {
   budgetAmount: number | null;
   budgetCurrency: string | null;
   status: string | null;
+  responseCount: number;
+  notes: string | null;
   createdAt: string;
 }
 
