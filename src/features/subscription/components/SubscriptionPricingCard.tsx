@@ -12,7 +12,21 @@ const CheckIcon = ({ colorClass }) => (
   </svg>
 );
 
-export const SubscriptionPricingCard = ({ plan }) => {
+interface SubscriptionPlan {
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  isPopular: boolean;
+  features: { text: string; included: boolean }[];
+}
+
+interface SubscriptionPricingCardProps {
+  plan: SubscriptionPlan;
+  isCurrent?: boolean;
+}
+
+export const SubscriptionPricingCard = ({ plan, isCurrent = false }: SubscriptionPricingCardProps) => {
   const isPopular = plan.isPopular;
   
   // Dynamic styling based on the Diamond/Popular tier vs Standard
@@ -66,8 +80,14 @@ export const SubscriptionPricingCard = ({ plan }) => {
         ))}
       </ul>
 
-      <button className={`w-full py-3 px-4 rounded-lg font-bold transition-colors cursor-pointer ${buttonClass}`}>
-        Get Started
+      <button
+        type="button"
+        disabled={isCurrent}
+        className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
+          isCurrent ? 'bg-gray-200 text-gray-500 cursor-default' : `cursor-pointer ${buttonClass}`
+        }`}
+      >
+        {isCurrent ? 'Current plan' : 'Get Started'}
       </button>
     </div>
   );
