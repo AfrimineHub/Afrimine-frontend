@@ -4,9 +4,11 @@ import { OrderRow } from "./OrderRow";
 export const OrderTable = ({
   orders,
   counterpartyLabel = "Buyer",
+  isBuyer,
 }: {
   orders: Order[];
   counterpartyLabel?: string;
+  isBuyer: boolean;
 }) => {
   return (
     <div className="hidden md:block">
@@ -26,7 +28,7 @@ export const OrderTable = ({
 
           <tbody>
             {orders.map((order) => (
-              <OrderRow key={order.id} order={order} />
+              <OrderRow key={order.id} order={order} isBuyer={isBuyer} />
             ))}
           </tbody>
         </table>

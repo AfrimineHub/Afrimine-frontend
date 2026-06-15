@@ -1,30 +1,60 @@
-import { Eye, CircleCheck, MessageSquareIcon } from "lucide-react";
-import { type OrderStatus } from "../types";
+import { Link } from 'react-router-dom';
+import { Eye, CircleCheck, MessageSquareIcon } from 'lucide-react';
+import { type OrderStatus } from '../types';
 
-export const OrderActions = ({
-  status,
-}: {
+interface OrderActionsProps {
+  orderId: string;
   status: OrderStatus;
-}) => {
+  isBuyer: boolean;
+}
+
+export const OrderActions = ({ orderId, status, isBuyer }: OrderActionsProps) => {
   return (
     <div className="flex items-center gap-3 text-sm">
-      <button className="flex items-center gap-1 text-gray-600 hover:text-black">
-        <Eye size={16} /> 
+      <Link
+        to={`/my-order/${orderId}`}
+        className="flex items-center gap-1 text-gray-600 hover:text-black"
+      >
+        <Eye size={16} />
         View
-      </button>
+      </Link>
 
-      {/* Mark Delivered */}
-      {status === "paid" && (
-        <button className="flex items-center gap-1 text-green-600 hover:underline">
+      {!isBuyer && status === 'paid' ? (
+        <Link
+          to={`/my-order/${orderId}`}
+          className="flex items-center gap-1 text-green-600 hover:underline"
+        >
           <CircleCheck size={14} />
           Mark Delivered
-        </button>
-      )}
+        </Link>
+      ) : null}
 
-      {/* Message icon */}
-      <button className="text-gray-500 hover:text-black">
+      {isBuyer && status === 'delivered' ? (
+        <Link
+          to={`/my-order/${orderId}`}
+          className="flex items-center gap-1 text-green-600 hover:underline"
+        >
+          <CircleCheck size={14} />
+          Confirm Delivery
+        </Link>
+      ) : null}
+
+      {isBuyer && status === 'pending' ? (
+        <Link
+          to={`/my-order/${orderId}`}
+          className="flex items-center gap-1 text-yellow-700 hover:underline font-medium"
+        >
+          Fund Escrow
+        </Link>
+      ) : null}
+
+      <Link
+        to={`/messages?orderId=${orderId}`}
+        className="text-gray-500 hover:text-black"
+        aria-label="Message"
+      >
         <MessageSquareIcon size={16} />
-      </button>
+      </Link>
     </div>
   );
 };

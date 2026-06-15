@@ -22,6 +22,9 @@ export interface VendorSubscription {
   usagePercent: number;
   canUpgrade: boolean;
   renewsAt: string | null;
+  status?: string | null;
+  canCancel?: boolean;
+  canceledAt?: string | null;
 }
 
 /** Matches RevenueSummaryDto */
@@ -108,6 +111,8 @@ export interface VendorOrderListItem {
   listingId: string;
   listingTitle: string | null;
   buyerName: string | null;
+  amount?: number;
+  currency?: string | null;
   status: string | null;
   createdAt: string;
   updatedAt: string | null;

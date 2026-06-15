@@ -46,7 +46,10 @@ const PayoutPage = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-5">
-          <RequestPayout />
+          <RequestPayout
+            availableAmount={payoutQuery.data?.pendingAmount}
+            currency={payoutQuery.data?.currency}
+          />
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-5">

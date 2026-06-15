@@ -3,7 +3,13 @@ import { StatusBadge } from "./OrderStatusBadge";
 import { OrderActions } from "./OrderActions";
 import { formatBuyerAmount } from "@/features/buyer/dashboardUtils";
 
-export const OrderCard = ({ order }: { order: Order }) => {
+export const OrderCard = ({
+  order,
+  isBuyer,
+}: {
+  order: Order;
+  isBuyer: boolean;
+}) => {
   return (
     <div className="bg-white rounded-xl shadow-sm p-4 space-y-3">
       <div className="flex justify-between items-center">
@@ -24,7 +30,7 @@ export const OrderCard = ({ order }: { order: Order }) => {
       </div>
 
       <div className="pt-2 border-t">
-        <OrderActions status={order.status} />
+        <OrderActions orderId={order.id} status={order.status} isBuyer={isBuyer} />
       </div>
     </div>
   );

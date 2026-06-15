@@ -16,6 +16,7 @@ import CreateListingPage from "@/features/listings/pages/CreateListingPage";
 import EditListingPage from "@/features/listings/pages/EditListingPage";
 import ViewListingPage from "@/features/listings/pages/ViewListingPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
+import OrderDetailPage from "@/features/marketplace/myOrders/pages/OrderDetailPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
 import { VendorDashboardPage } from "@/features/vendor/pages/VendorDashboardPage";
@@ -26,6 +27,7 @@ import CompanyDetailsPage from "@/features/vendor/pages/profile/CompanyDetails";
 import PayoutPage from "@/features/vendor/pages/payouts/PayoutsPage";
 import SubscriptionPage from "@/features/subscription/pages/SubscriptionPage";
 import RfqPage from "@/features/rfq/pages/RfqPage";
+import RfqQuotesPage from "@/features/rfq/pages/RfqQuotesPage";
 import VendorOpenRfqsPage from "@/features/vendor/pages/rfqs/VendorOpenRfqsPage";
 import NotificationsPage from "@/features/notification/pages/NotificationPage";
 import AdminDashboard from "@/features/admin/pages/AdminDashboardPage";
@@ -34,6 +36,7 @@ import AdminListingsManagement from "@/features/admin/pages/AdminListingsManagem
 import AdminAllQuotesPage from "@/features/admin/pages/AdminAllQuotesPage";
 import AdminOrderTrackingPage from "@/features/admin/pages/AdminOrderTrackingPage";
 import AdminDisputePage from "@/features/admin/pages/AdminDisputePage";
+import DisputeResolutionPage from "@/features/admin/pages/DisputeResolutionPage";
 import RevenueDashboard from "@/features/admin/pages/RevenueDashboard";
 import AdminVendorWithdrawals from "@/features/admin/pages/AdminVendorWithdrawals";
 import KYCVerificationQueue from "@/features/admin/pages/KYCVerificationQueue";
@@ -117,7 +120,9 @@ export const router = createBrowserRouter([
         children: [
           { path: "messages", element: <MessagesPage /> },
           { path: "my-order", element: <MyOrdersPage /> },
+          { path: "my-order/:orderId", element: <OrderDetailPage /> },
           { path: "rfq", element: <RfqPage /> },
+          { path: "rfq/:rfqId/quotes", element: <RfqQuotesPage /> },
           { path: "notification", element: <NotificationsPage /> },
           {
             element: <RoleGuard allowed={[USER_TYPES.buyer]} />,
@@ -154,6 +159,7 @@ export const router = createBrowserRouter([
               { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
               { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
               { path: "/admin/dispute", element: <AdminDisputePage /> },
+              { path: "/admin/dispute/:disputeId", element: <DisputeResolutionPage /> },
               { path: "/admin/revenue", element: <RevenueDashboard /> },
               { path: "/admin/vendor-withdrawals", element: <AdminVendorWithdrawals /> },
               { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },

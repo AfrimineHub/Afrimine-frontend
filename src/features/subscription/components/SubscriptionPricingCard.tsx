@@ -1,4 +1,6 @@
-const CheckIcon = ({ colorClass }) => (
+import type { SubscriptionPlan } from '@/features/subscription/types';
+
+const CheckIcon = ({ colorClass }: { colorClass: string }) => (
   <svg 
     className={`w-4 h-4 mr-3 flex-shrink-0 ${colorClass}`} 
     fill="currentColor" 
@@ -12,34 +14,37 @@ const CheckIcon = ({ colorClass }) => (
   </svg>
 );
 
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  isPopular: boolean;
-  features: { text: string; included: boolean }[];
-}
-
 interface SubscriptionPricingCardProps {
   plan: SubscriptionPlan;
   isCurrent?: boolean;
+  isLoading?: boolean;
+  onSelect?: (planId: string) => void;
 }
 
-export const SubscriptionPricingCard = ({ plan, isCurrent = false }: SubscriptionPricingCardProps) => {
+export const SubscriptionPricingCard = ({
+  plan,
+  isCurrent = false,
+  isLoading = false,
+  onSelect,
+}: SubscriptionPricingCardProps) => {
   const isPopular = plan.isPopular;
   
-  // Dynamic styling based on the Diamond/Popular tier vs Standard
   const cardBg = isPopular ? 'bg-[#FFFBF5] border-[#E5C99F]' : 'bg-white border-gray-200';
   const buttonClass = isPopular 
     ? 'bg-[#EAB308] hover:bg-[#CA8A04] text-white' 
     : 'bg-[#1E293B] hover:bg-slate-800 text-white';
   const iconColor = isPopular ? 'text-[#EAB308]' : 'text-blue-500';
 
+  const isFreePlan = plan.id === 'free';
+  const actionLabel = isCurrent
+    ? 'Current plan'
+    : isFreePlan
+      ? 'Switch to Free'
+      : 'Get Started';
+
   return (
     <div className={`relative flex flex-col p-6 rounded-2xl border ${cardBg} shadow-sm transition-all duration-300 hover:shadow-md`}>
       
-      {/* Most Popular Badge */}
       {isPopular && (
         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <span className="bg-[#EAB308] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide shadow-sm">
@@ -82,12 +87,15 @@ export const SubscriptionPricingCard = ({ plan, isCurrent = false }: Subscriptio
 
       <button
         type="button"
-        disabled={isCurrent}
+        disabled={isCurrent || isLoading}
+        onClick={() => onSelect?.(plan.id)}
         className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
-          isCurrent ? 'bg-gray-200 text-gray-500 cursor-default' : `cursor-pointer ${buttonClass}`
+          isCurrent || isLoading
+            ? 'bg-gray-200 text-gray-500 cursor-default'
+            : `cursor-pointer ${buttonClass}`
         }`}
       >
-        {isCurrent ? 'Current plan' : 'Get Started'}
+        {isLoading ? 'Processing…' : actionLabel}
       </button>
     </div>
   );
