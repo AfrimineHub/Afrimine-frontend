@@ -76,6 +76,7 @@ export function mapBuyerRfqToCard(rfq: BuyerRfqListItem) {
     quantity: rfq.quantity?.trim() || '—',
     location: rfq.location?.trim() || '—',
     targetPrice,
+    buyerName: rfq.buyerName?.trim() || '—',
     posted: formatRelativeTime(rfq.createdAt) || 'Recently',
     status,
     statusLabel: status.includes('close') ? 'Closed' : status.includes('respond') ? 'Responded' : 'Open',
