@@ -11,7 +11,7 @@ export const VendorOpenRfqCard = ({ rfq, onMessageBuyer, isMessaging }: VendorOp
   <div className="flex flex-col p-6 rounded-xl border border-gray-100 bg-white hover:shadow-md transition-shadow duration-200 h-full">
     <div className="mb-6">
       <h3 className="text-[17px] font-bold text-gray-900 mb-4">
-        {rfq.resource} – {rfq.quantity}
+        {rfq.title} – {rfq.quantity}
       </h3>
       <div className="space-y-2.5">
         <p className="text-sm text-gray-600 flex items-center gap-2">
@@ -19,8 +19,8 @@ export const VendorOpenRfqCard = ({ rfq, onMessageBuyer, isMessaging }: VendorOp
           <span className="font-medium text-gray-800">{rfq.location}</span>
         </p>
         <p className="text-sm text-gray-600 flex items-center gap-2">
-          <span className="text-gray-400">Budget:</span>
-          <span className="font-medium text-gray-800">{rfq.budget}</span>
+          <span className="text-gray-400">Target Price:</span>
+          <span className="font-medium text-gray-800">{rfq.targetPrice}</span>
         </p>
         <p className="text-sm text-gray-600 flex items-center gap-2">
           <span className="text-gray-400">Posted:</span>
