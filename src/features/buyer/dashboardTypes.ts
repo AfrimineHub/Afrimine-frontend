@@ -145,7 +145,7 @@ export interface BuyerRfqQuote {
   amount: number;
   currency: string | null;
   status: string | null;
-  note: string | null;
+  description: string | null;
   expiresAt: string | null;
   createdAt: string;
 }

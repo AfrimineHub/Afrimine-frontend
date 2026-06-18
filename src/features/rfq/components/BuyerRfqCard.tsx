@@ -18,7 +18,7 @@ export const BuyerRfqCard = ({ rfq }: BuyerRfqCardProps) => {
     <div className="flex flex-col p-6 rounded-xl border border-gray-100 bg-white hover:shadow-md transition-shadow duration-200 h-full">
       <div className="mb-4 flex items-start justify-between gap-3">
         <h3 className="text-[17px] font-bold text-gray-900">
-          {rfq.resource} – {rfq.quantity}
+          {rfq.title} – {rfq.quantity}
         </h3>
         <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full shrink-0 ${statusColor}`}>
           {rfq.statusLabel}
@@ -31,8 +31,8 @@ export const BuyerRfqCard = ({ rfq }: BuyerRfqCardProps) => {
           <span className="font-medium text-gray-800">{rfq.location}</span>
         </p>
         <p className="text-sm text-gray-600 flex items-center gap-2">
-          <span className="text-gray-400">Budget:</span>
-          <span className="font-medium text-gray-800">{rfq.budget}</span>
+          <span className="text-gray-400">Target Price:</span>
+          <span className="font-medium text-gray-800">{rfq.targetPrice}</span>
         </p>
         <p className="text-sm text-gray-600 flex items-center gap-2">
           <span className="text-gray-400">Posted:</span>
@@ -45,12 +45,12 @@ export const BuyerRfqCard = ({ rfq }: BuyerRfqCardProps) => {
 
       <div className="mt-auto flex items-center justify-between pt-2 gap-3 flex-wrap">
         <span className="text-xs text-gray-500">
-          {rfq.responseCount > 0
-            ? `${rfq.responseCount} vendor${rfq.responseCount === 1 ? '' : 's'} responded`
+          {Number(rfq.responseCount) > 0
+            ? `${rfq.responseCount} vendor${Number(rfq.responseCount) === 1 ? '' : 's'} responded`
             : 'Waiting for vendor responses'}
         </span>
         <div className="flex items-center gap-2">
-          {rfq.responseCount > 0 ? (
+          {Number(rfq.responseCount) > 0 ? (
             <Link
               to={`/rfq/${rfq.id}/quotes`}
               className="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-2.5 px-4 rounded transition-colors"

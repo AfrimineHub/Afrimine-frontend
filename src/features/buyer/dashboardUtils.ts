@@ -62,25 +62,25 @@ export function mapBuyerOrderToOrder(order: BuyerOrderListItem): Order {
 }
 
 export function mapBuyerRfqToCard(rfq: BuyerRfqListItem) {
-  const budget =
-    rfq.budget?.trim() ||
-    (rfq.budgetAmount != null && rfq.budgetAmount > 0
-      ? formatBuyerAmount(rfq.budgetAmount, rfq.budgetCurrency)
+  const targetPrice =
+    rfq.targetPrice?.trim() ||
+    (rfq.targetPrice != null && Number(rfq.targetPrice) > 0
+      ? formatBuyerAmount(Number(rfq.targetPrice))
       : '—');
 
   const status = (rfq.status ?? 'open').toLowerCase();
 
   return {
     id: rfq.id,
-    resource: rfq.resource,
+    title: rfq.title,
     quantity: rfq.quantity?.trim() || '—',
     location: rfq.location?.trim() || '—',
-    budget,
+    targetPrice,
     posted: formatRelativeTime(rfq.createdAt) || 'Recently',
     status,
     statusLabel: status.includes('close') ? 'Closed' : status.includes('respond') ? 'Responded' : 'Open',
-    responseCount: rfq.responseCount ?? 0,
-    notes: rfq.notes?.trim() || null,
+    responseCount: rfq.unit ?? 0,
+    notes: rfq.description?.trim() || null,
   };
 }
 
