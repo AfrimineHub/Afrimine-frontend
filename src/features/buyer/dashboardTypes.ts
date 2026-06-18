@@ -136,7 +136,6 @@ export interface CreateBuyerRfqPayload {
   targetPrice: string;
   location: string;
   country: string;
-  expiresAt: string;
 }
 
 /** Matches BuyerRfqQuoteDto */

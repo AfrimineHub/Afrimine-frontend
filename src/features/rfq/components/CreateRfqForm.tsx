@@ -28,7 +28,7 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
   const [budgetCurrency, setBudgetCurrency] = useState<CurrencyCode>('NGN')
   const [location, setLocation] = useState('');
   const [country, setCountry] = useState('');
-  const [expireAt, setExpiresAt] = useState('');
+  // const [expireAt, setExpiresAt] = useState('');
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -43,7 +43,7 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
         targetPrice: targetPrice.trim(),
         location: location.trim(),
         country: country.trim(),
-        expiresAt: expireAt.trim(),
+        // expiresAt: expireAt.trim(),
       },
       {
         onSuccess: () => {
@@ -55,7 +55,7 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
           setTargetPrice('NGN'),
           setLocation('');
           setCountry('');
-          setExpiresAt('');
+          // setExpiresAt('');
           onSuccess?.();
         },
       },
