@@ -3,6 +3,7 @@ import { extractApiData } from '@/lib/api/extractApiData';
 import { buyerDashboardApiPaths } from '@/features/buyer/dashboardConfig';
 import type {
   BuyerDashboard,
+  BuyerDashboardStats,
   BuyerOrderListItem,
   BuyerOrdersPage,
   BuyerOrdersQueryParams,
@@ -60,12 +61,14 @@ function normalizePagedResult<T>(
 
 export async function fetchBuyerDashboard(): Promise<BuyerDashboard> {
   const { data } = await apiClient.get(buyerDashboardApiPaths.dashboard);
-  const extracted = extractApiData<BuyerDashboard>(data);
+  
+  const stats = extractApiData<BuyerDashboardStats>(data);
+
   return {
-    ...extracted,
-    marketTrends: extracted.marketTrends ?? [],
-    investmentInsights: extracted.investmentInsights ?? [],
-    recentNotifications: extracted.recentNotifications ?? [],
+    stats,
+    marketTrends: [],
+    investmentInsights: [],
+    recentNotifications: [],
   };
 }
 
