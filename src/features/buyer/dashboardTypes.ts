@@ -102,10 +102,10 @@ export interface BuyerRfqListItem {
   quantity: string | null;
   unit: string;
   targetPrice: string | null;
+  buyerName: string;
   location: string | null;
   country: string;
   status: string | null;
-  buyerName: string;
   expiresAt: string;
   createdAt: string;
 }
