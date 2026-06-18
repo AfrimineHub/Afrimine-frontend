@@ -17,7 +17,7 @@ export const VendorOpenRfqsPage = () => {
   });
 
   const rfqsQuery = useOpenBuyerRfqsQuery({
-    resource: filters.resource || undefined,
+    title: filters.resource || undefined,
     location: filters.location || undefined,
     minQuantity: filters.minQuantity || undefined,
     Status: 'open',
