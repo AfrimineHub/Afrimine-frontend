@@ -15,7 +15,7 @@ const RfqPage = () => {
   const [showCreateForm, setShowCreateForm] = useState(true);
 
   const rfqsQuery = useBuyerRfqsQuery({
-    resource: filters.resource || undefined,
+    title: filters.resource || undefined,
     location: filters.location || undefined,
     minQuantity: filters.minQuantity || undefined,
     Page: 1,
