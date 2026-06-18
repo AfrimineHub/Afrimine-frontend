@@ -16,6 +16,7 @@ import {
   useSavedListingsQuery,
 } from '@/features/dashboard/queries';
 import {
+  useBuyerRfqsQuery,
   useInvestmentInsightsQuery,
   useMarketTrendsQuery,
 } from '@/features/buyer/dashboardQueries';
@@ -31,6 +32,7 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const summaryQuery = useDashboardSummaryQuery();
+  const rfqsQuery = useBuyerRfqsQuery({ Page: 1, PageSize: 50 });
   const notificationsQuery = useDashboardNotificationsQuery();
   const recommendedQuery = useRecommendedListingsQuery();
   const savedQuery = useSavedListingsQuery({ page: 1, pageSize: 5 });
@@ -132,7 +134,7 @@ const HomePage = () => {
             <StatCard
               icon={<Search size={18} className="text-yellow-500" />}
               label="My RFQs"
-              count={summary?.openRfqsCount ?? 0}
+              count={rfqsQuery.data?.totalCount ?? 0}
             />
           )}
         </Link>
