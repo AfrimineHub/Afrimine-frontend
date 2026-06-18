@@ -35,6 +35,10 @@ export const BuyerRfqCard = ({ rfq }: BuyerRfqCardProps) => {
           <span className="font-medium text-gray-800">{rfq.targetPrice}</span>
         </p>
         <p className="text-sm text-gray-600 flex items-center gap-2">
+          <span className="text-gray-400">Buyer Name:</span>
+          <span className="font-medium text-gray-800">{rfq.buyerName}</span>
+        </p>
+        <p className="text-sm text-gray-600 flex items-center gap-2">
           <span className="text-gray-400">Posted:</span>
           <span className="font-medium text-gray-800">{rfq.posted}</span>
         </p>
