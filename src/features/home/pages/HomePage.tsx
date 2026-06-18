@@ -16,7 +16,7 @@ import {
   useSavedListingsQuery,
 } from '@/features/dashboard/queries';
 import {
-  useBuyerRfqsQuery,
+  useBuyerDashboardQuery,
   useInvestmentInsightsQuery,
   useMarketTrendsQuery,
 } from '@/features/buyer/dashboardQueries';
@@ -32,14 +32,13 @@ const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const summaryQuery = useDashboardSummaryQuery();
-  const rfqsQuery = useBuyerRfqsQuery({ Page: 1, PageSize: 50 });
+  const dashboardQuery = useBuyerDashboardQuery();
   const notificationsQuery = useDashboardNotificationsQuery();
   const recommendedQuery = useRecommendedListingsQuery();
   const savedQuery = useSavedListingsQuery({ page: 1, pageSize: 5 });
   const trendsQuery = useMarketTrendsQuery();
   const insightsQuery = useInvestmentInsightsQuery();
 
-  const summary = summaryQuery.data;
   const marketplaceSearchUrl = searchQuery.trim()
     ? `/marketplace?q=${encodeURIComponent(searchQuery.trim())}`
     : '/marketplace';
@@ -111,7 +110,7 @@ const HomePage = () => {
             <StatCard
               icon={<Bookmark size={18} className="fill-yellow-500" />}
               label="Saved Listings"
-              count={summary?.savedListingsCount ?? 0}
+              count={dashboardQuery.data?.stats?.savedListingsCount ?? 0}
             />
           )}
         </Link>
@@ -122,8 +121,8 @@ const HomePage = () => {
             <StatCard
               icon={<MessageSquare size={18} className="fill-yellow-500" />}
               label="Messages"
-              count={summary?.unreadMessagesCount ?? 0}
-              badge={summary && summary.unreadMessagesCount > 0 ? 'new' : undefined}
+              count={dashboardQuery.data?.stats?.unreadMessagesCount ?? 0}
+              badge={dashboardQuery.data?.stats?.unreadMessagesCount && dashboardQuery.data.stats.unreadMessagesCount > 0 ? 'new' : undefined}
             />
           )}
         </Link>
@@ -134,7 +133,7 @@ const HomePage = () => {
             <StatCard
               icon={<Search size={18} className="text-yellow-500" />}
               label="My RFQs"
-              count={rfqsQuery.data?.totalCount ?? 0}
+              count={dashboardQuery.data?.stats?.openRfqsCount ?? 0}
             />
           )}
         </Link>
@@ -145,7 +144,7 @@ const HomePage = () => {
             <StatCard
               icon={<Package size={18} className="fill-yellow-500" />}
               label="Ongoing Orders"
-              count={summary?.ongoingOrdersCount ?? 0}
+              count={dashboardQuery.data?.stats?.ongoingOrdersCount ?? 0}
             />
           )}
         </Link>
