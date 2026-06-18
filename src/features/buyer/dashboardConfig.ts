@@ -1,6 +1,6 @@
 /**
  * Buyer dashboard API paths.
- * Env overrides allow pointing at staging paths before backend ships all endpoints.
+ * .
  */
 const trimSlash = (path: string) => path.replace(/^\/+|\/+$/g, '');
 

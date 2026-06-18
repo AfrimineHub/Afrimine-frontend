@@ -19,32 +19,43 @@ interface CreateRfqFormProps {
 
 export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
   const createMutation = useCreateBuyerRfqMutation();
-  const [resource, setResource] = useState('');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [mineralType, setMineralType] = useState('');
   const [quantity, setQuantity] = useState('');
+  const [unit, setUnit] = useState('');
+  const [targetPrice, setTargetPrice] = useState('');
+  const [budgetCurrency, setBudgetCurrency] = useState<CurrencyCode>('NGN')
   const [location, setLocation] = useState('');
-  const [budgetAmount, setBudgetAmount] = useState('');
-  const [budgetCurrency, setBudgetCurrency] = useState<CurrencyCode>('NGN');
-  const [notes, setNotes] = useState('');
+  const [country, setCountry] = useState('');
+  const [expireAt, setExpiresAt] = useState('');
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
 
     createMutation.mutate(
       {
-        resource: resource.trim(),
+        title: title.trim(),
+        description: description.trim(),
+        mineralType: mineralType.trim(),
         quantity: quantity.trim(),
+        unit: unit.trim(),
+        targetPrice: targetPrice.trim(),
         location: location.trim(),
-        budgetAmount: budgetAmount.trim() ? Number(budgetAmount) : undefined,
-        budgetCurrency,
-        notes: notes.trim() || undefined,
+        country: country.trim(),
+        expiresAt: expireAt.trim(),
       },
       {
         onSuccess: () => {
-          setResource('');
+          setTitle('');
+          setDescription('');
+          setMineralType('');
           setQuantity('');
+          setUnit('');
+          setTargetPrice('NGN'),
           setLocation('');
-          setBudgetAmount('');
-          setNotes('');
+          setCountry('');
+          setExpiresAt('');
           onSuccess?.();
         },
       },
@@ -54,6 +65,7 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
   const errorMessage =
     createMutation.isError &&
     getApiErrorMessage(createMutation.error, 'Could not post your request.');
+
 
   return (
     <form
@@ -75,8 +87,8 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
         <Input
           label="What are you looking for?"
           placeholder="e.g. Gold ore, excavator, lithium project"
-          value={resource}
-          onChange={(e) => setResource(e.target.value)}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
           required
         />
         <Input
@@ -95,12 +107,12 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
         />
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="Budget (optional)"
+            label="Target Price (optional)"
             placeholder="5000000"
             type="number"
             min="0"
-            value={budgetAmount}
-            onChange={(e) => setBudgetAmount(e.target.value)}
+            value={targetPrice}
+            onChange={(e) => setTargetPrice(e.target.value)}
           />
           <Select
             label="Currency"
@@ -114,8 +126,8 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
       <Textarea
         label="Additional details (optional)"
         placeholder="Grade, delivery terms, timeline, certifications..."
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
         rows={3}
       />
 

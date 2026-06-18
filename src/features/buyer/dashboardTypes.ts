@@ -96,20 +96,22 @@ export interface BuyerOrdersPage {
 /** Matches BuyerRfqDto */
 export interface BuyerRfqListItem {
   id: string;
-  resource: string;
+  title: string;
+  description: string;
+  mineralType: string;
   quantity: string | null;
+  unit: string;
+  targetPrice: string | null;
   location: string | null;
-  budget: string | null;
-  budgetAmount: number | null;
-  budgetCurrency: string | null;
+  country: string;
   status: string | null;
-  responseCount: number;
-  notes: string | null;
+  buyerName: string;
+  expiresAt: string;
   createdAt: string;
 }
 
 export interface BuyerRfqsQueryParams {
-  resource?: string;
+  title?: string;
   location?: string;
   minQuantity?: string;
   Page?: number;
@@ -126,12 +128,15 @@ export interface BuyerRfqsPage {
 }
 
 export interface CreateBuyerRfqPayload {
-  resource: string;
+  title: string;
+  description: string;
+  mineralType: string;
   quantity: string;
+  unit: string;
+  targetPrice: string;
   location: string;
-  budgetAmount?: number;
-  budgetCurrency?: CurrencyCode;
-  notes?: string;
+  country: string;
+  expiresAt: string;
 }
 
 /** Matches BuyerRfqQuoteDto */
