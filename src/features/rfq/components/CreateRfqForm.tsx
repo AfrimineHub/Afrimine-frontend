@@ -95,14 +95,14 @@ export const CreateRfqForm = ({ onSuccess }: CreateRfqFormProps) => {
           label="Country?"
           placeholder="e.g. Nigeria"
           value={country}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => setCountry(e.target.value)}
           required
         />
         <Input
           label="Mineral Type"
           placeholder="e.g. Gold ore"
           value={mineralType}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => setMineralType(e.target.value)}
           required
         />
         <Input
