@@ -1,30 +1,88 @@
-export const ActionButtons = ({ accountStatus }) => {
-    const isActive = accountStatus === 'Active';
-  
-    return (
+import { useState } from 'react';
+import {
+  useBanAdminUserMutation,
+  useReactivateAdminUserMutation,
+  useSuspendAdminUserMutation,
+} from '@/features/admin/queries';
+import { getApiErrorMessage } from '@/lib/api/errors';
+
+interface ActionButtonsProps {
+  userId: string;
+  accountStatus: string;
+}
+
+export const ActionButtons = ({ userId, accountStatus }: ActionButtonsProps) => {
+  const [actionError, setActionError] = useState<string | null>(null);
+  const suspendMutation = useSuspendAdminUserMutation();
+  const banMutation = useBanAdminUserMutation();
+  const reactivateMutation = useReactivateAdminUserMutation();
+
+  const isActive = accountStatus === 'Active';
+  const isBusy =
+    suspendMutation.isPending || banMutation.isPending || reactivateMutation.isPending;
+
+  const handleSuspend = async () => {
+    setActionError(null);
+    try {
+      await suspendMutation.mutateAsync({ userId });
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, 'Could not suspend user.'));
+    }
+  };
+
+  const handleBan = async () => {
+    const reason = window.prompt('Reason for ban (optional):') ?? undefined;
+    setActionError(null);
+    try {
+      await banMutation.mutateAsync({ userId, reason: reason?.trim() || undefined });
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, 'Could not ban user.'));
+    }
+  };
+
+  const handleReactivate = async () => {
+    setActionError(null);
+    try {
+      await reactivateMutation.mutateAsync(userId);
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, 'Could not reactivate user.'));
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-1">
       <div className="flex items-center gap-3">
-        <button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-          </svg>
-          View
-        </button>
-  
         {isActive ? (
           <>
-            <button className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+            <button
+              type="button"
+              onClick={handleSuspend}
+              disabled={isBusy}
+              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50"
+            >
               Suspend
             </button>
-            <button className="bg-[#EF4444] hover:bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors">
+            <button
+              type="button"
+              onClick={handleBan}
+              disabled={isBusy}
+              className="bg-[#EF4444] hover:bg-red-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
+            >
               Ban
             </button>
           </>
         ) : (
-          <button className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors">
+          <button
+            type="button"
+            onClick={handleReactivate}
+            disabled={isBusy}
+            className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
+          >
             Reactivate
           </button>
         )}
       </div>
-    );
-  };
+      {actionError ? <span className="text-[11px] text-red-600">{actionError}</span> : null}
+    </div>
+  );
+};

@@ -1,15 +1,13 @@
-export interface Listing {
-    id: string;
-    category: string;
-    title: string;
-    location: string;
-    priceRange: string;
-    imageUrl: string;
-  }
-  
-  export interface Category {
-    id: string;
-    title: string;
-    description: string;
-    imageUrl: string;
-  }
+export interface MarketplaceFilters {
+  location: string;
+  mineral: string;
+  listingType: string;
+  verifiedOnly: boolean;
+}
+
+export const DEFAULT_MARKETPLACE_FILTERS: MarketplaceFilters = {
+  location: '',
+  mineral: '',
+  listingType: '',
+  verifiedOnly: false,
+};

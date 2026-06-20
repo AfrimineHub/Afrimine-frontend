@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ListingCard } from './ListingCard';
 import { useMarketplaceListingsQuery } from '@/features/buyer/dashboardQueries';
 import { mapMarketplaceListingToCard } from '@/features/buyer/dashboardUtils';
@@ -13,7 +13,6 @@ const TAB_PARAMS: Record<string, Partial<MarketplaceListingsQueryParams>> = {
   Latest: { sort: 'latest' },
   Recommended: { sort: 'recommended' },
   Price: { sort: 'price' },
-  'Verified Only': { verifiedOnly: true },
 };
 
 interface ListingsGridProps {
@@ -21,13 +20,83 @@ interface ListingsGridProps {
   listingType?: string;
   mineral?: string;
   location?: string;
+  verifiedOnly?: boolean;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
 }
+
+interface ListingsPaginationProps {
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  isLoading?: boolean;
+}
+
+const ListingsPagination = ({
+  page,
+  pageSize,
+  totalCount,
+  totalPages,
+  onPageChange,
+  isLoading = false,
+}: ListingsPaginationProps) => {
+  if (totalPages <= 1) return null;
+
+  const rangeStart = (page - 1) * pageSize + 1;
+  const rangeEnd = Math.min(page * pageSize, totalCount);
+
+  return (
+    <nav
+      className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-between"
+      aria-label="Listings pagination"
+    >
+      <p className="text-sm text-gray-500">
+        Showing {rangeStart}–{rangeEnd} of {totalCount} listings
+      </p>
+
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => onPageChange(page - 1)}
+          disabled={page <= 1 || isLoading}
+          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Previous page"
+        >
+          <ChevronLeft size={16} />
+          Previous
+        </button>
+
+        <span className="px-2 text-sm font-medium text-gray-700">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          type="button"
+          onClick={() => onPageChange(page + 1)}
+          disabled={page >= totalPages || isLoading}
+          className="inline-flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          aria-label="Next page"
+        >
+          Next
+          <ChevronRight size={16} />
+        </button>
+      </div>
+    </nav>
+  );
+};
 
 export const ListingsGrid = ({
   searchQuery = '',
   listingType,
   mineral,
   location,
+  verifiedOnly,
+  page = 1,
+  pageSize = 24,
+  onPageChange,
 }: ListingsGridProps) => {
   const { user } = useAuth();
   const isBuyer = user?.type === USER_TYPES.buyer;
@@ -39,11 +108,12 @@ export const ListingsGrid = ({
       listingType,
       mineral,
       location,
-      page: 1,
-      pageSize: 24,
+      verifiedOnly: verifiedOnly || undefined,
+      page,
+      pageSize,
       ...TAB_PARAMS[activeTab],
     }),
-    [activeTab, listingType, location, mineral, searchQuery],
+    [activeTab, listingType, location, mineral, page, pageSize, searchQuery, verifiedOnly],
   );
 
   const listingsQuery = useMarketplaceListingsQuery(queryParams);
@@ -53,9 +123,27 @@ export const ListingsGrid = ({
     [listingsQuery.data?.items],
   );
 
+  const totalCount = listingsQuery.data?.totalCount ?? 0;
+  const totalPages = listingsQuery.data?.totalPages ?? 1;
+
+  useEffect(() => {
+    if (!onPageChange || totalPages < 1 || page <= totalPages) return;
+    onPageChange(totalPages);
+  }, [onPageChange, page, totalPages]);
+
   const loadError =
     listingsQuery.isError &&
     getApiErrorMessage(listingsQuery.error, 'Could not load listings.');
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    onPageChange?.(1);
+  };
+
+  const handlePageChange = (nextPage: number) => {
+    onPageChange?.(nextPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <section className="mt-8">
@@ -74,7 +162,7 @@ export const ListingsGrid = ({
           <button
             key={tab}
             type="button"
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleTabChange(tab)}
             className={`pb-3 text-sm font-bold flex items-center gap-1 transition-all cursor-pointer ${
               activeTab === tab
                 ? 'text-gray-900 p-2 rounded-lg bg-yellow-500 border-yellow-500'
@@ -119,6 +207,17 @@ export const ListingsGrid = ({
           ))}
         </div>
       )}
+
+      {onPageChange ? (
+        <ListingsPagination
+          page={page}
+          pageSize={pageSize}
+          totalCount={totalCount}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          isLoading={listingsQuery.isFetching}
+        />
+      ) : null}
     </section>
   );
 };
