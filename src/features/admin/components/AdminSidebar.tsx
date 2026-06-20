@@ -14,13 +14,22 @@ const AdminSidebar = () => {
             </h3>
             <ul className="space-y-1">
               {group.links.map((link) => {
-                // Check if the current URL matches the link's path
-                const isActive = location.pathname === link.path;
+                const isActive = link.path ? location.pathname === link.path : false;
+
+                if (!link.path) {
+                  return (
+                    <li key={link.id}>
+                      <span className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-400">
+                        <div className="w-4 h-4 rounded-sm bg-gray-200" />
+                        {link.label}
+                      </span>
+                    </li>
+                  );
+                }
 
                 return (
                   <li key={link.id}>
-                    {/* Swap <button> for <Link> */}
-                    <Link 
+                    <Link
                       to={link.path}
                       className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         isActive 

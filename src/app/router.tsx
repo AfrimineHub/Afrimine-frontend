@@ -17,6 +17,7 @@ import EditListingPage from "@/features/listings/pages/EditListingPage";
 import ViewListingPage from "@/features/listings/pages/ViewListingPage";
 import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
 import OrderDetailPage from "@/features/marketplace/myOrders/pages/OrderDetailPage";
+import AdminOrderDetailPage from "@/features/admin/pages/AdminOrderDetailPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
 import { VendorDashboardPage } from "@/features/vendor/pages/VendorDashboardPage";
@@ -158,12 +159,13 @@ export const router = createBrowserRouter([
               { path: "/admin/listings", element: <AdminListingsManagement /> },
               { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
               { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
+              { path: "/admin/orders/:orderId", element: <AdminOrderDetailPage /> },
               { path: "/admin/dispute", element: <AdminDisputePage /> },
               { path: "/admin/dispute/:disputeId", element: <DisputeResolutionPage /> },
               { path: "/admin/revenue", element: <RevenueDashboard /> },
               { path: "/admin/vendor-withdrawals", element: <AdminVendorWithdrawals /> },
               { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },
-              { path: "/admin/kyc/review", element: <KYCReviewDetail /> },
+              { path: "/admin/kyc/review/:submissionId", element: <KYCReviewDetail /> },
               { path: "/admin/user-management", element: <UsersManagementPage /> },
             ],
           },
