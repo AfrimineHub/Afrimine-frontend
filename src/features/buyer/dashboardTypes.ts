@@ -151,50 +151,60 @@ export interface BuyerRfqQuote {
 }
 
 /** Matches ConversationDto */
+/** Matches ConversationListItemDto */
 export interface ConversationListItem {
   id: string;
+  participantId: string | null;
   participantName: string | null;
-  participantAvatarUrl: string | null;
   lastMessage: string | null;
   lastMessageAt: string | null;
   unreadCount: number;
+  listingId: string | null;
+  listingTitle: string | null;
 }
 
 export interface ConversationsQueryParams {
   q?: string;
-  page?: number;
-  pageSize?: number;
 }
 
-export interface ConversationsPage {
+export interface ConversationsList {
   items: ConversationListItem[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
 }
 
 /** Matches MessageDto */
 export interface MessageItem {
   id: string;
-  conversationId: string;
+  senderId: string | null;
   senderName: string | null;
+  content: string | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
+/** UI shape for chat bubbles */
+export interface ChatMessage {
+  id: string;
   body: string;
   sentAt: string;
   isOwn: boolean;
+  senderName: string | null;
 }
 
-export interface MessagesQueryParams {
-  page?: number;
-  pageSize?: number;
-}
-
-export interface MessagesPage {
+export interface MessagesList {
   items: MessageItem[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
+}
+
+/** Matches SendMessageDto */
+export interface SendMessagePayload {
+  content: string;
+}
+
+/** Matches StartConversationDto */
+export interface StartConversationPayload {
+  vendorId: string;
+  initialMessage: string;
+  listingId?: string | null;
+  orderId?: string | null;
 }
 
 /** Matches ConversationContextDto — listing/order snippet in messages sidebar. */
@@ -206,6 +216,7 @@ export interface ConversationContext {
   priceRange: string | null;
   imageUrl: string | null;
   category: string | null;
+  orderStatus: string | null;
 }
 
 export interface BuyerDashboard {

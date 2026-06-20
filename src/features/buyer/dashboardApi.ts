@@ -13,8 +13,7 @@ import type {
   BuyerRfqsQueryParams,
   ConversationContext,
   ConversationListItem,
-  ConversationsPage,
-  ConversationsQueryParams,
+  ConversationsList,
   CreateBuyerRfqPayload,
   InvestmentInsightItem,
   ListingCategory,
@@ -23,8 +22,9 @@ import type {
   MarketplaceListingsQueryParams,
   MarketTrendItem,
   MessageItem,
-  MessagesPage,
-  MessagesQueryParams,
+  MessagesList,
+  SendMessagePayload,
+  StartConversationPayload,
 } from '@/features/buyer/dashboardTypes';
 
 type PagedResult<T> = {
@@ -146,42 +146,40 @@ export async function fetchInvestmentInsights(): Promise<InvestmentInsightItem[]
   return extractApiData<InvestmentInsightItem[]>(data) ?? [];
 }
 
-export async function fetchConversations(
-  params: ConversationsQueryParams = {},
-): Promise<ConversationsPage> {
-  const { data } = await apiClient.get(buyerDashboardApiPaths.conversations, { params });
-  const extracted = extractApiData<PagedResult<ConversationListItem> | ConversationListItem[]>(data);
-  return normalizePagedResult(extracted, params);
+export async function fetchConversations(): Promise<ConversationsList> {
+  const { data } = await apiClient.get(buyerDashboardApiPaths.conversations);
+  const extracted = extractApiData<ConversationListItem[]>(data);
+  return { items: extracted ?? [] };
 }
 
-export async function fetchConversationMessages(
-  conversationId: string,
-  params: MessagesQueryParams = {},
-): Promise<MessagesPage> {
+export async function fetchConversationMessages(conversationId: string): Promise<MessagesList> {
   const { data } = await apiClient.get(
     `${buyerDashboardApiPaths.conversations}/${conversationId}/messages`,
-    { params },
   );
-  const extracted = extractApiData<PagedResult<MessageItem> | MessageItem[]>(data);
-  return normalizePagedResult(extracted, params);
+  const extracted = extractApiData<MessageItem[]>(data);
+  return { items: extracted ?? [] };
 }
 
 export async function sendConversationMessage(
   conversationId: string,
-  body: string,
+  payload: SendMessagePayload,
 ): Promise<MessageItem> {
   const { data } = await apiClient.post(
     `${buyerDashboardApiPaths.conversations}/${conversationId}/messages`,
-    { body },
+    payload,
   );
   return extractApiData<MessageItem>(data);
 }
 
-export async function startConversationFromRfq(
-  rfqId: string,
-): Promise<{ conversationId: string }> {
-  const { data } = await apiClient.post(buyerDashboardApiPaths.conversations, { rfqId });
-  return extractApiData<{ conversationId: string }>(data);
+export async function startConversation(
+  payload: StartConversationPayload,
+): Promise<ConversationListItem> {
+  const { data } = await apiClient.post(buyerDashboardApiPaths.conversations, payload);
+  return extractApiData<ConversationListItem>(data);
+}
+
+export async function markConversationRead(conversationId: string): Promise<void> {
+  await apiClient.patch(`${buyerDashboardApiPaths.conversations}/${conversationId}/read`);
 }
 
 export async function fetchConversationContext(

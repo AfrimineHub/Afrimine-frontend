@@ -42,6 +42,11 @@ export const OrderContextCard = ({ context, isLoading }: OrderContextCardProps) 
             <span className="text-yellow-500">📍</span> {context.location}
           </div>
         ) : null}
+        {context.orderStatus ? (
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500 mb-3">
+            Order status: {context.orderStatus}
+          </p>
+        ) : null}
         <div className="flex justify-between items-center pt-3 border-t">
           <span className="font-black text-gray-900 text-sm">{context.priceRange || '—'}</span>
           {context.orderId ? (
