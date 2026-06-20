@@ -9,6 +9,7 @@ import type {
   InvestmentInsightItem,
   MarketplaceListing,
   MarketTrendItem,
+  MessageItem,
 } from '@/features/buyer/dashboardTypes';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 
@@ -152,11 +153,29 @@ export function mapConversationToSidebarItem(conversation: ConversationListItem)
   return {
     id: conversation.id,
     name: conversation.participantName?.trim() || 'Contact',
-    avatarUrl: conversation.participantAvatarUrl?.trim() || '/images/categories/buyer.png',
-    preview: conversation.lastMessage?.trim() || '',
+    avatarUrl: '/images/categories/buyer.png',
+    preview:
+      conversation.lastMessage?.trim() ||
+      conversation.listingTitle?.trim() ||
+      '',
+    subtitle: conversation.listingTitle?.trim() || undefined,
     timeAgo: conversation.lastMessageAt
       ? formatRelativeTime(conversation.lastMessageAt) || ''
       : '',
     unreadCount: conversation.unreadCount,
+  };
+}
+
+export function mapMessageToChat(message: MessageItem, currentUserId?: string | null) {
+  const isOwn = Boolean(
+    currentUserId && message.senderId && message.senderId === currentUserId,
+  );
+
+  return {
+    id: message.id,
+    body: message.content?.trim() || '',
+    sentAt: message.createdAt,
+    isOwn,
+    senderName: message.senderName,
   };
 }

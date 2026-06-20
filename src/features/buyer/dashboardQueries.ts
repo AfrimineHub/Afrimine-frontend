@@ -17,9 +17,10 @@ import {
   fetchMarketTrends,
   fetchMarketplaceListing,
   fetchMarketplaceListings,
+  markConversationRead,
   openBuyerOrderDispute,
   sendConversationMessage,
-  startConversationFromRfq,
+  startConversation,
 } from '@/features/buyer/dashboardApi';
 import {
   BUYER_CONVERSATION_CONTEXT_QUERY_KEY,
@@ -38,10 +39,9 @@ import {
 import type {
   BuyerOrdersQueryParams,
   BuyerRfqsQueryParams,
-  ConversationsQueryParams,
   CreateBuyerRfqPayload,
   MarketplaceListingsQueryParams,
-  MessagesQueryParams,
+  StartConversationPayload,
 } from '@/features/buyer/dashboardTypes';
 
 export function useBuyerDashboardQuery() {
@@ -140,21 +140,18 @@ export function useInvestmentInsightsQuery() {
   });
 }
 
-export function useConversationsQuery(params: ConversationsQueryParams = {}) {
+export function useConversationsQuery() {
   return useQuery({
-    queryKey: [...BUYER_CONVERSATIONS_QUERY_KEY, params],
-    queryFn: () => fetchConversations(params),
+    queryKey: BUYER_CONVERSATIONS_QUERY_KEY,
+    queryFn: fetchConversations,
     staleTime: 30 * 1000,
   });
 }
 
-export function useConversationMessagesQuery(
-  conversationId: string | undefined,
-  params: MessagesQueryParams = {},
-) {
+export function useConversationMessagesQuery(conversationId: string | undefined) {
   return useQuery({
-    queryKey: [...BUYER_MESSAGES_QUERY_KEY, conversationId, params],
-    queryFn: () => fetchConversationMessages(conversationId!, params),
+    queryKey: [...BUYER_MESSAGES_QUERY_KEY, conversationId],
+    queryFn: () => fetchConversationMessages(conversationId!),
     enabled: Boolean(conversationId),
     staleTime: 15 * 1000,
   });
@@ -228,8 +225,8 @@ export function useSendConversationMessageMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ conversationId, body }: { conversationId: string; body: string }) =>
-      sendConversationMessage(conversationId, body),
+    mutationFn: ({ conversationId, content }: { conversationId: string; content: string }) =>
+      sendConversationMessage(conversationId, { content }),
     onSuccess: (_data, { conversationId }) => {
       queryClient.invalidateQueries({ queryKey: [...BUYER_MESSAGES_QUERY_KEY, conversationId] });
       queryClient.invalidateQueries({ queryKey: BUYER_CONVERSATIONS_QUERY_KEY });
@@ -237,11 +234,22 @@ export function useSendConversationMessageMutation() {
   });
 }
 
-export function useStartRfqConversationMutation() {
+export function useStartConversationMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (rfqId: string) => startConversationFromRfq(rfqId),
+    mutationFn: (payload: StartConversationPayload) => startConversation(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BUYER_CONVERSATIONS_QUERY_KEY });
+    },
+  });
+}
+
+export function useMarkConversationReadMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (conversationId: string) => markConversationRead(conversationId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: BUYER_CONVERSATIONS_QUERY_KEY });
     },

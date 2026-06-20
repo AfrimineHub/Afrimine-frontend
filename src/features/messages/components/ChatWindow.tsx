@@ -1,16 +1,16 @@
 import { useState, type FormEvent } from 'react';
 import { Paperclip, Send } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
-import type { MessageItem } from '@/features/buyer/dashboardTypes';
+import type { ChatMessage } from '@/features/buyer/dashboardTypes';
 
 interface ChatWindowProps {
   participantName?: string;
   participantLocation?: string;
   participantAvatarUrl?: string;
-  messages: MessageItem[];
+  messages: ChatMessage[];
   isLoading?: boolean;
   isSending?: boolean;
-  onSend: (body: string) => void;
+  onSend: (content: string) => void;
 }
 
 export const ChatWindow = ({

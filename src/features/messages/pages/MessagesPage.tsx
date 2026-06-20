@@ -4,32 +4,40 @@ import { useSearchParams } from 'react-router-dom';
 import { ChatSidebar } from '../components/ChatSidebar';
 import { ChatWindow } from '../components/ChatWindow';
 import { OrderContextCard } from '../components/OrderContextCard';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
   useConversationContextQuery,
   useConversationMessagesQuery,
   useConversationsQuery,
+  useMarkConversationReadMutation,
   useSendConversationMessageMutation,
 } from '@/features/buyer/dashboardQueries';
-import { mapConversationToSidebarItem } from '@/features/buyer/dashboardUtils';
+import { mapConversationToSidebarItem, mapMessageToChat } from '@/features/buyer/dashboardUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 const MessagesPage = () => {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | undefined>(
     searchParams.get('conversationId') ?? undefined,
   );
 
-  const conversationsQuery = useConversationsQuery({
-    q: searchQuery || undefined,
-    page: 1,
-    pageSize: 50,
-  });
+  const conversationsQuery = useConversationsQuery();
+  const markReadMutation = useMarkConversationReadMutation();
 
-  const conversations = useMemo(
-    () => (conversationsQuery.data?.items ?? []).map(mapConversationToSidebarItem),
-    [conversationsQuery.data?.items],
-  );
+  const conversations = useMemo(() => {
+    const items = (conversationsQuery.data?.items ?? []).map(mapConversationToSidebarItem);
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return items;
+
+    return items.filter(
+      (conversation) =>
+        conversation.name.toLowerCase().includes(query) ||
+        conversation.preview.toLowerCase().includes(query) ||
+        (conversation.subtitle?.toLowerCase().includes(query) ?? false),
+    );
+  }, [conversationsQuery.data?.items, searchQuery]);
 
   useEffect(() => {
     const conversationId = searchParams.get('conversationId');
@@ -42,11 +50,21 @@ const MessagesPage = () => {
     }
   }, [conversations, searchParams, selectedId]);
 
+  useEffect(() => {
+    if (!selectedId) return;
+    markReadMutation.mutate(selectedId);
+  }, [selectedId]);
+
   const selectedConversation = conversations.find((c) => c.id === selectedId);
 
-  const messagesQuery = useConversationMessagesQuery(selectedId, { page: 1, pageSize: 100 });
+  const messagesQuery = useConversationMessagesQuery(selectedId);
   const contextQuery = useConversationContextQuery(selectedId);
   const sendMessageMutation = useSendConversationMessageMutation();
+
+  const messages = useMemo(
+    () => (messagesQuery.data?.items ?? []).map((message) => mapMessageToChat(message, user?.id)),
+    [messagesQuery.data?.items, user?.id],
+  );
 
   const loadError =
     conversationsQuery.isError &&
@@ -77,12 +95,12 @@ const MessagesPage = () => {
         <ChatWindow
           participantName={selectedConversation?.name}
           participantAvatarUrl={selectedConversation?.avatarUrl}
-          messages={messagesQuery.data?.items ?? []}
+          messages={messages}
           isLoading={messagesQuery.isLoading}
           isSending={sendMessageMutation.isPending}
-          onSend={(body) => {
+          onSend={(content) => {
             if (!selectedId) return;
-            sendMessageMutation.mutate({ conversationId: selectedId, body });
+            sendMessageMutation.mutate({ conversationId: selectedId, content });
           }}
         />
 
