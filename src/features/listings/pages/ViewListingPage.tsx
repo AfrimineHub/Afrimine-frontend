@@ -7,7 +7,9 @@ import {
   formatListingPrice,
   getCategoryLabel,
   getListingImageUrl,
+  LISTING_PLACEHOLDER_IMAGE,
   mapListingStatusToDisplay,
+  resolveListingImageUrl,
 } from '@/features/listings/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
@@ -113,7 +115,7 @@ const ViewListingPage: React.FC = () => {
                   {listing.images.slice(1).map((image) => (
                     <img
                       key={image.id}
-                      src={image.url}
+                      src={resolveListingImageUrl(image.url) ?? LISTING_PLACEHOLDER_IMAGE}
                       alt=""
                       className="w-full h-24 rounded-lg object-cover bg-gray-100"
                     />

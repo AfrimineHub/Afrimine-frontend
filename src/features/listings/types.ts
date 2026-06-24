@@ -11,6 +11,7 @@ export interface VendorListing {
   id: string;
   title: string;
   description?: string | null;
+  category?: string;
   categoryType: ListingCategoryType;
   categoryLabel?: string | null;
   status: ListingStatus;
@@ -23,6 +24,7 @@ export interface VendorListing {
   priceDisplay?: string | null;
   contactInfo?: string | null;
   adminReviewNote?: string | null;
+  primaryImageUrl?: string | null;
   imageUrl?: string | null;
   images?: ListingImage[];
   viewsCount?: number;

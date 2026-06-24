@@ -23,6 +23,7 @@ export function getListingImageUrl(listing: VendorListing): string {
   const firstFromGallery = listing.images?.[0]?.url;
 
   return (
+    resolveListingImageUrl(listing.primaryImageUrl) ??
     resolveListingImageUrl(listing.imageUrl) ??
     resolveListingImageUrl(primaryFromGallery) ??
     resolveListingImageUrl(firstFromGallery) ??
@@ -66,6 +67,8 @@ export function formatListingDate(iso: string): string {
 
 export function getCategoryLabel(listing: VendorListing): string {
   if (listing.categoryLabel) return listing.categoryLabel;
+  if (listing.category) return listing.category;
+  
   switch (listing.categoryType) {
     case 1:
       return 'Mineral';
