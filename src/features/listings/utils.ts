@@ -9,12 +9,17 @@ const API_ORIGIN = API_BASE_URL.replace(/\/api\/v\d+$/i, '');
 export function resolveListingImageUrl(url?: string | null): string | null {
   if (!url?.trim()) return null;
 
-  const trimmed = url.trim();
+  let trimmed = url.trim();
+
+  trimmed = trimmed.split('/').map(segment => encodeURIComponent(segment)).join('/')
+
   if (/^https?:\/\//i.test(trimmed)) return trimmed;
   if (trimmed.startsWith('//')) return `https:${trimmed}`;
+
   if (trimmed.startsWith('/')) {
     return API_ORIGIN ? `${API_ORIGIN}${trimmed}` : trimmed;
   }
+  
   return API_BASE_URL ? `${API_BASE_URL}/${trimmed}` : trimmed;
 }
 
