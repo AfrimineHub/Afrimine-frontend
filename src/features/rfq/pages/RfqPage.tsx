@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useMemo, useState, type ChangeEvent, useEffect } from 'react';
 import { RfqFilter } from '../components/RfqFilter';
 import { BuyerRfqCard } from '../components/BuyerRfqCard';
 import { CreateRfqForm } from '../components/CreateRfqForm';
@@ -6,18 +6,33 @@ import { useBuyerRfqsQuery } from '@/features/buyer/dashboardQueries';
 import { mapBuyerRfqToCard } from '@/features/buyer/dashboardUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
+
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 const RfqPage = () => {
+  const [showCreateForm, setShowCreateForm] = useState(true);
+
   const [filters, setFilters] = useState({
     resource: '',
     location: '',
     minQuantity: '',
   });
-  const [showCreateForm, setShowCreateForm] = useState(true);
+
+  const debouncedFilters = useDebounce(filters, 400);
 
   const rfqsQuery = useBuyerRfqsQuery({
-    title: filters.resource || undefined,
-    location: filters.location || undefined,
-    minQuantity: filters.minQuantity || undefined,
+    title: debouncedFilters.resource || undefined,
+    location: debouncedFilters.location || undefined,
+    minQuantity: debouncedFilters.minQuantity || undefined,
     Page: 1,
     PageSize: 50,
   });
