@@ -7,20 +7,23 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '
 const API_ORIGIN = API_BASE_URL.replace(/\/api\/v\d+$/i, '');
 
 export function resolveListingImageUrl(url?: string | null): string | null {
-  if (!url?.trim()) return null;
+  if (!url) return null;
 
-  let trimmed = url.trim();
+  const trimmed = url.trim();
 
-  trimmed = trimmed.split('/').map(segment => encodeURIComponent(segment)).join('/')
-
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (trimmed.startsWith('//')) return `https:${trimmed}`;
-
-  if (trimmed.startsWith('/')) {
-    return API_ORIGIN ? `${API_ORIGIN}${trimmed}` : trimmed;
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed;
   }
-  
-  return API_BASE_URL ? `${API_BASE_URL}/${trimmed}` : trimmed;
+
+  if (trimmed.startsWith("//")) {
+    return `https:${trimmed}`;
+  }
+
+  if (trimmed.startsWith("/")) {
+    return `${API_ORIGIN}${trimmed}`;
+  }
+
+  return `${API_BASE_URL}/${trimmed}`;
 }
 
 export function getListingImageUrl(listing: VendorListing): string {
