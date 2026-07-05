@@ -7,7 +7,7 @@ export const USER_TYPES = {
   buyer: 2,
   investor: 3,
   supplier: 4,
-  superAdmin: 5,
+  superAdmin: 6,
 } as const;
 
 export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
