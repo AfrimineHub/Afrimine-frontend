@@ -9,11 +9,11 @@ import { USER_TYPES, type UserType } from '../types';
 import { type Option } from '@/shared/Select';
 import axios from 'axios';
 
-const userTypes: Option<UserType>[] = [
-  { label: 'Vendor', value: USER_TYPES.vendor },
+type RegisterableUserType = typeof USER_TYPES.supplier | typeof USER_TYPES.buyer;
+
+const userTypes: Option<RegisterableUserType>[] = [
+  { label: 'Vendor / Supplier', value: USER_TYPES.supplier },
   { label: 'Buyer', value: USER_TYPES.buyer },
-  { label: 'Investor', value: USER_TYPES.investor },
-  { label: 'Supplier', value: USER_TYPES.supplier },
 ];
 
 const PHONE_COUNTRY_PREFIX = '+234';
@@ -22,7 +22,7 @@ export const AccountRegistrationForm = () => {
   const navigate = useNavigate();
   const registerMutation = useRegisterMutation();
 
-  const [userType, setUserType] = useState<UserType | ''>('');
+  const [userType, setUserType] = useState<RegisterableUserType | ''>('');
   const [fullName, setFullName] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [email, setEmail] = useState('');
@@ -31,12 +31,19 @@ export const AccountRegistrationForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
 
+  const isSupplier = userType === USER_TYPES.supplier;
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
 
     if (!userType) {
       setError('Please choose a user type');
+      return;
+    }
+
+    if (isSupplier && !companyName.trim()) {
+      setError('Company name is required for Vendor / Supplier accounts');
       return;
     }
 
@@ -48,9 +55,9 @@ export const AccountRegistrationForm = () => {
     try {
       const phone = `${PHONE_COUNTRY_PREFIX}${phoneLocal.replace(/\D/g, '')}`;
       const res = await registerMutation.mutateAsync({
-        type: userType,
+        type: userType as UserType,
         fullName,
-        companyName: companyName || undefined,
+        companyName: companyName.trim() || undefined,
         email,
         phone,
         password,
@@ -73,7 +80,6 @@ export const AccountRegistrationForm = () => {
         const message = record ? record.message : undefined;
         const text = typeof message === 'string' ? message.toLowerCase() : '';
 
-        // Common backend pattern: account already exists but isn't verified yet.
         if (
           (status === 400 || status === 409) &&
           (text.includes('not verified') ||
@@ -97,12 +103,23 @@ export const AccountRegistrationForm = () => {
         </p>
       )}
 
-      <Select<UserType>
+      <Select<RegisterableUserType>
         label="Choose user type"
         placeholder="How do you want to use Afrimine"
         options={userTypes}
+        value={userType || undefined}
         onChange={setUserType}
       />
+
+      <div
+        className="mb-4 rounded-xl border border-dashed border-gray-200 bg-slate-50 px-4 py-3"
+        role="note"
+      >
+        <p className="text-sm font-semibold text-slate-700">Investor — Coming Soon</p>
+        <p className="mt-1 text-xs text-slate-500">
+          Investor accounts are temporarily unavailable while we focus on equipment suppliers.
+        </p>
+      </div>
 
       <Input
         label="Full Name"
@@ -113,9 +130,10 @@ export const AccountRegistrationForm = () => {
         onChange={(e) => setFullName(e.target.value)}
       />
       <Input
-        label="Company name (optional)"
+        label={isSupplier ? 'Company name' : 'Company name (optional)'}
         placeholder="Enter your company name"
         name="companyName"
+        required={isSupplier}
         value={companyName}
         onChange={(e) => setCompanyName(e.target.value)}
       />
@@ -172,7 +190,7 @@ export const AccountRegistrationForm = () => {
           placeholder="Confirm your password"
           type="password"
           name="confirmPassword"
-          autoComplete="confirm-password"
+          autoComplete="new-password"
           required
           minLength={8}
           value={confirmPassword}

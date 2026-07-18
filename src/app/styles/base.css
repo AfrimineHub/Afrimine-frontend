@@ -1,5 +1,25 @@
 :root {
-    --color-primary: #2563EB;
+    /* Brand — warm gold/amber (matches primary CTAs) */
+    --color-brand: #EAB308;
+    --color-brand-dark: #CA8A04;
+    --color-primary: #EAB308;
     --color-accent: #10B981;
-    --radius-lg: 12px;
+
+    /* Neutrals — supplier dashboard canvas */
+    --color-canvas: #f8fafc;
+    --color-surface: #ffffff;
+    --color-overlay: #0f172a;
+    --color-staging: #e2e8f0;
+
+    /* Text */
+    --color-text: #0f172a;
+    --color-text-secondary: #64748b;
+    --color-text-muted: #94a3b8;
+
+    /* Borders & radius */
+    --color-border: #e2e8f0;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
 }

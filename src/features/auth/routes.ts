@@ -1,10 +1,18 @@
 import { USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
+import {
+  isOnboardingComplete,
+  loadOnboardingDraft,
+} from '@/features/supplier/onboarding/onboardingStorage';
+import {
+  SUPPLIER_DASHBOARD_PATH,
+  SUPPLIER_ONBOARDING_PATH,
+} from '@/features/supplier/constants';
 
 export const ROLE_HOME_PATH: Record<UserType, string> = {
   [USER_TYPES.vendor]: '/vendor-dashboard',
   [USER_TYPES.buyer]: '/buyer-dashboard',
   [USER_TYPES.investor]: '/investor-dashboard',
-  [USER_TYPES.supplier]: '/vendor-dashboard',
+  [USER_TYPES.supplier]: SUPPLIER_DASHBOARD_PATH,
   [USER_TYPES.superAdmin]: '/admin',
 };
 
@@ -20,11 +28,15 @@ const ROLE_ROUTE_PREFIXES: Record<UserType, string[]> = {
     '/vendor/',
   ],
   [USER_TYPES.supplier]: [
+    SUPPLIER_DASHBOARD_PATH,
+    SUPPLIER_ONBOARDING_PATH,
+    '/supplier/',
     '/vendor-dashboard',
     '/my-ad',
     '/dashboard/',
     '/vendor-profile',
     '/vendor/',
+    '/my-order',
   ],
   [USER_TYPES.buyer]: ['/buyer-dashboard', '/my-order', '/rfq'],
   [USER_TYPES.investor]: ['/investor-dashboard'],
@@ -48,6 +60,14 @@ function pathMatchesAnyPrefix(path: string, prefixes: string[]): boolean {
 }
 
 export function getHomePathForUser(user: AuthUser | null | undefined): string {
+  if (user?.type === USER_TYPES.supplier) {
+    const draft = loadOnboardingDraft(user.id);
+    if (!isOnboardingComplete(draft)) {
+      return SUPPLIER_ONBOARDING_PATH;
+    }
+    return SUPPLIER_DASHBOARD_PATH;
+  }
+
   if (user?.type != null && user.type in ROLE_HOME_PATH) {
     return ROLE_HOME_PATH[user.type];
   }
@@ -83,6 +103,15 @@ export function resolvePostAuthPath(
   requestedPath?: string | null,
 ): string {
   const home = getHomePathForUser(user);
+
+  // Incomplete suppliers must finish onboarding before other destinations.
+  if (user?.type === USER_TYPES.supplier) {
+    const draft = loadOnboardingDraft(user.id);
+    if (!isOnboardingComplete(draft)) {
+      return SUPPLIER_ONBOARDING_PATH;
+    }
+  }
+
   if (!requestedPath) return home;
   return isPathAllowedForUser(requestedPath, user) ? normalizePath(requestedPath) : home;
 }

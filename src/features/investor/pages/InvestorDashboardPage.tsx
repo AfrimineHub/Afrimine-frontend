@@ -45,6 +45,12 @@ const InvestorDashboardPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6 md:p-10">
       <div className="max-w-6xl mx-auto">
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <span className="font-bold">Investor tools — Coming Soon.</span>{' '}
+          New investor registration is paused while we focus on the equipment supplier MVP.
+          Existing accounts can still browse opportunities below.
+        </div>
+
         <h1 className="text-2xl font-bold text-slate-900">Welcome back, {displayName}</h1>
         <p className="text-sm text-gray-500 mt-2">
           Track mining opportunities, saved projects, and investment insights.
