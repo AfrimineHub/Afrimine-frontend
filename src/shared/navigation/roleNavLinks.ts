@@ -1,5 +1,9 @@
 import { getHomePathForUser } from '@/features/auth/routes';
 import { USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
+import {
+  SUPPLIER_DASHBOARD_PATH,
+  SUPPLIER_MACHINES_PATH,
+} from '@/features/supplier/constants';
 
 export interface RoleNavLink {
   label: string;
@@ -26,6 +30,7 @@ export function isNavLinkActive(currentPath: string, linkPath: string, user?: Au
 export function getProfilePathForUser(user: AuthUser | null | undefined): string | null {
   switch (user?.type) {
     case USER_TYPES.vendor:
+      return '/vendor-profile';
     case USER_TYPES.supplier:
       return '/vendor-profile';
     case USER_TYPES.superAdmin:
@@ -65,7 +70,13 @@ export function getNavLinksForUser(
 
   links.push({ label: 'Dashboard', path: getHomePathForUser(user) });
 
-  if (type === USER_TYPES.vendor || type === USER_TYPES.supplier) {
+  if (type === USER_TYPES.supplier) {
+    links.push(
+      { label: 'My Machines', path: SUPPLIER_MACHINES_PATH },
+      { label: 'Bookings', path: '/supplier/bookings' },
+      { label: 'Payouts', path: '/dashboard/my-payouts' },
+    );
+  } else if (type === USER_TYPES.vendor) {
     links.push(
       { label: 'My Listings', path: '/my-ad' },
       { label: 'Buyer RFQs', path: '/dashboard/buyer-rfqs' },
@@ -87,3 +98,6 @@ export function getNavLinksForUser(
 
   return links;
 }
+
+/** @deprecated Prefer SUPPLIER_DASHBOARD_PATH from supplier constants */
+export { SUPPLIER_DASHBOARD_PATH };

@@ -41,13 +41,12 @@ const AuthLayout = () => {
       <div className="w-full lg:w-1/2 text-white px-6 pt-28 pb-12 md:px-12 lg:p-16 flex flex-col justify-center relative z-20">
         <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
-            Buy and sell <span className="text-yellow-500">minerals</span>,
-            list <span className="text-yellow-500">mining</span> sites,
-            find equipment, and connect with investors.
+            List and lease <span className="text-yellow-500">mining equipment</span>,
+            connect with verified buyers, and grow your yard.
           </h1>
 
           <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8">
-            Connect with verified buyers, streamline deals, and grow your mining business.
+            Built for equipment suppliers. Investor tools are coming soon.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 text-sm text-gray-400 font-medium tracking-wider">

@@ -20,7 +20,6 @@ import OrderDetailPage from "@/features/marketplace/myOrders/pages/OrderDetailPa
 import AdminOrderDetailPage from "@/features/admin/pages/AdminOrderDetailPage";
 import MessagesPage from "@/features/messages/pages/MessagesPage";
 import LandingPage from "@/features/landing/pages/LandingPage";
-import { VendorDashboardPage } from "@/features/vendor/pages/VendorDashboardPage";
 import { QuotesListPage } from "@/features/vendor/pages/quotes/QuotesListPage";
 import { QuoteDetailsPage } from "@/features/vendor/pages/quotes/QuoteDetailsPage";
 import VendorProfilePage from "@/features/vendor/pages/profile/VendorProfilePage";
@@ -48,6 +47,13 @@ import { RoleGuard } from "@/features/auth/components/RoleGuard";
 import { USER_TYPES } from "@/features/auth/types";
 import BuyerDashboardPage from "@/features/buyer/pages/BuyerDashboardPage";
 import InvestorDashboardPage from "@/features/investor/pages/InvestorDashboardPage";
+import SupplierOnboardingPage from "@/features/supplier/pages/SupplierOnboardingPage";
+import SupplierDashboardPage from "@/features/supplier/pages/SupplierDashboardPage";
+import SupplierMachinesPage from "@/features/supplier/pages/SupplierMachinesPage";
+import CreateMachinePage from "@/features/supplier/pages/CreateMachinePage";
+import SupplierBookingsPage from "@/features/supplier/pages/SupplierBookingsPage";
+import { SupplierOnboardingGuard } from "@/features/supplier/components/SupplierOnboardingGuard";
+import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashboardEntry";
 
 export const router = createBrowserRouter([
   {
@@ -134,9 +140,34 @@ export const router = createBrowserRouter([
             children: [{ path: "investor-dashboard", element: <InvestorDashboardPage /> }],
           },
           {
+            element: <RoleGuard allowed={[USER_TYPES.supplier]} />,
+            children: [
+              {
+                path: "supplier/onboarding",
+                element: <SupplierOnboardingPage />,
+              },
+              {
+                element: <SupplierOnboardingGuard requireComplete />,
+                children: [
+                  { path: "supplier-dashboard", element: <SupplierDashboardPage /> },
+                  { path: "supplier/machines", element: <SupplierMachinesPage /> },
+                  { path: "supplier/machines/new", element: <CreateMachinePage /> },
+                  { path: "supplier/bookings", element: <SupplierBookingsPage /> },
+                ],
+              },
+            ],
+          },
+          {
             element: <RoleGuard allowed={[USER_TYPES.vendor, USER_TYPES.supplier]} />,
             children: [
-              { path: "vendor-dashboard", element: <VendorDashboardPage /> },
+              {
+                path: "vendor-dashboard",
+                element: (
+                  <SupplierOnboardingGuard requireComplete>
+                    <VendorDashboardEntry />
+                  </SupplierOnboardingGuard>
+                ),
+              },
               { path: "my-ad", element: <MyAdsPage /> },
               { path: "my-ad/new", element: <CreateListingPage /> },
               { path: "my-ad/:id", element: <ViewListingPage /> },
