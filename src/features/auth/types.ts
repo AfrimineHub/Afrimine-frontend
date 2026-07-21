@@ -12,6 +12,12 @@ export const USER_TYPES = {
 
 export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
 
+export const USER_STATUS = {
+  active: 1,
+} as const;
+ 
+export type UserStatus = (typeof USER_STATUS)[keyof typeof USER_STATUS];
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -19,7 +25,14 @@ export interface AuthUser {
   companyName?: string;
   phone?: string;
   type?: UserType;
+  status?: UserStatus;
+  statusText?: string;
 }
+
+export function isEmailVerified(user: AuthUser | null | undefined): boolean {
+  return user?.status === USER_STATUS.active;
+}
+
 
 export interface LoginPayload {
   email: string;

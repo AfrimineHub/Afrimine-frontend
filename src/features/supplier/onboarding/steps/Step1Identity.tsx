@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Input } from '@/shared/inputs/Input';
 import { Button } from '@/shared/buttons/Button';
 import { useResendOtpMutation } from '@/features/auth/queries';
@@ -9,16 +9,26 @@ interface Step1IdentityProps {
   value: SupplierIdentity;
   onChange: (value: SupplierIdentity) => void;
   onContinue: () => void;
+  isEmailVerified: boolean;
 }
 
 const PHONE_PREFIX = '+234';
 
-export function Step1Identity({ value, onChange, onContinue }: Step1IdentityProps) {
+export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: Step1IdentityProps) {
   const resendOtp = useResendOtpMutation();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(value.otpVerified);
+
+  useEffect(() => {
+    if (isEmailVerified && !value.otpVerified) {
+      onChange({ ...value, otpVerified: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEmailVerified]);
+
+  const verified = isEmailVerified || value.otpVerified;
 
   const update = <K extends keyof SupplierIdentity>(key: K, next: SupplierIdentity[K]) => {
     onChange({ ...value, [key]: next });
@@ -50,7 +60,7 @@ export function Step1Identity({ value, onChange, onContinue }: Step1IdentityProp
       setError('Please complete all identity fields.');
       return;
     }
-    if (!value.otpVerified) {
+    if (!verified) {
       if (!otpSent || otp.replace(/\D/g, '').length < 6) {
         setError('Enter the 6-digit verification code to continue.');
         return;
@@ -117,7 +127,7 @@ export function Step1Identity({ value, onChange, onContinue }: Step1IdentityProp
         </div>
       </div>
 
-      {!value.otpVerified && (
+      {!verified && (
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 mb-4 space-y-3">
           <Button
             type="button"
@@ -140,7 +150,7 @@ export function Step1Identity({ value, onChange, onContinue }: Step1IdentityProp
         </div>
       )}
 
-      {value.otpVerified && (
+      {verified && (
         <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
           Identity verified. You can continue.
         </p>
