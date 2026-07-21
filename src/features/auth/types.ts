@@ -6,7 +6,7 @@ export const USER_TYPES = {
   vendor: 1,
   buyer: 2,
   investor: 3,
-  supplier: 4,
+  supplier: 1,
   superAdmin: 6,
 } as const;
 
