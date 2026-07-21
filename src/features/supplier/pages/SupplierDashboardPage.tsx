@@ -14,7 +14,7 @@ function buildStats(
     ongoingOrdersCount?: number;
     pendingPayoutAmount?: number;
   },
-  revenue?: { thisMonthInflow?: number; currency?: string },
+  revenue?: { thisMonthInflow?: number; currency?: string | null },
 ): SupplierDashboardStats {
   return {
     totalMachines: Math.max(draftMachineCount, vendorStats?.totalListingsCount ?? 0),
