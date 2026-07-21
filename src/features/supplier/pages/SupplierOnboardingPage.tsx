@@ -14,8 +14,8 @@ import {
   saveOnboardingDraft,
 } from '@/features/supplier/onboarding/onboardingStorage';
 import { SUPPLIER_DASHBOARD_PATH } from '@/features/supplier/constants';
-import type { AuthUser } from '@/features/auth/types';
 import type { OnboardingStep, SupplierOnboardingDraft } from '@/features/supplier/types';
+import { isEmailVerified as isUserEmailVerified, type AuthUser } from '@/features/auth/types';
 
 function seedDraftFromUser(user: AuthUser | null | undefined): SupplierOnboardingDraft {
   const stored = loadOnboardingDraft(user?.id);
@@ -80,6 +80,7 @@ export default function SupplierOnboardingPage() {
               value={draft.identity}
               onChange={(identity) => setDraft((prev) => ({ ...prev, identity }))}
               onContinue={() => goTo(2)}
+              isEmailVerified={isUserEmailVerified(user)}
             />
           )}
 

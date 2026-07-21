@@ -25,6 +25,11 @@ function readUserType(record: JsonRecord): UserType | undefined {
   return typeof rawType === 'number' ? (rawType as UserType) : undefined;
 }
 
+function readUserStatus(record: JsonRecord): UserStatus | undefined {
+  const rawStatus = record.status ?? record.userStatus ?? record.user_status;
+  return typeof rawStatus === 'number' ? (rawStatus as UserStatus) : undefined;
+}
+
 function isAuthTokenPayload(record: JsonRecord): boolean {
   return Boolean(readAccessToken(record)) && typeof record.email !== 'string';
 }
@@ -68,5 +73,8 @@ export function extractUser(data: JsonRecord): AuthUser | undefined {
             ? record.phone_number
             : undefined,
     type: readUserType(record),
+    status: readUserStatus(record),
+    statusText: typeof record.statusText === 'string' ? record.statusText : undefined,
+
   };
 }
