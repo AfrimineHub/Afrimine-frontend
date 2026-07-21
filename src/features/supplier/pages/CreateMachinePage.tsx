@@ -152,7 +152,7 @@ export default function CreateMachinePage() {
             Photos
           </p>
           <ListingImageUpload
-            images={images}
+            files={images}
             previews={previews}
             onChange={(nextImages, nextPreviews) => {
               setImages(nextImages);
