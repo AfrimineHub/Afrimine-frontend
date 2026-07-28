@@ -1,4 +1,5 @@
 import { Input } from '@/shared/inputs/Input';
+import { Textarea } from '@/shared/inputs/Textarea';
 import { Select } from '@/shared/Select';
 import { ToggleSwitch } from '@/features/supplier/components/ToggleSwitch';
 import { MACHINE_TYPES } from '@/features/supplier/constants';
@@ -48,13 +49,22 @@ export function MachineAssetForm({
         onChange={(value) => update('machineType', value)}
       />
 
-      <Input
-        label="Brand / Model"
-        placeholder="e.g. Caterpillar 320D"
-        value={machine.brandModel}
-        onChange={(e) => update('brandModel', e.target.value)}
-        required
-      />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 sm:gap-4">
+        <Input
+          label="Brand"
+          placeholder="e.g. Caterpillar"
+          value={machine.brand}
+          onChange={(e) => update('brand', e.target.value)}
+          required
+        />
+        <Input
+          label="Model"
+          placeholder="e.g. 320D"
+          value={machine.model}
+          onChange={(e) => update('model', e.target.value)}
+          required
+        />
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 sm:gap-4">
         <Input
@@ -77,6 +87,34 @@ export function MachineAssetForm({
           required
         />
       </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 sm:gap-4">
+        <Input
+          label="Daily Rental Rate (NGN)"
+          placeholder="e.g. 150000"
+          type="number"
+          min={0}
+          value={machine.dailyRentalRate}
+          onChange={(e) => update('dailyRentalRate', e.target.value)}
+          required
+        />
+        <Input
+          label="Mobilization Fee per KM (NGN)"
+          placeholder="e.g. 500"
+          type="number"
+          min={0}
+          value={machine.mobilizationFeePerKm}
+          onChange={(e) => update('mobilizationFeePerKm', e.target.value)}
+          required
+        />
+      </div>
+
+      <Textarea
+        label="Description (optional)"
+        placeholder="Condition, attachments, transport notes…"
+        value={machine.description ?? ''}
+        onChange={(e) => update('description', e.target.value)}
+      />
 
       <div className="pt-2 pb-1">
         <ToggleSwitch

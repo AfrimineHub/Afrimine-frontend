@@ -23,17 +23,22 @@ export interface SupplierLocation {
 
 export interface MachineAsset {
   id: string;
+  remoteId?: string;
   machineType: string;
-  brandModel: string;
+  brand: string;
+  model: string;
   yearOfManufacture: string;
   engineHours: string;
   includesOperator: boolean;
-}
-
-export interface SupplierDocuments {
+  dailyRentalRate: string;
+  mobilizationFeePerKm: string;
+  description?: string;
   frontPhotoName?: string;
   sidePhotoName?: string;
   serialPhotoName?: string;
+}
+
+export interface SupplierDocuments {
   cacCertificateName?: string;
 }
 
@@ -85,10 +90,13 @@ export function createEmptyMachine(): MachineAsset {
   return {
     id: crypto.randomUUID(),
     machineType: '',
-    brandModel: '',
+    brand: '',
+    model: '',
     yearOfManufacture: '',
     engineHours: '',
     includesOperator: false,
+    dailyRentalRate: '',
+    mobilizationFeePerKm: '',
   };
 }
 

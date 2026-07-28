@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/shared/buttons/Button';
 import { FileDropzone } from '@/features/supplier/components/FileDropzone';
-import { uploadKycDocument } from '@/features/supplier/onboarding/onboardingApi';
+import { useUploadSupplierCacCertificateMutation } from '@/features/supplier/onboarding/onboardingQueries';
+import { getApiErrorMessage } from '@/lib/api/errors';
 import type { SupplierDocuments } from '@/features/supplier/types';
 
 interface Step4DocumentsProps {
@@ -13,48 +14,42 @@ interface Step4DocumentsProps {
 
 export function Step4Documents({ value, onChange, onContinue, onBack }: Step4DocumentsProps) {
   const [error, setError] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-
-  const setFile = (key: keyof SupplierDocuments, file: File) => {
-    onChange({ ...value, [key]: file.name });
-  };
-
-  const handleContinue = async () => {
-    setError(null);
-    if (
-      !value.frontPhotoName ||
-      !value.sidePhotoName ||
-      !value.serialPhotoName ||
-      !value.cacCertificateName
-    ) {
-      setError('Upload front, side, and serial photos plus CAC / proof of purchase.');
-      return;
-    }
-
-    // Best-effort KYC upload when a real file was last selected is not retained;
-    // document names are persisted locally until dedicated supplier document APIs ship.
-    setUploading(true);
-    try {
-      onContinue();
-    } finally {
-      setUploading(false);
-    }
-  };
+  const uploadCac = useUploadSupplierCacCertificateMutation();
 
   const handleCacUpload = async (file: File) => {
-    setFile('cacCertificateName', file);
+    setError(null);
+    onChange({ ...value, cacCertificateName: file.name });
     try {
-      await uploadKycDocument(file, 1);
-    } catch {
-      // Local draft still records the filename if API rejects.
+      await uploadCac.mutateAsync(file);
+    } catch (err) {
+      setError(
+        getApiErrorMessage(
+          err,
+          'Could not upload the CAC certificate / proof of purchase. Please retry before continuing.',
+        ),
+      );
     }
+  };
+
+  const handleContinue = () => {
+    setError(null);
+    if (!value.cacCertificateName) {
+      setError('Upload your CAC certificate or proof of purchase to continue.');
+      return;
+    }
+    if (uploadCac.isError) {
+      setError('The last upload attempt failed — please retry before continuing.');
+      return;
+    }
+    onContinue();
   };
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-1">Document upload</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-1">Proof of ownership</h2>
       <p className="text-sm text-slate-500 mb-6">
-        Collect proof of ownership and clear asset images for field verification.
+        Machine photos were captured in the previous step. Upload your CAC certificate or proof
+        of purchase here for field verification.
       </p>
 
       {error && (
@@ -63,24 +58,6 @@ export function Step4Documents({ value, onChange, onContinue, onBack }: Step4Doc
         </p>
       )}
 
-      <FileDropzone
-        label="Front photo"
-        accept="image/*"
-        fileName={value.frontPhotoName}
-        onFile={(file) => setFile('frontPhotoName', file)}
-      />
-      <FileDropzone
-        label="Side photo"
-        accept="image/*"
-        fileName={value.sidePhotoName}
-        onFile={(file) => setFile('sidePhotoName', file)}
-      />
-      <FileDropzone
-        label="Serial number plate"
-        accept="image/*"
-        fileName={value.serialPhotoName}
-        onFile={(file) => setFile('serialPhotoName', file)}
-      />
       <FileDropzone
         label="CAC certificate / Proof of purchase"
         accept="image/*,.pdf"
@@ -92,8 +69,8 @@ export function Step4Documents({ value, onChange, onContinue, onBack }: Step4Doc
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="button" onClick={handleContinue} disabled={uploading}>
-          {uploading ? 'Saving…' : 'Continue'}
+        <Button type="button" onClick={handleContinue} disabled={uploadCac.isPending}>
+          {uploadCac.isPending ? 'Uploading…' : 'Continue'}
         </Button>
       </div>
     </div>

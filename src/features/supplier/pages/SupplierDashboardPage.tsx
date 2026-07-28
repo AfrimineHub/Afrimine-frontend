@@ -3,27 +3,56 @@ import { Plus, Truck, CalendarClock, Wallet, Lock } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { loadOnboardingDraft } from '@/features/supplier/onboarding/onboardingStorage';
-import { SUPPLIER_MACHINES_PATH } from '@/features/supplier/constants';
+import { SUPPLIER_MACHINES_PATH, SUPPLIER_BOOKINGS_PATH } from '@/features/supplier/constants';
 import type { ActiveLeaseRow, SupplierDashboardStats } from '@/features/supplier/types';
-import { useVendorDashboardQuery, useVendorRevenueSummaryQuery } from '@/features/vendor/dashboardQueries';
+import { useSupplierStatsQuery } from '@/features/supplier/dashboard/dashboardQueries';
+import { useSupplierStatusQuery } from '@/features/supplier/onboarding/onboardingQueries';
+import { useSupplierAssetsQuery } from '@/features/supplier/onboarding/assetsQueries';
+import { useSupplierBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
+import { normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
 
-function buildStats(
-  draftMachineCount: number,
-  vendorStats?: {
-    totalListingsCount?: number;
-    ongoingOrdersCount?: number;
-    pendingPayoutAmount?: number;
-  },
-  revenue?: { thisMonthInflow?: number; currency?: string | null },
-): SupplierDashboardStats {
-  return {
-    totalMachines: Math.max(draftMachineCount, vendorStats?.totalListingsCount ?? 0),
-    activeBookings: vendorStats?.ongoingOrdersCount ?? 0,
-    currentEarnings: revenue?.thisMonthInflow ?? 0,
-    pendingEscrow: vendorStats?.pendingPayoutAmount ?? 0,
-    currency: revenue?.currency ?? 'NGN',
-    machinesTrend: draftMachineCount > 0 ? `+${draftMachineCount} listed` : undefined,
+function normalizeSupplierStats(raw: unknown): Partial<SupplierDashboardStats> {
+  if (!raw || typeof raw !== 'object') return {};
+  const r = raw as Record<string, unknown>;
+
+  const num = (keys: string[]): number | undefined => {
+    for (const key of keys) {
+      const v = r[key];
+      if (typeof v === 'number') return v;
+    }
+    return undefined;
   };
+  const str = (keys: string[]): string | undefined => {
+    for (const key of keys) {
+      const v = r[key];
+      if (typeof v === 'string' && v) return v;
+    }
+    return undefined;
+  };
+
+  return {
+    totalMachines: num(['totalMachines', 'totalAssets', 'machinesCount']),
+    activeBookings: num(['activeBookings', 'activeLeases', 'ongoingBookings']),
+    currentEarnings: num(['currentMonthEarnings', 'thisMonthEarnings', 'monthlyEarnings']),
+    pendingEscrow: num(['pendingEscrow', 'pendingPayout', 'escrowPending']),
+    currency: str(['currency']),
+  };
+}
+
+function normalizeAssetsCount(raw: unknown): number | undefined {
+  if (Array.isArray(raw)) return raw.length;
+  if (raw && typeof raw === 'object' && Array.isArray((raw as Record<string, unknown>).items)) {
+    return ((raw as Record<string, unknown>).items as unknown[]).length;
+  }
+  return undefined;
+}
+
+function normalizeVerificationPending(raw: unknown): boolean | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const r = raw as Record<string, unknown>;
+  const value = r.status ?? r.verificationStatus ?? r.supplierStatus;
+  if (typeof value !== 'string') return undefined;
+  return value.toUpperCase() === 'PENDING';
 }
 
 const STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {
@@ -36,17 +65,33 @@ const STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
   const draft = loadOnboardingDraft(user?.id);
-  const dashboardQuery = useVendorDashboardQuery();
-  const revenueQuery = useVendorRevenueSummaryQuery();
 
-  const stats = buildStats(
-    draft.machines.filter((m) => m.brandModel).length,
-    dashboardQuery.data?.stats,
-    revenueQuery.data ?? dashboardQuery.data?.revenue,
-  );
+  const statsQuery = useSupplierStatsQuery();
+  const statusQuery = useSupplierStatusQuery();
+  const assetsQuery = useSupplierAssetsQuery();
+  const bookingsQuery = useSupplierBookingsQuery();
 
-  const leases: ActiveLeaseRow[] = [];
-  const pending = draft.status === 'pending_verification';
+  const normalizedStats = normalizeSupplierStats(statsQuery.data);
+  const draftMachineCount = draft.machines.filter((m) => m.brand.trim() || m.model.trim()).length;
+  const assetsCount = normalizeAssetsCount(assetsQuery.data);
+
+  const stats: SupplierDashboardStats = {
+    totalMachines: normalizedStats.totalMachines ?? assetsCount ?? draftMachineCount,
+    activeBookings: normalizedStats.activeBookings ?? 0,
+    currentEarnings: normalizedStats.currentEarnings ?? 0,
+    pendingEscrow: normalizedStats.pendingEscrow ?? 0,
+    currency: normalizedStats.currency ?? 'NGN',
+    machinesTrend:
+      draftMachineCount > 0 && normalizedStats.totalMachines == null
+        ? `+${draftMachineCount} listed`
+        : undefined,
+  };
+
+  const leases = normalizeBookingsList(bookingsQuery.data);
+
+  const backendPending = normalizeVerificationPending(statusQuery.data);
+  const pending = backendPending ?? draft.status === 'pending_verification';
+
   const displayName = user?.fullName ?? user?.companyName ?? 'Supplier';
 
   const kpiCards = [
@@ -123,18 +168,22 @@ export default function SupplierDashboardPage() {
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
           <h2 className="text-base font-bold text-slate-900">Active Leases</h2>
           <Link
-            to="/supplier/bookings"
+            to={SUPPLIER_BOOKINGS_PATH}
             className="text-sm font-semibold text-[#CA8A04] hover:underline"
           >
             View all
           </Link>
         </div>
 
-        {leases.length === 0 ? (
+        {bookingsQuery.isLoading ? (
+          <div className="px-5 py-12 text-center">
+            <p className="text-sm font-semibold text-slate-700">Loading leases…</p>
+          </div>
+        ) : leases.length === 0 ? (
           <div className="px-5 py-12 text-center">
             <p className="text-sm font-semibold text-slate-700">No active leases yet</p>
             <p className="mt-1 text-xs text-slate-500">
-              Booking requests from miners will appear here once the booking API is live.
+              Booking requests from miners will appear here.
             </p>
           </div>
         ) : (
