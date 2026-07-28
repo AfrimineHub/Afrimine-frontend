@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Input } from '@/shared/inputs/Input';
 import { Button } from '@/shared/buttons/Button';
 import { useResendOtpMutation } from '@/features/auth/queries';
+import { useUpdateSupplierProfileMutation } from '@/features/supplier/onboarding/onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import type { SupplierIdentity } from '@/features/supplier/types';
 
@@ -14,12 +15,25 @@ interface Step1IdentityProps {
 
 const PHONE_PREFIX = '+234';
 
+type SyncedProfileFields = Pick<SupplierIdentity, 'companyName' | 'phone' | 'email'>;
+
+function profileFieldsEqual(a: SyncedProfileFields, b: SyncedProfileFields): boolean {
+  return a.companyName === b.companyName && a.phone === b.phone && a.email === b.email;
+}
+
 export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: Step1IdentityProps) {
   const resendOtp = useResendOtpMutation();
+  const updateProfile = useUpdateSupplierProfileMutation();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(value.otpVerified);
+
+  const lastSyncedRef = useRef<SyncedProfileFields>({
+    companyName: value.companyName,
+    phone: value.phone,
+    email: value.email,
+  });
 
   useEffect(() => {
     if (isEmailVerified && !value.otpVerified) {
@@ -54,20 +68,46 @@ export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: 
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     setError(null);
     if (!value.fullName.trim() || !value.companyName.trim() || !value.email.trim() || !phoneLocal.trim()) {
       setError('Please complete all identity fields.');
       return;
     }
+
+    let nextValue = value;
     if (!verified) {
       if (!otpSent || otp.replace(/\D/g, '').length < 6) {
         setError('Enter the 6-digit verification code to continue.');
         return;
       }
       // Email was already verified at registration for most users; accept code locally for onboarding gate.
-      onChange({ ...value, otpVerified: true, phone: `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}` });
+      nextValue = { ...value, otpVerified: true, phone: `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}` };
+      onChange(nextValue);
+    } else {
+      const normalizedPhone = `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}`;
+      if (normalizedPhone !== value.phone) {
+        nextValue = { ...value, phone: normalizedPhone };
+        onChange(nextValue);
+      }
     }
+
+    const candidateFields: SyncedProfileFields = {
+      companyName: nextValue.companyName,
+      phone: nextValue.phone,
+      email: nextValue.email,
+    };
+
+    if (!profileFieldsEqual(candidateFields, lastSyncedRef.current)) {
+      try {
+        await updateProfile.mutateAsync(candidateFields);
+        lastSyncedRef.current = candidateFields;
+      } catch (err) {
+        setError(getApiErrorMessage(err, 'Could not save your profile details. Please try again.'));
+        return;
+      }
+    }
+
     onContinue();
   };
 
@@ -156,8 +196,8 @@ export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: 
         </p>
       )}
 
-      <Button type="button" onClick={handleContinue}>
-        Continue
+      <Button type="button" onClick={handleContinue} disabled={updateProfile.isPending}>
+        {updateProfile.isPending ? 'Saving…' : 'Continue'}
       </Button>
     </div>
   );

@@ -9,12 +9,12 @@ export const SUPPLIER_BASE_CITIES = [
 export const MACHINE_TYPES = [
   { label: 'Excavator', value: 'excavator' },
   { label: 'Bulldozer', value: 'bulldozer' },
-  { label: 'Wheel Loader', value: 'wheel_loader' },
-  { label: 'Dump Truck', value: 'dump_truck' },
-  { label: 'Drilling Rig', value: 'drilling_rig' },
-  { label: 'Crusher', value: 'crusher' },
+  { label: 'PayLoader', value: 'payloader' },
+  { label: 'Tipper', value: 'tipper' },
   { label: 'Grader', value: 'grader' },
-  { label: 'Other', value: 'other' },
+  { label: 'Crane', value: 'crane' },
+  { label: 'Compactor', value: 'compactor' },
+  // { label: 'Other', value: 'other' },
 ] as const;
 
 export const ONBOARDING_STEPS = [
@@ -29,3 +29,5 @@ export const SUPPLIER_ONBOARDING_STORAGE_KEY = 'afrimine.supplier.onboarding';
 export const SUPPLIER_ONBOARDING_PATH = '/supplier/onboarding';
 export const SUPPLIER_DASHBOARD_PATH = '/supplier-dashboard';
 export const SUPPLIER_MACHINES_PATH = '/supplier/machines';
+export const SUPPLIER_BOOKINGS_PATH = '/supplier/bookings';
+

@@ -1,39 +1,45 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { Input } from '@/shared/inputs/Input';
-import { Textarea } from '@/shared/inputs/Textarea';
 import { Button } from '@/shared/buttons/Button';
 import { MachineAssetForm } from '@/features/supplier/components/MachineAssetForm';
+import { FileDropzone } from '@/features/supplier/components/FileDropzone';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { createEmptyMachine } from '@/features/supplier/types';
 import { SUPPLIER_MACHINES_PATH } from '@/features/supplier/constants';
-import { ListingImageUpload } from '@/features/listings/components/ListingImageUpload';
-import { LISTING_CATEGORY_TYPES } from '@/features/listings/constants';
-import { useCreateListingMutation } from '@/features/listings/queries';
-import { getApiErrorMessage } from '@/lib/api/errors';
-import { useAuth } from '@/features/auth/hooks/useAuth';
 import {
-  loadOnboardingDraft,
-  saveOnboardingDraft,
-} from '@/features/supplier/onboarding/onboardingStorage';
-import { MACHINE_TYPES } from '@/features/supplier/constants';
+  useCreateAssetMutation,
+  useUploadAssetPhotosMutation,
+} from '@/features/supplier/onboarding/assetsQueries';
+import { MACHINE_TYPE_ENUM, type AssetPhotosPayload, type CreateAssetPayload } from '@/features/supplier/onboarding/assetsApi';
+import { getApiErrorMessage } from '@/lib/api/errors';
+
+function extractCreatedAssetId(created: unknown): string | undefined {
+  if (created && typeof created === 'object' && 'id' in created) {
+    const id = (created as { id?: unknown }).id;
+    return typeof id === 'string' ? id : undefined;
+  }
+  return undefined;
+}
 
 export default function CreateMachinePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const createMutation = useCreateListingMutation();
+  const createAsset = useCreateAssetMutation();
+  const uploadPhotos = useUploadAssetPhotosMutation();
 
   const [machine, setMachine] = useState(createEmptyMachine);
-  const [description, setDescription] = useState('');
-  const [priceAmount, setPriceAmount] = useState('');
-  const [location, setLocation] = useState('');
-  const [images, setImages] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<AssetPhotosPayload>({});
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const typeLabel =
-    MACHINE_TYPES.find((t) => t.value === machine.machineType)?.label ?? machine.machineType;
+  const setPhoto = (
+    key: keyof AssetPhotosPayload,
+    nameKey: 'frontPhotoName' | 'sidePhotoName' | 'serialPhotoName',
+    file: File,
+  ) => {
+    setPhotos((prev) => ({ ...prev, [key]: file }));
+    setMachine((prev) => ({ ...prev, [nameKey]: file.name }));
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -41,50 +47,54 @@ export default function CreateMachinePage() {
 
     if (
       !machine.machineType ||
-      !machine.brandModel.trim() ||
+      !machine.brand.trim() ||
+      !machine.model.trim() ||
       !machine.yearOfManufacture ||
-      !machine.engineHours
+      !machine.engineHours ||
+      !machine.dailyRentalRate ||
+      !machine.mobilizationFeePerKm
     ) {
-      setError('Complete all machine fields before listing.');
+      setError('Complete all machine fields, including daily rate and mobilization fee, before listing.');
       return;
     }
-    if (!description.trim() || !location.trim() || !priceAmount.trim()) {
-      setError('Add description, location, and rental price.');
+    if (!(machine.machineType in MACHINE_TYPE_ENUM)) {
+      setError('Selected machine type is not recognized. Please re-select it.');
+      return;
+    }
+    if (!machine.frontPhotoName || !machine.sidePhotoName || !machine.serialPhotoName) {
+      setError('Upload front, side, and serial number plate photos.');
       return;
     }
 
+    const payload: CreateAssetPayload = {
+      machineType: MACHINE_TYPE_ENUM[machine.machineType],
+      brand: machine.brand.trim(),
+      model: machine.model.trim(),
+      yearOfManufacture: Number(machine.yearOfManufacture),
+      engineHours: Number(machine.engineHours),
+      hasCertifiedOperator: machine.includesOperator,
+      dailyRentalRate: Number(machine.dailyRentalRate),
+      mobilizationFeePerKm: Number(machine.mobilizationFeePerKm),
+      description: machine.description,
+    };
+
+    setSubmitting(true);
     try {
-      await createMutation.mutateAsync({
-        payload: {
-          categoryType: LISTING_CATEGORY_TYPES.equipment,
-          title: machine.brandModel.trim(),
-          description: [
-            description.trim(),
-            `Engine hours: ${machine.engineHours}.`,
-            machine.includesOperator ? 'Certified operator included.' : 'Operator not included.',
-          ].join(' '),
-          country: 'Nigeria',
-          stateOrRegion: location.trim(),
-          location: location.trim(),
-          priceAmount: Number(priceAmount),
-          priceCurrency: 'NGN',
-          priceUnit: 'per_month',
-          equipmentType: typeLabel || machine.machineType,
-          yearManufactured: Number(machine.yearOfManufacture),
-          publish: true,
-        },
-        images,
-      });
+      const created = await createAsset.mutateAsync(payload);
+      const assetId = extractCreatedAssetId(created);
+      if (!assetId) {
+        throw new Error('Machine was created but no id came back in the expected shape.');
+      }
 
-      const draft = loadOnboardingDraft(user?.id);
-      saveOnboardingDraft(
-        { ...draft, machines: [...draft.machines.filter((m) => m.brandModel), machine] },
-        user?.id,
-      );
+      if (photos.frontPhoto || photos.sidePhoto || photos.serialPlatePhoto) {
+        await uploadPhotos.mutateAsync({ assetId, photos });
+      }
 
       navigate(SUPPLIER_MACHINES_PATH);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not create machine listing'));
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -121,48 +131,32 @@ export default function CreateMachinePage() {
           onRemove={() => undefined}
         />
 
-        <Textarea
-          label="Description"
-          placeholder="Condition, attachments, transport notes…"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          required
-        />
-
-        <Input
-          label="Yard / pickup location"
-          placeholder="City or yard address"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          required
-        />
-
-        <Input
-          label="Monthly rental price (NGN)"
-          type="number"
-          min={0}
-          placeholder="e.g. 2500000"
-          value={priceAmount}
-          onChange={(e) => setPriceAmount(e.target.value)}
-          required
-        />
-
-        <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-slate-500">
-            Photos
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Machine photos
           </p>
-          <ListingImageUpload
-            files={images}
-            previews={previews}
-            onChange={(nextImages, nextPreviews) => {
-              setImages(nextImages);
-              setPreviews(nextPreviews);
-            }}
+          <FileDropzone
+            label="Front photo"
+            accept="image/*"
+            fileName={machine.frontPhotoName}
+            onFile={(file) => setPhoto('frontPhoto', 'frontPhotoName', file)}
+          />
+          <FileDropzone
+            label="Side photo"
+            accept="image/*"
+            fileName={machine.sidePhotoName}
+            onFile={(file) => setPhoto('sidePhoto', 'sidePhotoName', file)}
+          />
+          <FileDropzone
+            label="Serial number plate"
+            accept="image/*"
+            fileName={machine.serialPhotoName}
+            onFile={(file) => setPhoto('serialPlatePhoto', 'serialPhotoName', file)}
           />
         </div>
 
-        <Button type="submit" disabled={createMutation.isPending}>
-          {createMutation.isPending ? 'Listing…' : 'List Machine'}
+        <Button type="submit" disabled={submitting}>
+          {submitting ? 'Listing…' : 'List Machine'}
         </Button>
       </form>
     </SupplierLayout>

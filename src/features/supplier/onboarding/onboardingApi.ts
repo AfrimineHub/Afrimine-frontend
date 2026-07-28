@@ -1,66 +1,61 @@
 import { apiClient } from '@/lib/api/client';
 import { extractApiData } from '@/lib/api/extractApiData';
-import type { SupplierLocation, SupplierOnboardingDraft } from '@/features/supplier/types';
+import { supplierOnboardingApiPaths } from './onboardingConfig';
+import type { SupplierIdentity, SupplierLocation } from '@/features/supplier/types';
 
-
-export interface VendorOnboardingProfile {
-  businessType?: number;
-  country?: string;
-  stateOrRegion?: string;
-  officeAddress?: string;
-  website?: string;
-  documentType?: number;
-  documentFileName?: string;
-  documentUrl?: string;
-  onboardingStep?: number;
-  isComplete?: boolean;
+export interface SupplierLocationPayload {
+  primaryBaseCity: string;
+  yardAddress: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
-export async function fetchVendorOnboardingProfile(): Promise<VendorOnboardingProfile | null> {
-  try {
-    const { data } = await apiClient.get('onboarding');
-    return extractApiData<VendorOnboardingProfile>(data);
-  } catch {
-    return null;
-  }
+export async function syncLocationStep(location: SupplierLocation): Promise<void> {
+  const payload: SupplierLocationPayload = {
+    primaryBaseCity: location.baseCity,
+    yardAddress: location.yardAddress,
+    latitude: location.lat ?? null,
+    longitude: location.lng ?? null,
+  };
+  await apiClient.put(supplierOnboardingApiPaths.location, payload);
 }
 
-export async function saveBusinessProfile(location: SupplierLocation): Promise<void> {
-  await apiClient.post('onboarding/business-profile', {
-    businessType: 1,
-    country: 'Nigeria',
-    stateOrRegion: location.baseCity,
-    officeAddress: location.yardAddress,
-    website: '',
-  });
+export interface SupplierProfileUpdatePayload {
+  companyName?: string;
+  businessPhone?: string;
+  businessEmail?: string;
 }
 
-export async function uploadKycDocument(file: File, documentType = 1): Promise<void> {
-  const form = new FormData();
-  form.append('DocumentType', String(documentType));
-  form.append('File', file);
-  await apiClient.post('onboarding/kyc', form, {
+export async function updateSupplierProfile(
+  identity: Pick<SupplierIdentity, 'companyName' | 'phone' | 'email'>,
+): Promise<void> {
+  const payload: SupplierProfileUpdatePayload = {
+    companyName: identity.companyName,
+    businessPhone: identity.phone,
+    businessEmail: identity.email,
+  };
+  await apiClient.patch(supplierOnboardingApiPaths.profile, payload);
+}
+
+
+export async function uploadSupplierCacCertificate(file: File): Promise<void> {
+  const formData = new FormData();
+  formData.append('Document', file);
+  await apiClient.post(supplierOnboardingApiPaths.documents, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }
 
-/** Best-effort sync of location step to existing onboarding API. */
-export async function syncLocationStep(location: SupplierLocation): Promise<void> {
-  try {
-    await saveBusinessProfile(location);
-  } catch {
-    // Backend may reject until schema is extended; draft is still saved locally.
-  }
+export async function submitSupplierOnboarding(): Promise<void> {
+  await apiClient.post(supplierOnboardingApiPaths.submit);
 }
 
-export async function submitOnboardingDraft(
-  draft: SupplierOnboardingDraft,
-): Promise<SupplierOnboardingDraft> {
-  await syncLocationStep(draft.location);
-  return {
-    ...draft,
-    step: 5,
-    status: 'pending_verification',
-    submittedAt: new Date().toISOString(),
-  };
+export async function fetchSupplierProfile(): Promise<unknown> {
+  const { data } = await apiClient.get(supplierOnboardingApiPaths.me);
+  return extractApiData<unknown>(data);
+}
+
+export async function fetchSupplierStatus(): Promise<unknown> {
+  const { data } = await apiClient.get(supplierOnboardingApiPaths.status);
+  return extractApiData<unknown>(data);
 }

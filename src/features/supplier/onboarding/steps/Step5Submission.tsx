@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/shared/buttons/Button';
-import { submitOnboardingDraft } from '@/features/supplier/onboarding/onboardingApi';
+import { useSubmitSupplierOnboardingMutation } from '@/features/supplier/onboarding/onboardingQueries';
+import { getApiErrorMessage } from '@/lib/api/errors';
 import type { SupplierOnboardingDraft } from '@/features/supplier/types';
 
 interface Step5SubmissionProps {
@@ -18,20 +19,25 @@ export function Step5Submission({
   onGoToDashboard,
 }: Step5SubmissionProps) {
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const submitOnboarding = useSubmitSupplierOnboardingMutation();
   const alreadySubmitted =
     draft.status === 'pending_verification' || draft.status === 'verified';
 
+  const machinesWithAllPhotos = draft.machines.filter(
+    (m) => m.frontPhotoName && m.sidePhotoName && m.serialPhotoName,
+  ).length;
+
   const handleSubmit = async () => {
     setError(null);
-    setSubmitting(true);
     try {
-      const next = await submitOnboardingDraft(draft);
-      onSubmitted(next);
-    } catch {
-      setError('Could not finalize onboarding. Your progress is saved — try again.');
-    } finally {
-      setSubmitting(false);
+      await submitOnboarding.mutateAsync();
+      onSubmitted({
+        ...draft,
+        status: 'pending_verification',
+        submittedAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not finalize onboarding. Your progress is saved — try again.'));
     }
   };
 
@@ -80,20 +86,14 @@ export function Step5Submission({
         </p>
         <p>
           <span className="text-slate-500">Machines listed:</span>{' '}
-          <span className="font-semibold text-slate-900">{draft.machines.length}</span>
+          <span className="font-semibold text-slate-900">
+            {draft.machines.length} ({machinesWithAllPhotos} with all photos)
+          </span>
         </p>
         <p>
-          <span className="text-slate-500">Documents:</span>{' '}
+          <span className="text-slate-500">CAC certificate:</span>{' '}
           <span className="font-semibold text-slate-900">
-            {[
-              draft.documents.frontPhotoName,
-              draft.documents.sidePhotoName,
-              draft.documents.serialPhotoName,
-              draft.documents.cacCertificateName,
-            ]
-              .filter(Boolean)
-              .length}{' '}
-            uploaded
+            {draft.documents.cacCertificateName ? 'Uploaded' : 'Not uploaded'}
           </span>
         </p>
       </div>
@@ -102,8 +102,8 @@ export function Step5Submission({
         <Button type="button" variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button type="button" onClick={handleSubmit} disabled={submitting}>
-          {submitting ? 'Submitting…' : 'Submit for verification'}
+        <Button type="button" onClick={handleSubmit} disabled={submitOnboarding.isPending}>
+          {submitOnboarding.isPending ? 'Submitting…' : 'Submit for verification'}
         </Button>
       </div>
     </div>
