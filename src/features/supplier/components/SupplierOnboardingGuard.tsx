@@ -3,6 +3,8 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { USER_TYPES } from '@/features/auth/types';
 import { SUPPLIER_ONBOARDING_PATH } from '@/features/supplier/constants';
+import { useSupplierStatusQuery } from '../onboarding/onboardingQueries';
+import { normalizeVerificationStatus } from '../onboarding/onboardingNormalize';
 
 interface SupplierOnboardingGuardProps {
   children?: ReactNode;
