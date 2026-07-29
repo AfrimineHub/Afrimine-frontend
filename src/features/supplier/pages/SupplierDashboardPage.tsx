@@ -146,9 +146,6 @@ export default function SupplierDashboardPage() {
                 <Icon className="text-[#CA8A04]" size={18} aria-hidden />
               </div>
               <p className="text-2xl font-bold tabular-nums text-slate-900">{card.value}</p>
-              {card.trend ? (
-                <p className="mt-2 text-xs font-semibold text-emerald-600">{card.trend}</p>
-              ) : null}
             </div>
           );
         })}
