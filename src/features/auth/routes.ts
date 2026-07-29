@@ -4,41 +4,60 @@ import {
   SUPPLIER_ONBOARDING_PATH,
 } from '@/features/supplier/constants';
 
-export const ROLE_HOME_PATH: Record<UserType, string> = {
-  [USER_TYPES.vendor]: '/vendor-dashboard',
-  [USER_TYPES.buyer]: '/buyer-dashboard',
-  [USER_TYPES.investor]: '/investor-dashboard',
-  [USER_TYPES.supplier]: SUPPLIER_DASHBOARD_PATH,
-  [USER_TYPES.superAdmin]: '/admin',
-};
-
 const SHARED_AUTHENTICATED_PREFIXES = ['/messages', '/notification'];
-
-const ROLE_ROUTE_PREFIXES: Record<UserType, string[]> = {
-  [USER_TYPES.superAdmin]: ['/admin'],
-  [USER_TYPES.vendor]: [
-    '/vendor-dashboard',
-    '/my-ad',
-    '/dashboard/',
-    '/vendor-profile',
-    '/vendor/',
-  ],
-  [USER_TYPES.supplier]: [
-    SUPPLIER_DASHBOARD_PATH,
-    SUPPLIER_ONBOARDING_PATH,
-    '/supplier/',
-    '/vendor-dashboard',
-    '/my-ad',
-    '/dashboard/',
-    '/vendor-profile',
-    '/vendor/',
-    '/my-order',
-  ],
-  [USER_TYPES.buyer]: ['/buyer-dashboard', '/my-order', '/rfq'],
-  [USER_TYPES.investor]: ['/investor-dashboard'],
-};
-
 const FALLBACK_HOME = '/marketplace';
+
+export function getRoleHomePath(type: UserType | undefined): string {
+  switch (type) {
+    case USER_TYPES.supplier:
+      return SUPPLIER_DASHBOARD_PATH;
+    case USER_TYPES.vendor:
+      return '/vendor-dashboard';
+    case USER_TYPES.buyer:
+      return '/buyer-dashboard';
+    case USER_TYPES.investor:
+      return '/investor-dashboard';
+    case USER_TYPES.superAdmin:
+      return '/admin';
+    default:
+      return FALLBACK_HOME;
+  }
+}
+
+
+export function getRoleRoutePrefixes(type: UserType): string[] {
+  switch (type) {
+    case USER_TYPES.superAdmin:
+      return ['/admin'];
+    case USER_TYPES.supplier:
+      return [
+        SUPPLIER_DASHBOARD_PATH,
+        SUPPLIER_ONBOARDING_PATH,
+        '/supplier/',
+        '/vendor-dashboard',
+        '/my-ad',
+        '/dashboard/',
+        '/vendor-profile',
+        '/vendor/',
+        '/my-order',
+      ];
+    case USER_TYPES.vendor:
+      return [
+        '/vendor-dashboard',
+        '/my-ad',
+        '/dashboard/',
+        '/vendor-profile',
+        '/vendor/',
+      ];
+    case USER_TYPES.buyer:
+      return ['/buyer-dashboard', '/my-order', '/rfq'];
+    case USER_TYPES.investor:
+      return ['/investor-dashboard'];
+    default:
+      return [];
+  }
+}
+
 
 function normalizePath(path: string): string {
   const pathname = path.split('?')[0].replace(/\/+$/, '') || '/';
@@ -56,18 +75,11 @@ function pathMatchesAnyPrefix(path: string, prefixes: string[]): boolean {
 }
 
 export function getHomePathForUser(user: AuthUser | null | undefined): string {
-  if (user?.type === USER_TYPES.supplier) {
-    const draft = loadOnboardingDraft(user.id);
-    if (!isOnboardingComplete(draft)) {
-      return SUPPLIER_ONBOARDING_PATH;
-    }
-    return SUPPLIER_DASHBOARD_PATH;
+  if (user?.type === null) {
+    return FALLBACK_HOME;
   }
 
-  if (user?.type != null && user.type in ROLE_HOME_PATH) {
-    return ROLE_HOME_PATH[user.type];
-  }
-  return FALLBACK_HOME;
+  return getRoleHomePath(user?.type);
 }
 
 export function isPathAllowedForUser(path: string, user: AuthUser | null | undefined): boolean {
@@ -78,14 +90,22 @@ export function isPathAllowedForUser(path: string, user: AuthUser | null | undef
   }
 
   if (user?.type != null) {
-    const allowedPrefixes = ROLE_ROUTE_PREFIXES[user.type] ?? [];
+    const allowedPrefixes = getRoleRoutePrefixes(user.type);
     if (pathMatchesAnyPrefix(normalized, allowedPrefixes)) {
       return true;
     }
 
-    for (const [roleKey, prefixes] of Object.entries(ROLE_ROUTE_PREFIXES)) {
-      if (Number(roleKey) === user.type) continue;
-      if (pathMatchesAnyPrefix(normalized, prefixes)) {
+    const allKnownTypes: UserType[] = [
+      USER_TYPES.superAdmin,
+      USER_TYPES.vendor,
+      USER_TYPES.supplier,
+      USER_TYPES.buyer,
+      USER_TYPES.investor,
+    ];
+
+    for (const roleType of allKnownTypes) {
+      if (roleType === user.type) continue;
+      if (pathMatchesAnyPrefix(normalized, getRoleRoutePrefixes(roleType))) {
         return false;
       }
     }
@@ -99,14 +119,6 @@ export function resolvePostAuthPath(
   requestedPath?: string | null,
 ): string {
   const home = getHomePathForUser(user);
-
-  // Incomplete suppliers must finish onboarding before other destinations.
-  // if (user?.type === USER_TYPES.supplier) {
-  //   const draft = loadOnboardingDraft(user.id);
-  //   if (!isOnboardingComplete(draft)) {
-  //     return SUPPLIER_ONBOARDING_PATH;
-  //   }
-  // }
 
   if (!requestedPath) return home;
   return isPathAllowedForUser(requestedPath, user) ? normalizePath(requestedPath) : home;
