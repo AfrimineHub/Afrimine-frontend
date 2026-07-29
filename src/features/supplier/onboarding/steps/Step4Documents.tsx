@@ -6,21 +6,23 @@ import { getApiErrorMessage } from '@/lib/api/errors';
 import type { SupplierDocuments } from '@/features/supplier/types';
 
 interface Step4DocumentsProps {
-  value: SupplierDocuments;
-  onChange: (docs: SupplierDocuments) => void;
+  initialUploaded: boolean;
   onContinue: () => void;
   onBack: () => void;
 }
 
-export function Step4Documents({ value, onChange, onContinue, onBack }: Step4DocumentsProps) {
+export function Step4Documents({ initialUploaded, onContinue, onBack }: Step4DocumentsProps) {
+  const [uploaded, setUploaded] = useState(initialUploaded);
+  const [fileName, setFileName] = useState<string | undefined>();
   const [error, setError] = useState<string | null>(null);
   const uploadCac = useUploadSupplierCacCertificateMutation();
 
   const handleCacUpload = async (file: File) => {
     setError(null);
-    onChange({ ...value, cacCertificateName: file.name });
+    setFileName(file.name);
     try {
       await uploadCac.mutateAsync(file);
+      setUploaded(true);
     } catch (err) {
       setError(
         getApiErrorMessage(
@@ -33,12 +35,8 @@ export function Step4Documents({ value, onChange, onContinue, onBack }: Step4Doc
 
   const handleContinue = () => {
     setError(null);
-    if (!value.cacCertificateName) {
+    if (!uploaded) {
       setError('Upload your CAC certificate or proof of purchase to continue.');
-      return;
-    }
-    if (uploadCac.isError) {
-      setError('The last upload attempt failed — please retry before continuing.');
       return;
     }
     onContinue();

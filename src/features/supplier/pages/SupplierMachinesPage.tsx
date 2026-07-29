@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Plus, Truck } from 'lucide-react';
-import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
-import { loadOnboardingDraft } from '@/features/supplier/onboarding/onboardingStorage';
+import { useSupplierAssetsQuery } from '@/features/supplier/onboarding/assetsQueries';
+import { normalizeAssetsList } from '@/features/supplier/onboarding/onboardingNormalize';
 import { MACHINE_TYPES, SUPPLIER_MACHINES_PATH } from '@/features/supplier/constants';
 import { useVendorListingsQuery } from '@/features/listings/queries';
 import { LISTING_CATEGORY_TYPES } from '@/features/listings/constants';
@@ -12,16 +12,23 @@ function machineTypeLabel(value: string): string {
 }
 
 export default function SupplierMachinesPage() {
-  const { user } = useAuth();
-  const draft = loadOnboardingDraft(user?.id);
+  const assetsQuery = useSupplierAssetsQuery();
   const listingsQuery = useVendorListingsQuery({
     page: 1,
     pageSize: 50,
     categoryType: LISTING_CATEGORY_TYPES.equipment,
   });
 
-  const draftMachines = draft.machines.filter((m) => m.brandModel.trim());
+  const machines = normalizeAssetsList(assetsQuery.data);
   const apiListings = listingsQuery.data?.items ?? [];
+
+  if (assetsQuery.isLoading) {
+    return (
+      <SupplierLayout>
+        <p className="text-sm text-slate-500">Loading your machines…</p>
+      </SupplierLayout>
+    );
+  }
 
   return (
     <SupplierLayout>
@@ -41,7 +48,7 @@ export default function SupplierMachinesPage() {
         </Link>
       </div>
 
-      {draftMachines.length === 0 && apiListings.length === 0 ? (
+      {machines.length === 0 && apiListings.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
           <Truck className="mx-auto text-slate-300" size={36} aria-hidden />
           <p className="mt-4 text-sm font-semibold text-slate-700">No machines listed yet</p>
@@ -55,15 +62,17 @@ export default function SupplierMachinesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {draftMachines.map((machine) => (
+          {machines.map((machine) => (
             <article
-              key={machine.id}
+              key={machine.remoteId ?? machine.id}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
             >
               <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                 {machineTypeLabel(machine.machineType)}
               </p>
-              <h2 className="mt-1 text-lg font-bold text-slate-900">{machine.brandModel}</h2>
+              <h2 className="mt-1 text-lg font-bold text-slate-900">
+                {machine.brand} {machine.model}
+              </h2>
               <dl className="mt-4 space-y-2 text-sm text-slate-600">
                 <div className="flex justify-between gap-2">
                   <dt>Year</dt>
@@ -80,9 +89,6 @@ export default function SupplierMachinesPage() {
                   </dd>
                 </div>
               </dl>
-              <span className="mt-4 inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800">
-                Onboarding draft
-              </span>
             </article>
           ))}
 

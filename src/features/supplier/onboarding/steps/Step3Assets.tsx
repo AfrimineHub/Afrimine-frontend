@@ -16,8 +16,7 @@ import {
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface Step3AssetsProps {
-  value: MachineAsset[];
-  onChange: (machines: MachineAsset[]) => void;
+  initialValue: MachineAsset[];
   onContinue: () => void;
   onBack: () => void;
 }
@@ -45,28 +44,31 @@ function extractCreatedAssetId(created: unknown): string | undefined {
   return undefined;
 }
 
-export function Step3Assets({ value, onChange, onContinue, onBack }: Step3AssetsProps) {
+export function Step3Assets({ initialValue, onContinue, onBack }: Step3AssetsProps) {
+  const [machinesState, setMachinesState] = useState<MachineAsset[]>(
+    initialValue.length > 0 ? initialValue : [createEmptyMachine()],
+  );
   const [error, setError] = useState<string | null>(null);
   const [savingIndex, setSavingIndex] = useState<number | null>(null);
   const createAsset = useCreateAssetMutation();
   const uploadPhotos = useUploadAssetPhotosMutation();
-  const machines = value.length > 0 ? value : [createEmptyMachine()];
+  const machines = machinesState.length > 0 ? machinesState : [createEmptyMachine()];
 
   const photoFilesRef = useRef<Record<number, AssetPhotosPayload>>({});
 
   const updateAt = (index: number, machine: MachineAsset) => {
     const next = [...machines];
     next[index] = machine;
-    onChange(next);
+    setMachinesState(next);
   };
 
   const removeAt = (index: number) => {
     delete photoFilesRef.current[index];
-    onChange(machines.filter((_, i) => i !== index));
+    setMachinesState(machines.filter((_, i) => i !== index));
   };
 
   const addMachine = () => {
-    onChange([...machines, createEmptyMachine()]);
+    setMachinesState([...machines, createEmptyMachine()]);
   };
 
   const setPhoto = (
@@ -92,7 +94,7 @@ export function Step3Assets({ value, onChange, onContinue, onBack }: Step3Assets
     const unmapped = machines.find((m) => !(m.machineType in MACHINE_TYPE_ENUM));
     if (unmapped) {
       setError(
-        'Machine type mapping is not configured yet (MACHINE_TYPE_ENUM_TODO is empty) — this needs the real backend enum values before assets can be saved.',
+        `Unrecognized machine type "${unmapped.machineType}" — check MACHINE_TYPE_ENUM matches the backend MachineType enum.`
       );
       return;
     }
@@ -124,7 +126,7 @@ export function Step3Assets({ value, onChange, onContinue, onBack }: Step3Assets
           }
           machine = { ...machine, remoteId: createdId };
           next[i] = machine;
-          onChange(next);
+          setMachinesState(next);
         }
 
         const pendingPhotos = photoFilesRef.current[i];

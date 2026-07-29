@@ -7,18 +7,19 @@ import { SUPPLIER_BASE_CITIES } from '@/features/supplier/constants';
 import type { SupplierLocation } from '@/features/supplier/types';
 
 interface Step2LocationProps {
-  value: SupplierLocation;
-  onChange: (value: SupplierLocation) => void;
+  initialValue: SupplierLocation;
   onContinue: () => void;
   onBack: () => void;
 }
 
-export function Step2Location({ value, onChange, onContinue, onBack }: Step2LocationProps) {
+export function Step2Location({ initialValue, onContinue, onBack }: Step2LocationProps) {
+  const [value, setValue] = useState<SupplierLocation>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
+  const syncLocation = useSyncLocationMutation();
 
   const update = <K extends keyof SupplierLocation>(key: K, next: SupplierLocation[K]) => {
-    onChange({ ...value, [key]: next });
+    setValue({ ...value, [key]: next });
   };
 
   const handleLocate = () => {
@@ -30,7 +31,7 @@ export function Step2Location({ value, onChange, onContinue, onBack }: Step2Loca
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        onChange({
+        setValue({
           ...value,
           lat: pos.coords.latitude,
           lng: pos.coords.longitude,
@@ -45,13 +46,18 @@ export function Step2Location({ value, onChange, onContinue, onBack }: Step2Loca
     );
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     setError(null);
     if (!value.baseCity || !value.yardAddress.trim()) {
       setError('Select a base city and enter your physical yard address.');
       return;
     }
-    onContinue();
+    try {
+      await syncLocation.mutateAsync(value);
+      onContinue();
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not save your location. Please try again.'));
+    }
   };
 
   return (

@@ -3,39 +3,36 @@ import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/shared/buttons/Button';
 import { useSubmitSupplierOnboardingMutation } from '@/features/supplier/onboarding/onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
-import type { SupplierOnboardingDraft } from '@/features/supplier/types';
 
 interface Step5SubmissionProps {
-  draft: SupplierOnboardingDraft;
-  onSubmitted: (draft: SupplierOnboardingDraft) => void;
+  companyName: string;
+  baseCity: string;
+  machinesCount: number;
+  cacUploaded: boolean;
+  alreadySubmitted: boolean;
+  onSubmitted: () => void;
   onBack: () => void;
   onGoToDashboard: () => void;
 }
 
 export function Step5Submission({
-  draft,
+  companyName,
+  baseCity,
+  machinesCount,
+  cacUploaded,
+  alreadySubmitted,
   onSubmitted,
   onBack,
   onGoToDashboard,
 }: Step5SubmissionProps) {
   const [error, setError] = useState<string | null>(null);
   const submitOnboarding = useSubmitSupplierOnboardingMutation();
-  const alreadySubmitted =
-    draft.status === 'pending_verification' || draft.status === 'verified';
-
-  const machinesWithAllPhotos = draft.machines.filter(
-    (m) => m.frontPhotoName && m.sidePhotoName && m.serialPhotoName,
-  ).length;
 
   const handleSubmit = async () => {
     setError(null);
     try {
       await submitOnboarding.mutateAsync();
-      onSubmitted({
-        ...draft,
-        status: 'pending_verification',
-        submittedAt: new Date().toISOString(),
-      });
+      onSubmitted();
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not finalize onboarding. Your progress is saved — try again.'));
     }
@@ -78,22 +75,22 @@ export function Step5Submission({
       <div className="mb-6 space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm">
         <p>
           <span className="text-slate-500">Company:</span>{' '}
-          <span className="font-semibold text-slate-900">{draft.identity.companyName}</span>
+          <span className="font-semibold text-slate-900">{companyName}</span>
         </p>
         <p>
           <span className="text-slate-500">Base city:</span>{' '}
-          <span className="font-semibold text-slate-900 capitalize">{draft.location.baseCity}</span>
+          <span className="font-semibold text-slate-900 capitalize">{baseCity}</span>
         </p>
         <p>
           <span className="text-slate-500">Machines listed:</span>{' '}
           <span className="font-semibold text-slate-900">
-            {draft.machines.length} ({machinesWithAllPhotos} with all photos)
+            {machinesCount}
           </span>
         </p>
         <p>
           <span className="text-slate-500">CAC certificate:</span>{' '}
           <span className="font-semibold text-slate-900">
-            {draft.documents.cacCertificateName ? 'Uploaded' : 'Not uploaded'}
+            {cacUploaded ? 'Uploaded' : 'Not uploaded'}
           </span>
         </p>
       </div>

@@ -1,9 +1,5 @@
 import { USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
 import {
-  isOnboardingComplete,
-  loadOnboardingDraft,
-} from '@/features/supplier/onboarding/onboardingStorage';
-import {
   SUPPLIER_DASHBOARD_PATH,
   SUPPLIER_ONBOARDING_PATH,
 } from '@/features/supplier/constants';
@@ -105,12 +101,12 @@ export function resolvePostAuthPath(
   const home = getHomePathForUser(user);
 
   // Incomplete suppliers must finish onboarding before other destinations.
-  if (user?.type === USER_TYPES.supplier) {
-    const draft = loadOnboardingDraft(user.id);
-    if (!isOnboardingComplete(draft)) {
-      return SUPPLIER_ONBOARDING_PATH;
-    }
-  }
+  // if (user?.type === USER_TYPES.supplier) {
+  //   const draft = loadOnboardingDraft(user.id);
+  //   if (!isOnboardingComplete(draft)) {
+  //     return SUPPLIER_ONBOARDING_PATH;
+  //   }
+  // }
 
   if (!requestedPath) return home;
   return isPathAllowedForUser(requestedPath, user) ? normalizePath(requestedPath) : home;

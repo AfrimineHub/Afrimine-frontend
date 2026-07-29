@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SupplierStepper } from '@/features/supplier/components/SupplierStepper';
@@ -7,57 +7,61 @@ import { Step2Location } from '@/features/supplier/onboarding/steps/Step2Locatio
 import { Step3Assets } from '@/features/supplier/onboarding/steps/Step3Assets';
 import { Step4Documents } from '@/features/supplier/onboarding/steps/Step4Documents';
 import { Step5Submission } from '@/features/supplier/onboarding/steps/Step5Submission';
-import { syncLocationStep } from '@/features/supplier/onboarding/onboardingApi';
 import {
-  clampStep,
-  loadOnboardingDraft,
-  saveOnboardingDraft,
-} from '@/features/supplier/onboarding/onboardingStorage';
+  useSupplierProfileQuery,
+  useSupplierStatusQuery,
+} from '@/features/supplier/onboarding/onboardingQueries';
+import { useSupplierAssetsQuery } from '@/features/supplier/onboarding/assetsQueries';
+import {
+  normalizeSupplierIdentity,
+  normalizeSupplierLocation,
+  normalizeSupplierDocuments,
+  normalizeVerificationStatus,
+  hasCompletedLocation,
+} from '@/features/supplier/onboarding/onboardingNormalize';
+import { normalizeAssetsList } from '@/features/supplier/onboarding/onboardingNormalize';
+import { clampStep } from '@/features/supplier/types';
 import { SUPPLIER_DASHBOARD_PATH } from '@/features/supplier/constants';
-import type { OnboardingStep, SupplierOnboardingDraft } from '@/features/supplier/types';
-import { isEmailVerified as isUserEmailVerified, type AuthUser } from '@/features/auth/types';
-
-function seedDraftFromUser(user: AuthUser | null | undefined): SupplierOnboardingDraft {
-  const stored = loadOnboardingDraft(user?.id);
-  return {
-    ...stored,
-    identity: {
-      ...stored.identity,
-      fullName: stored.identity.fullName || user?.fullName || '',
-      companyName: stored.identity.companyName || user?.companyName || '',
-      email: stored.identity.email || user?.email || '',
-      phone: stored.identity.phone || user?.phone || '',
-      otpVerified: stored.identity.otpVerified,
-    },
-  };
-}
+import type { OnboardingStep } from '@/features/supplier/types';
+import { isEmailVerified as isUserEmailVerified } from '@/features/auth/types';
 
 export default function SupplierOnboardingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [draft, setDraft] = useState<SupplierOnboardingDraft>(() => seedDraftFromUser(user));
-  const [hydratedUserId, setHydratedUserId] = useState(user?.id);
 
-  // Re-seed when session user id becomes available after first paint.
-  if (user?.id && user.id !== hydratedUserId) {
-    setHydratedUserId(user.id);
-    setDraft(seedDraftFromUser(user));
+  const profileQuery = useSupplierProfileQuery();
+  const statusQuery = useSupplierStatusQuery();
+  const assetsQuery = useSupplierAssetsQuery();
+
+  const identity = useMemo(() => normalizeSupplierIdentity(profileQuery.data), [profileQuery.data]);
+  const location = useMemo(() => normalizeSupplierLocation(profileQuery.data), [profileQuery.data]);
+  const documents = useMemo(() => normalizeSupplierDocuments(profileQuery.data), [profileQuery.data]);
+  const assets = useMemo(() => normalizeAssetsList(assetsQuery.data), [assetsQuery.data]);
+  const status = useMemo(() => normalizeVerificationStatus(statusQuery.data), [statusQuery.data]);
+
+  const furthestCompletedStep = useMemo((): OnboardingStep => {
+    if (status === 'pending_verification' || status === 'verified') return 5;
+    if (!identity.otpVerified || !identity.fullName || !identity.companyName) return 1;
+    if (!hasCompletedLocation(location)) return 2;
+    if (assets.length === 0) return 3;
+    if (!documents.cacUploaded) return 4;
+    return 5;
+  }, [status, identity, location, assets, documents]);
+
+  const [manualStep, setManualStep] = useState<OnboardingStep | null>(null);
+  const currentStep = manualStep ?? furthestCompletedStep;
+
+  const isLoading = profileQuery.isLoading || statusQuery.isLoading || assetsQuery.isLoading;
+
+  const goTo = (step: OnboardingStep) => setManualStep(clampStep(step));
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <p className="text-sm text-slate-500">Loading your onboarding progress…</p>
+      </div>
+    );
   }
-
-  useEffect(() => {
-    saveOnboardingDraft(draft, user?.id);
-  }, [draft, user?.id]);
-
-  const goTo = (step: OnboardingStep) => {
-    setDraft((prev) => ({ ...prev, step: clampStep(step) }));
-  };
-
-  const persistAndContinue = async (next: SupplierOnboardingDraft, step: OnboardingStep) => {
-    if (step === 3) {
-      await syncLocationStep(next.location);
-    }
-    setDraft({ ...next, step });
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6">
@@ -73,51 +77,61 @@ export default function SupplierOnboardingPage() {
         </div>
 
         <div className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 shadow-sm">
-          <SupplierStepper currentStep={draft.step} />
+          <SupplierStepper currentStep={currentStep} />
 
-          {draft.step === 1 && (
+          {currentStep === 1 && (
             <Step1Identity
-              value={draft.identity}
-              onChange={(identity) => setDraft((prev) => ({ ...prev, identity }))}
-              onContinue={() => goTo(2)}
+              initialValue={identity}
+              onContinue={() => {
+                profileQuery.refetch();
+                goTo(2);
+              }}
               isEmailVerified={isUserEmailVerified(user)}
             />
           )}
 
-          {draft.step === 2 && (
+          {currentStep === 2 && (
             <Step2Location
-              value={draft.location}
-              onChange={(location) => setDraft((prev) => ({ ...prev, location }))}
+              initialValue={location}
               onBack={() => goTo(1)}
-              onContinue={() =>
-                void persistAndContinue({ ...draft, location: draft.location }, 3)
-              }
+              onContinue={() => {
+                profileQuery.refetch();
+                goTo(3);
+              }}
             />
           )}
 
-          {draft.step === 3 && (
+          {currentStep === 3 && (
             <Step3Assets
-              value={draft.machines}
-              onChange={(machines) => setDraft((prev) => ({ ...prev, machines }))}
+              initialValue={assets}
               onBack={() => goTo(2)}
-              onContinue={() => goTo(4)}
+              onContinue={() => {
+                assetsQuery.refetch();
+                goTo(4);
+              }}
             />
           )}
 
-          {draft.step === 4 && (
+          {currentStep === 4 && (
             <Step4Documents
-              value={draft.documents}
-              onChange={(documents) => setDraft((prev) => ({ ...prev, documents }))}
+              initialUploaded={documents.cacUploaded}
               onBack={() => goTo(3)}
-              onContinue={() => goTo(5)}
+              onContinue={() => {
+                profileQuery.refetch();
+                goTo(5);
+              }}
             />
           )}
 
-          {draft.step === 5 && (
+          {currentStep === 5 && (
             <Step5Submission
-              draft={draft}
+              companyName={identity.companyName}
+              baseCity={location.baseCity}
+              machinesCount={assets.length}
+              cacUploaded={documents.cacUploaded}
+              alreadySubmitted={status === 'pending_verification' || status === 'verified'}
               onBack={() => goTo(4)}
-              onSubmitted={(next) => setDraft(next)}
+              onSubmitted={() => statusQuery.refetch()}
               onGoToDashboard={() => navigate(SUPPLIER_DASHBOARD_PATH, { replace: true })}
             />
           )}

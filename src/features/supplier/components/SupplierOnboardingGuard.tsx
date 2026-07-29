@@ -2,29 +2,24 @@ import type { ReactNode } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { USER_TYPES } from '@/features/auth/types';
-import {
-  isOnboardingComplete,
-  loadOnboardingDraft,
-} from '@/features/supplier/onboarding/onboardingStorage';
 import { SUPPLIER_ONBOARDING_PATH } from '@/features/supplier/constants';
 
 interface SupplierOnboardingGuardProps {
   children?: ReactNode;
-  /** When true, redirect incomplete suppliers away from dashboard into onboarding. */
   requireComplete?: boolean;
 }
 
-/**
- * Gates supplier routes: incomplete onboarding → wizard; completed → allow dashboard.
- */
 export function SupplierOnboardingGuard({
   children,
   requireComplete = true,
 }: SupplierOnboardingGuardProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
+  const isSupplier = user?.type === USER_TYPES.supplier;
 
-  if (isLoading) {
+  const statusQuery = useSupplierStatusQuery({ enabled: isSupplier });
+
+  if (authLoading || (isSupplier && statusQuery.isLoading)) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center text-sm text-slate-500">
         Loading…
@@ -32,12 +27,12 @@ export function SupplierOnboardingGuard({
     );
   }
 
-  if (user?.type !== USER_TYPES.supplier) {
+  if (!isSupplier) {
     return children ?? <Outlet />;
   }
 
-  const draft = loadOnboardingDraft(user.id);
-  const complete = isOnboardingComplete(draft);
+  const status = normalizeVerificationStatus(statusQuery.data);
+  const complete = status === 'pending_verification' || status === 'verified';
   const onOnboarding = location.pathname.startsWith(SUPPLIER_ONBOARDING_PATH);
 
   if (requireComplete && !complete && !onOnboarding) {
