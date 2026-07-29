@@ -1,14 +1,14 @@
 export const supplierOnboardingApiPaths = {
-  profile: '/api/v1/suppliers/profile',
-  location: '/api/v1/suppliers/location',
-  documents: '/api/v1/suppliers/documents',
-  submit: '/api/v1/suppliers/submit',
-  me: '/api/v1/suppliers/me',
-  status: '/api/v1/suppliers/status',
+  profile: 'suppliers/profile',
+  location: 'suppliers/location',
+  documents: 'suppliers/documents',
+  submit: 'suppliers/submit',
+  me: 'suppliers/me',
+  status: 'suppliers/status',
 } as const;
 
 export const supplierAssetApiPaths = {
-  assets: '/api/v1/assets',
-  asset: (assetId: string) => `/api/v1/assets/${assetId}`,
-  assetPhotos: (assetId: string) => `/api/v1/assets/${assetId}/photos`,
+  assets: 'assets',
+  asset: (assetId: string) => `assets/${assetId}`,
+  assetPhotos: (assetId: string) => `assets/${assetId}/photos`,
 } as const;
