@@ -1,0 +1,98 @@
+import { 
+  createEmptyMachine, 
+  type MachineAsset, 
+  type SupplierIdentity, 
+  type SupplierLocation 
+} from '@/features/supplier/types';
+
+function str(r: Record<string, unknown>, keys: string[]): string {
+  for (const k of keys) {
+    const v = r[k];
+    if (typeof v === 'string') return v;
+  }
+  return '';
+}
+function num(r: Record<string, unknown>, keys: string[]): number | undefined {
+  for (const k of keys) {
+    const v = r[k];
+    if (typeof v === 'number') return v;
+  }
+  return undefined;
+}
+function bool(r: Record<string, unknown>, keys: string[]): boolean {
+  for (const k of keys) {
+    const v = r[k];
+    if (typeof v === 'boolean') return v;
+  }
+  return false;
+}
+
+/** GET /suppliers/me → identity fields. Verify key names against a real response. */
+export function normalizeSupplierIdentity(raw: unknown): SupplierIdentity {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  return {
+    fullName: str(r, ['fullName']),
+    companyName: str(r, ['companyName']),
+    phone: str(r, ['businessPhone', 'phone']),
+    email: str(r, ['businessEmail', 'email']),
+    otpVerified: bool(r, ['otpVerified', 'emailVerified', 'isEmailVerified']),
+  };
+}
+
+export function normalizeSupplierLocation(raw: unknown): SupplierLocation {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  return {
+    baseCity: str(r, ['primaryBaseCity', 'baseCity']),
+    yardAddress: str(r, ['yardAddress']),
+    lat: num(r, ['latitude', 'lat']),
+    lng: num(r, ['longitude', 'lng']),
+  };
+}
+
+export function hasCompletedLocation(loc: SupplierLocation): boolean {
+  return Boolean(loc.baseCity && loc.yardAddress.trim());
+}
+
+/** GET /suppliers/me → CAC document status. */
+export function normalizeSupplierDocuments(raw: unknown): { cacUploaded: boolean } {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  return {
+    cacUploaded: bool(r, ['hasCacCertificate', 'cacUploaded']) || Boolean(str(r, ['cacCertificateUrl'])),
+  };
+}
+
+/** GET /assets → list of MachineAsset for display/edit. */
+export function normalizeAssetsList(raw: unknown): MachineAsset[] {
+  const items: unknown[] = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === 'object' && Array.isArray((raw as Record<string, unknown>).items)
+      ? ((raw as Record<string, unknown>).items as unknown[])
+      : [];
+
+  return items.map((item) => {
+    const r = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+    const base = createEmptyMachine();
+    return {
+      ...base,
+      remoteId: str(r, ['id']) || undefined,
+      machineType: str(r, ['machineType']),
+      brand: str(r, ['brand']),
+      model: str(r, ['model']),
+      yearOfManufacture: String(num(r, ['yearOfManufacture']) ?? ''),
+      engineHours: String(num(r, ['engineHours']) ?? ''),
+      includesOperator: bool(r, ['hasCertifiedOperator']),
+      dailyRentalRate: String(num(r, ['dailyRentalRate']) ?? ''),
+      mobilizationFeePerKm: String(num(r, ['mobilizationFeePerKm']) ?? ''),
+      description: str(r, ['description']) || undefined,
+    };
+  });
+}
+
+export function normalizeVerificationStatus(raw: unknown): 'draft' | 'pending_verification' | 'verified' | 'rejected' {
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
+  const value = str(r, ['status', 'verificationStatus', 'supplierStatus']).toUpperCase();
+  if (value === 'PENDING') return 'pending_verification';
+  if (value === 'VERIFIED' || value === 'APPROVED') return 'verified';
+  if (value === 'REJECTED') return 'rejected';
+  return 'draft';
+}

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { Plus, Truck, CalendarClock, Wallet, Lock } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
-import { loadOnboardingDraft } from '@/features/supplier/onboarding/onboardingStorage';
 import { SUPPLIER_MACHINES_PATH, SUPPLIER_BOOKINGS_PATH } from '@/features/supplier/constants';
 import type { ActiveLeaseRow, SupplierDashboardStats } from '@/features/supplier/types';
 import { useSupplierStatsQuery } from '@/features/supplier/dashboard/dashboardQueries';
@@ -64,7 +63,6 @@ const STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {
 
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
-  const draft = loadOnboardingDraft(user?.id);
 
   const statsQuery = useSupplierStatsQuery();
   const statusQuery = useSupplierStatusQuery();
@@ -72,25 +70,18 @@ export default function SupplierDashboardPage() {
   const bookingsQuery = useSupplierBookingsQuery();
 
   const normalizedStats = normalizeSupplierStats(statsQuery.data);
-  const draftMachineCount = draft.machines.filter((m) => m.brand.trim() || m.model.trim()).length;
   const assetsCount = normalizeAssetsCount(assetsQuery.data);
 
   const stats: SupplierDashboardStats = {
-    totalMachines: normalizedStats.totalMachines ?? assetsCount ?? draftMachineCount,
+    totalMachines: normalizedStats.totalMachines ?? assetsCount ?? 0,
     activeBookings: normalizedStats.activeBookings ?? 0,
     currentEarnings: normalizedStats.currentEarnings ?? 0,
     pendingEscrow: normalizedStats.pendingEscrow ?? 0,
     currency: normalizedStats.currency ?? 'NGN',
-    machinesTrend:
-      draftMachineCount > 0 && normalizedStats.totalMachines == null
-        ? `+${draftMachineCount} listed`
-        : undefined,
   };
 
   const leases = normalizeBookingsList(bookingsQuery.data);
-
-  const backendPending = normalizeVerificationPending(statusQuery.data);
-  const pending = backendPending ?? draft.status === 'pending_verification';
+  const pending = normalizeVerificationPending(statusQuery.data) ?? false;
 
   const displayName = user?.fullName ?? user?.companyName ?? 'Supplier';
 
@@ -98,7 +89,6 @@ export default function SupplierDashboardPage() {
     {
       label: 'Total Machines Listed',
       value: stats.totalMachines,
-      trend: stats.machinesTrend,
       icon: Truck,
     },
     {

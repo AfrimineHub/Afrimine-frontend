@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import {
   fetchSupplierProfile,
   fetchSupplierStatus,
@@ -56,10 +56,13 @@ export function useSupplierProfileQuery() {
   });
 }
 
-export function useSupplierStatusQuery() {
+export function useSupplierStatusQuery(
+  options?: Pick<UseQueryOptions<unknown>, 'enabled'>,
+) {
   return useQuery({
     queryKey: SUPPLIER_STATUS_QUERY_KEY,
     queryFn: fetchSupplierStatus,
     staleTime: 60 * 1000,
+    ...options, 
   });
 }

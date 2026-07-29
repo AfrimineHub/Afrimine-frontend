@@ -7,8 +7,7 @@ import { getApiErrorMessage } from '@/lib/api/errors';
 import type { SupplierIdentity } from '@/features/supplier/types';
 
 interface Step1IdentityProps {
-  value: SupplierIdentity;
-  onChange: (value: SupplierIdentity) => void;
+  initialValue: SupplierIdentity;
   onContinue: () => void;
   isEmailVerified: boolean;
 }
@@ -21,7 +20,8 @@ function profileFieldsEqual(a: SyncedProfileFields, b: SyncedProfileFields): boo
   return a.companyName === b.companyName && a.phone === b.phone && a.email === b.email;
 }
 
-export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: Step1IdentityProps) {
+export function Step1Identity({ initialValue, onContinue, isEmailVerified }: Step1IdentityProps) {
+  const [value, setValue] = useState<SupplierIdentity>(initialValue);
   const resendOtp = useResendOtpMutation();
   const updateProfile = useUpdateSupplierProfileMutation();
   const [otp, setOtp] = useState('');
@@ -37,7 +37,7 @@ export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: 
 
   useEffect(() => {
     if (isEmailVerified && !value.otpVerified) {
-      onChange({ ...value, otpVerified: true });
+      setValue({ ...value, otpVerified: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEmailVerified]);
@@ -45,7 +45,7 @@ export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: 
   const verified = isEmailVerified || value.otpVerified;
 
   const update = <K extends keyof SupplierIdentity>(key: K, next: SupplierIdentity[K]) => {
-    onChange({ ...value, [key]: next });
+    setValue({ ...value, [key]: next });
   };
 
   const phoneLocal = value.phone.startsWith(PHONE_PREFIX)
@@ -83,12 +83,12 @@ export function Step1Identity({ value, onChange, onContinue, isEmailVerified }: 
       }
       // Email was already verified at registration for most users; accept code locally for onboarding gate.
       nextValue = { ...value, otpVerified: true, phone: `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}` };
-      onChange(nextValue);
+      setValue(nextValue);
     } else {
       const normalizedPhone = `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}`;
       if (normalizedPhone !== value.phone) {
         nextValue = { ...value, phone: normalizedPhone };
-        onChange(nextValue);
+        setValue(nextValue);
       }
     }
 

@@ -6,6 +6,12 @@ export type SupplierVerificationStatus =
 
 export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 
+export function clampStep(step: number): OnboardingStep {
+  if (step < 1) return 1;
+  if (step > 5) return 5;
+  return step as OnboardingStep;
+}
+
 export interface SupplierIdentity {
   fullName: string;
   companyName: string;
@@ -42,16 +48,6 @@ export interface SupplierDocuments {
   cacCertificateName?: string;
 }
 
-export interface SupplierOnboardingDraft {
-  step: OnboardingStep;
-  identity: SupplierIdentity;
-  location: SupplierLocation;
-  machines: MachineAsset[];
-  documents: SupplierDocuments;
-  status: SupplierVerificationStatus;
-  submittedAt?: string;
-}
-
 export interface SupplierDashboardStats {
   totalMachines: number;
   activeBookings: number;
@@ -71,21 +67,6 @@ export interface ActiveLeaseRow {
   status: 'pending' | 'active' | 'completed' | 'declined';
 }
 
-export const EMPTY_IDENTITY: SupplierIdentity = {
-  fullName: '',
-  companyName: '',
-  phone: '',
-  email: '',
-  otpVerified: false,
-};
-
-export const EMPTY_LOCATION: SupplierLocation = {
-  baseCity: '',
-  yardAddress: '',
-};
-
-export const EMPTY_DOCUMENTS: SupplierDocuments = {};
-
 export function createEmptyMachine(): MachineAsset {
   return {
     id: crypto.randomUUID(),
@@ -97,16 +78,5 @@ export function createEmptyMachine(): MachineAsset {
     includesOperator: false,
     dailyRentalRate: '',
     mobilizationFeePerKm: '',
-  };
-}
-
-export function createEmptyDraft(): SupplierOnboardingDraft {
-  return {
-    step: 1,
-    identity: { ...EMPTY_IDENTITY },
-    location: { ...EMPTY_LOCATION },
-    machines: [createEmptyMachine()],
-    documents: { ...EMPTY_DOCUMENTS },
-    status: 'draft',
   };
 }
