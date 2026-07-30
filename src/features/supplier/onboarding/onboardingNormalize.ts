@@ -27,7 +27,6 @@ function bool(r: Record<string, unknown>, keys: string[]): boolean {
   return false;
 }
 
-/** GET /suppliers/me → identity fields. Verify key names against a real response. */
 export function normalizeSupplierIdentity(raw: unknown): SupplierIdentity {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   return {

@@ -1,6 +1,6 @@
 /**
  * Backend enum:
- * Vendor = 1, Buyer = 2, Investor = 3, Supplier = 4, SuperAdmin = 6
+ * Vendor = 1, Buyer = 2, Investor = 3, Supplier = 1, SuperAdmin = 6
  */
 export const USER_TYPES = {
   vendor: 1,

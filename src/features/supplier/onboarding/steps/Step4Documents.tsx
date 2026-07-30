@@ -3,7 +3,6 @@ import { Button } from '@/shared/buttons/Button';
 import { FileDropzone } from '@/features/supplier/components/FileDropzone';
 import { useUploadSupplierCacCertificateMutation } from '@/features/supplier/onboarding/onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
-import type { SupplierDocuments } from '@/features/supplier/types';
 
 interface Step4DocumentsProps {
   initialUploaded: boolean;
@@ -59,7 +58,7 @@ export function Step4Documents({ initialUploaded, onContinue, onBack }: Step4Doc
       <FileDropzone
         label="CAC certificate / Proof of purchase"
         accept="image/*,.pdf"
-        fileName={value.cacCertificateName}
+        fileName={fileName}
         onFile={handleCacUpload}
       />
 

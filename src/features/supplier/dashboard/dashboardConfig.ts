@@ -1,3 +1,3 @@
 export const supplierDashboardApiPaths = {
-  stats: '/api/v1/dashboard/supplier/stats',
+  stats: 'dashboard/supplier/stats',
 } as const;

@@ -2,11 +2,6 @@ import { apiClient } from '@/lib/api/client';
 import { extractApiData } from '@/lib/api/extractApiData';
 import { supplierBookingsApiPaths } from './bookingsConfig';
 
-/**
- * The GET /bookings `status` query param is typed as a plain string in the
- * spec (no enum), so these values are a guess based on ActiveLeaseRow's
- * existing status union — confirm the real accepted values with backend.
- */
 export type BookingStatusFilter = 'pending' | 'active' | 'completed' | 'declined';
 
 export async function fetchBookings(status?: BookingStatusFilter): Promise<unknown> {
