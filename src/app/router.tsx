@@ -54,6 +54,7 @@ import CreateMachinePage from "@/features/supplier/pages/CreateMachinePage";
 import SupplierBookingsPage from "@/features/supplier/pages/SupplierBookingsPage";
 import { SupplierOnboardingGuard } from "@/features/supplier/components/SupplierOnboardingGuard";
 import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashboardEntry";
+import { EquipmentdetailsPage } from "@/features/marketplace";
 
 export const router = createBrowserRouter([
   {
@@ -122,6 +123,7 @@ export const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: "home", element: <LandingPage /> },
       { path: "marketplace", element: <MarketplacePage /> },
+      { path: "equipment/:id", element: <EquipmentdetailsPage /> },
       {
         element: <ProtectedRoute />,
         children: [

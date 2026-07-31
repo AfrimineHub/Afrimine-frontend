@@ -36,7 +36,7 @@ export default function SupplierMachinesPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900">My Machines</h1>
           <p className="mt-1 text-sm text-slate-500">
-            Equipment in your yard — from onboarding and marketplace listings.
+            Equipment in your yard will be listed in the marketplace.
           </p>
         </div>
         <Link

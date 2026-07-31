@@ -1,13 +1,13 @@
 export interface MarketplaceFilters {
   location: string;
-  mineral: string;
-  listingType: string;
-  verifiedOnly: boolean;
+  machineType: string;
+  maxDailyRate: string;
+  availableOnly: boolean;
 }
 
 export const DEFAULT_MARKETPLACE_FILTERS: MarketplaceFilters = {
   location: '',
-  mineral: '',
-  listingType: '',
-  verifiedOnly: false,
+  machineType: '',
+  maxDailyRate: '',
+  availableOnly: true,
 };
