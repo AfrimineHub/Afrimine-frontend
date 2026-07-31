@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { MapPin, ShieldCheck, Truck } from 'lucide-react';
+import { MapPin, Truck } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import { useAssetDetailQuery, useAssetPricingQuery, useCreateBookingMutation } from '../equipmentQueries';
 import { LOGISTICS_TYPE_OPTIONS } from '../equipmentTypes';
+
+const DEFAULT_CURRENCY = 'NGN'; // the asset endpoints don't return a currency field yet
 
 function toIsoDateTime(dateStr: string): string {
   return new Date(`${dateStr}T00:00:00`).toISOString();
@@ -18,7 +20,7 @@ function daysBetween(startDate: string, endDate: string): number {
   return diff > 0 ? diff : 0;
 }
 
-function formatCurrency(amount: number, currency: string): string {
+function formatCurrency(amount: number, currency: string = DEFAULT_CURRENCY): string {
   try {
     return new Intl.NumberFormat('en-NG', {
       style: 'currency',
@@ -79,7 +81,7 @@ export default function EquipmentDetailPage() {
       endDate: toIsoDateTime(endDate),
       siteAddress: siteAddress.trim(),
       distanceKm: distanceKm ? Number(distanceKm) : 0,
-      currency: asset.currency,
+      currency: DEFAULT_CURRENCY,
       minerPhone: minerPhone.trim(),
       logisticsType,
     });
@@ -107,6 +109,7 @@ export default function EquipmentDetailPage() {
     );
   }
 
+  const isAvailable = asset.status?.toLowerCase() === 'available';
   const bookingError =
     createBooking.isError && getApiErrorMessage(createBooking.error, 'Could not submit your booking request.');
 
@@ -115,9 +118,9 @@ export default function EquipmentDetailPage() {
       <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <div className="h-64 overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 sm:h-80">
-            {asset.primaryImageUrl ? (
+            {asset.frontPhotoUrl ? (
               <img
-                src={asset.primaryImageUrl}
+                src={asset.frontPhotoUrl}
                 alt={`${asset.brand} ${asset.model}`}
                 className="h-full w-full object-cover"
               />
@@ -129,11 +132,13 @@ export default function EquipmentDetailPage() {
               <span className="rounded-full bg-amber-600 px-2 py-1 text-[10px] font-bold text-white">
                 {asset.machineType}
               </span>
-              {asset.isVerified ? (
-                <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
-                  <ShieldCheck size={14} /> Verified supplier
-                </span>
-              ) : null}
+              <span
+                className={`rounded-full px-2 py-1 text-[10px] font-bold ${
+                  isAvailable ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-600'
+                }`}
+              >
+                {asset.status}
+              </span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">
               {asset.brand} {asset.model}
@@ -171,7 +176,7 @@ export default function EquipmentDetailPage() {
           <div className="mb-4">
             <div className="text-xs font-semibold uppercase text-gray-400">Daily rate</div>
             <div className="text-2xl font-extrabold text-gray-900">
-              {formatCurrency(asset.dailyRentalRate, asset.currency)}
+              {formatCurrency(asset.dailyRentalRate)}
               <span className="text-sm font-medium text-gray-400">/day</span>
             </div>
           </div>
@@ -182,6 +187,10 @@ export default function EquipmentDetailPage() {
                 Log in
               </Link>{' '}
               to request this equipment.
+            </div>
+          ) : !isAvailable ? (
+            <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+              This machine isn&apos;t currently available to book.
             </div>
           ) : createBooking.isSuccess ? (
             <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
