@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { MapPin } from 'lucide-react';
 
 export type ListingCardData = {
@@ -53,12 +54,14 @@ export const ListingCard = ({ data }: { data: ListingCardData }) => {
             <span className="font-bold text-gray-900">{data.spec}</span>
             {data.subSpec ? <span className="text-gray-400"> · {data.subSpec}</span> : null}
           </div>
-          <button className="text-xs font-bold text-black bg-yellow-400 rounded-lg px-4 py-2 hover:text-yellow-800 cursor-pointer">
+          <Link
+            to={`/equipment/${data.id}`}
+            className="text-xs font-bold text-black bg-yellow-400 rounded-lg px-4 py-2 hover:text-yellow-800 cursor-pointer"
+          >
             View Details
-          </button>
+          </Link>
         </div>
       </div>
     </article>
   );
 }
-
