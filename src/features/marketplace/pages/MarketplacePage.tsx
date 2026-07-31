@@ -5,6 +5,7 @@ import { DEFAULT_MARKETPLACE_FILTERS, type MarketplaceFilters } from '../types';
 
 const PAGE_SIZE = 24;
 const LOCATION_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 300;
 
 export const MarketplacePage = () => {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ export const MarketplacePage = () => {
   const [filters, setFilters] = useState<MarketplaceFilters>(DEFAULT_MARKETPLACE_FILTERS);
   const [debouncedLocation, setDebouncedLocation] = useState(filters.location);
   const [page, setPage] = useState(1);
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -24,8 +26,16 @@ export const MarketplacePage = () => {
   }, [filters.location]);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setSearchQuery(searchInput.trim());
+    }, SEARCH_DEBOUNCE_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [searchInput]);
+
+  useEffect(() => {
     setPage(1);
-  }, [debouncedLocation, filters.machineType, filters.maxDailyRate, filters.availableOnly]);
+  }, [debouncedLocation, filters.machineType, filters.maxDailyRate, filters.availableOnly, searchQuery]);
 
   const handleSearch = () => {
     setSearchQuery(searchInput.trim());
@@ -49,6 +59,7 @@ export const MarketplacePage = () => {
       page,
       pageSize: PAGE_SIZE,
       onPageChange: setPage,
+      OnFetchingChange: setIsSearching,
     }),
     [
       debouncedLocation,
@@ -66,6 +77,7 @@ export const MarketplacePage = () => {
         searchQuery={searchInput}
         onSearchQueryChange={setSearchInput}
         onSearch={handleSearch}
+        isSearching={isSearching}
       />
       <FilterBar filters={filters} onFiltersChange={handleFiltersChange} />
       <CategoryGrid />
