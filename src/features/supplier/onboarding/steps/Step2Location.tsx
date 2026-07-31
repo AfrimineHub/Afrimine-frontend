@@ -5,6 +5,9 @@ import { Select } from '@/shared/Select';
 import { Button } from '@/shared/buttons/Button';
 import { SUPPLIER_BASE_CITIES } from '@/features/supplier/constants';
 import type { SupplierLocation } from '@/features/supplier/types';
+import { useSyncLocationMutation } from '../onboardingQueries';
+import { getApiErrorMessage } from '@/lib/api/errors';
+import { SupplierLocationMap } from './SupplierLocationMap';
 
 interface Step2LocationProps {
   initialValue: SupplierLocation;
@@ -20,6 +23,14 @@ export function Step2Location({ initialValue, onContinue, onBack }: Step2Locatio
 
   const update = <K extends keyof SupplierLocation>(key: K, next: SupplierLocation[K]) => {
     setValue({ ...value, [key]: next });
+  };
+
+  const updateCoordinates = (latitude: number,longitude: number,) => {
+    setValue((current) => ({
+      ...current,
+      lat: latitude,
+      lng: longitude,
+    }));
   };
 
   const handleLocate = () => {
@@ -62,72 +73,129 @@ export function Step2Location({ initialValue, onContinue, onBack }: Step2Locatio
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-1">Location & operations</h2>
+
+      <h2 className="text-2xl font-bold text-slate-900 mb-1">
+        Location & operations
+      </h2>
+
+
       <p className="text-sm text-slate-500 mb-6">
         Pinpoint your yard so we can match nearby miners and logistics partners.
       </p>
 
+
       {error && (
-        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+        <p
+          className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+          role="alert"
+        >
           {error}
         </p>
       )}
+
 
       <Select
         label="Primary Base City"
         placeholder="Select city"
         options={[...SUPPLIER_BASE_CITIES]}
         value={value.baseCity || undefined}
-        onChange={(city) => update('baseCity', city)}
+        onChange={(city) =>
+          update('baseCity', city)
+        }
       />
+
 
       <Input
         label="Physical Yard Address"
         placeholder="Street, landmark, area"
         value={value.yardAddress}
-        onChange={(e) => update('yardAddress', e.target.value)}
+        onChange={(event) =>
+          update(
+            'yardAddress',
+            event.target.value,
+          )
+        }
         required
       />
 
+
       <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-100 p-5">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <div className="rounded-full bg-white p-2 shadow-sm">
-              <MapPin className="text-[#CA8A04]" size={18} aria-hidden />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-slate-800">Locate Me on Map</p>
-              <p className="text-xs text-slate-500 mt-0.5">
-                {value.lat != null && value.lng != null
-                  ? `Pinned: ${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}`
-                  : 'Optional GPS pin for your yard'}
-              </p>
-            </div>
+
+        <div className="flex items-start gap-3 mb-4">
+
+          <div className="rounded-full bg-white p-2 shadow-sm">
+            <MapPin
+              className="text-[#CA8A04]"
+              size={18}
+              aria-hidden
+            />
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth={false}
-            className="shrink-0"
-            onClick={handleLocate}
-            disabled={locating}
-          >
-            {locating ? 'Locating…' : 'Locate Me'}
-          </Button>
+
+
+          <div>
+            <p className="text-sm font-semibold text-slate-800">
+              Yard Location
+            </p>
+
+            <p className="text-xs text-slate-500">
+              {value.lat != null &&
+              value.lng != null
+                ? `Pinned: ${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}`
+                : 'Click the map or use Locate Me'}
+            </p>
+          </div>
+
         </div>
-        <div className="mt-4 h-28 rounded-xl bg-slate-200/80 border border-dashed border-slate-300 flex items-center justify-center text-xs text-slate-500">
-          Map preview — GPS coordinates saved when available
-        </div>
+
+
+        <SupplierLocationMap
+          latitude={value.lat}
+          longitude={value.lng}
+          locating={locating}
+          onLocationChange={
+            updateCoordinates
+          }
+        />
+
+
+        <Button
+          type="button"
+          variant="outline"
+          fullWidth={false}
+          className="mt-4"
+          onClick={handleLocate}
+          disabled={locating}
+        >
+          {locating
+            ? 'Locating…'
+            : 'Locate Me'}
+        </Button>
+
+
       </div>
 
+
       <div className="flex flex-col-reverse sm:flex-row gap-3">
-        <Button type="button" variant="outline" onClick={onBack}>
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+        >
           Back
         </Button>
-        <Button type="button" onClick={handleContinue}>
+
+
+        <Button
+          type="button"
+          onClick={handleContinue}
+        >
           Continue
         </Button>
+
       </div>
+
+
     </div>
   );
 }

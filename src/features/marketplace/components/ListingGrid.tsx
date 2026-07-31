@@ -35,15 +35,16 @@ interface ListingsGridProps {
   page?: number;
   pageSize?: number;
   onPageChange?: (page: number) => void;
+  onFetchingChange?: (isFetching: boolean) => void;
 }
 
 interface ListingsPaginationProps {
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
+  page:number;
+  pageSize:number;
+  totalCount:number;
+  totalPages:number;
   onPageChange: (page: number) => void;
-  isLoading?: boolean;
+  isLoading: boolean;
 }
 
 const ListingsPagination = ({
@@ -108,6 +109,7 @@ export const ListingsGrid = ({
   page = 1,
   pageSize = 24,
   onPageChange,
+  onFetchingChange,
 }: ListingsGridProps) => {
   const { user } = useAuth();
   const isBuyer = user?.type === USER_TYPES.buyer;
@@ -128,6 +130,11 @@ export const ListingsGrid = ({
   );
 
   const equipmentQuery = useMarketplaceEquipmentQuery(queryParams);
+
+  // Reflect real fetch state upwards for callers to reflect
+  useEffect(() => {
+    onFetchingChange?.(equipmentQuery.isFetching);
+  }, [equipmentQuery.isFetching, onFetchingChange]);
 
   const listings = useMemo(() => {
     const items = equipmentQuery.data?.items ?? [];
