@@ -113,7 +113,7 @@ export default function SupplierDashboardPage() {
       {pending && (
         <div className="mb-6 rounded-2xl bg-slate-900 px-4 py-3 text-sm text-white sm:px-5">
           <span className="font-semibold text-[#EAB308]">Account pending verification.</span>{' '}
-          Field agents in the Jos / Nasarawa hub will contact you within 24 hours.
+          Our agent will contact you within 24 hours.
         </div>
       )}
 

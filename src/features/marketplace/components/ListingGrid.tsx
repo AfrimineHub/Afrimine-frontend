@@ -2,25 +2,36 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ListingCard } from './ListingCard';
-import { useMarketplaceListingsQuery } from '@/features/buyer/dashboardQueries';
-import { mapMarketplaceListingToCard } from '@/features/buyer/dashboardUtils';
-import type { MarketplaceListingsQueryParams } from '@/features/buyer/dashboardTypes';
+import { useMarketplaceEquipmentQuery } from '../equipmentQueries';
+import { mapEquipmentToCard } from '../equipmentMappers';
+import type { MarketplaceEquipmentDto, MarketplaceEquipmentQueryParams } from '../equipmentTypes';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { USER_TYPES } from '@/features/auth/types';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
-const TAB_PARAMS: Record<string, Partial<MarketplaceListingsQueryParams>> = {
-  Latest: { sort: 'latest' },
-  Recommended: { sort: 'recommended' },
-  Price: { sort: 'price' },
-};
+// The backend has no server-side sort param, so tabs sort the current page
+// of results client-side. "Recommended" is left in fetch order for now.
+const TABS = ['Latest', 'Recommended', 'Price'] as const;
+type Tab = (typeof TABS)[number];
+
+function sortEquipment(items: MarketplaceEquipmentDto[], tab: Tab): MarketplaceEquipmentDto[] {
+  if (tab === 'Latest') {
+    return [...items].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+  }
+  if (tab === 'Price') {
+    return [...items].sort((a, b) => a.dailyRentalRate - b.dailyRentalRate);
+  }
+  return items;
+}
 
 interface ListingsGridProps {
   searchQuery?: string;
-  listingType?: string;
-  mineral?: string;
+  machineType?: number;
   location?: string;
-  verifiedOnly?: boolean;
+  maxDailyRate?: number;
+  availableOnly?: boolean;
   page?: number;
   pageSize?: number;
   onPageChange?: (page: number) => void;
@@ -90,41 +101,41 @@ const ListingsPagination = ({
 
 export const ListingsGrid = ({
   searchQuery = '',
-  listingType,
-  mineral,
+  machineType,
   location,
-  verifiedOnly,
+  maxDailyRate,
+  availableOnly,
   page = 1,
   pageSize = 24,
   onPageChange,
 }: ListingsGridProps) => {
   const { user } = useAuth();
   const isBuyer = user?.type === USER_TYPES.buyer;
-  const [activeTab, setActiveTab] = useState('Latest');
+  const isSupplier = user?.type === USER_TYPES.supplier;
+  const [activeTab, setActiveTab] = useState<Tab>('Latest');
 
-  const queryParams = useMemo(
+  const queryParams = useMemo<MarketplaceEquipmentQueryParams>(
     () => ({
       q: searchQuery || undefined,
-      listingType,
-      mineral,
+      machineType,
       location,
-      verifiedOnly: verifiedOnly || undefined,
+      maxDailyRate,
+      availableOnly,
       page,
       pageSize,
-      ...TAB_PARAMS[activeTab],
     }),
-    [activeTab, listingType, location, mineral, page, pageSize, searchQuery, verifiedOnly],
+    [availableOnly, location, machineType, maxDailyRate, page, pageSize, searchQuery],
   );
 
-  const listingsQuery = useMarketplaceListingsQuery(queryParams);
+  const equipmentQuery = useMarketplaceEquipmentQuery(queryParams);
 
-  const listings = useMemo(
-    () => (listingsQuery.data?.items ?? []).map(mapMarketplaceListingToCard),
-    [listingsQuery.data?.items],
-  );
+  const listings = useMemo(() => {
+    const items = equipmentQuery.data?.items ?? [];
+    return sortEquipment(items, activeTab).map(mapEquipmentToCard);
+  }, [activeTab, equipmentQuery.data?.items]);
 
-  const totalCount = listingsQuery.data?.totalCount ?? 0;
-  const totalPages = listingsQuery.data?.totalPages ?? 1;
+  const totalCount = equipmentQuery.data?.totalCount ?? 0;
+  const totalPages = equipmentQuery.data?.totalPages ?? 1;
 
   useEffect(() => {
     if (!onPageChange || totalPages < 1 || page <= totalPages) return;
@@ -132,12 +143,11 @@ export const ListingsGrid = ({
   }, [onPageChange, page, totalPages]);
 
   const loadError =
-    listingsQuery.isError &&
-    getApiErrorMessage(listingsQuery.error, 'Could not load listings.');
+    equipmentQuery.isError &&
+    getApiErrorMessage(equipmentQuery.error, 'Could not load equipment listings.');
 
-  const handleTabChange = (tab: string) => {
+  const handleTabChange = (tab: Tab) => {
     setActiveTab(tab);
-    onPageChange?.(1);
   };
 
   const handlePageChange = (nextPage: number) => {
@@ -148,17 +158,19 @@ export const ListingsGrid = ({
   return (
     <section className="mt-8">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
-        <h2 className="text-xl font-bold text-gray-800">Recent Listings</h2>
-        <button
-          type="button"
-          className="bg-yellow-400 hover:bg-[#CA8A04] text-black font-bold px-5 py-2 rounded-lg text-sm transition-colors shadow-sm cursor-pointer w-full sm:w-auto"
-        >
-          Post New Listings
-        </button>
+        <h2 className="text-xl font-bold text-gray-800">Equipment Available to Lease</h2>
+        {isSupplier ? (
+          <Link
+            to="/supplier/machines/new"
+            className="bg-yellow-400 hover:bg-[#CA8A04] text-black font-bold px-5 py-2 rounded-lg text-sm text-center transition-colors shadow-sm cursor-pointer w-full sm:w-auto"
+          >
+            List New Equipment
+          </Link>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-8 mb-8 border-b border-gray-100 overflow-x-auto whitespace-nowrap scrollbar-hide">
-        {Object.keys(TAB_PARAMS).map((tab) => (
+        {TABS.map((tab) => (
           <button
             key={tab}
             type="button"
@@ -181,7 +193,7 @@ export const ListingsGrid = ({
         </p>
       ) : null}
 
-      {listingsQuery.isLoading ? (
+      {equipmentQuery.isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" aria-busy="true">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-72 bg-white border border-gray-100 rounded-2xl animate-pulse" />
@@ -189,14 +201,14 @@ export const ListingsGrid = ({
         </div>
       ) : listings.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-          <p className="text-sm text-gray-500 mb-2">No listings found.</p>
+          <p className="text-sm text-gray-500 mb-2">No equipment found.</p>
           {isBuyer ? (
             <p className="text-xs text-gray-400">
               Can&apos;t find what you need?{' '}
               <Link to="/rfq" className="text-yellow-700 font-semibold hover:underline">
                 Post a buying request (RFQ)
               </Link>{' '}
-              and vendors will message you.
+              and suppliers will message you.
             </p>
           ) : null}
         </div>
@@ -215,7 +227,7 @@ export const ListingsGrid = ({
           totalCount={totalCount}
           totalPages={totalPages}
           onPageChange={handlePageChange}
-          isLoading={listingsQuery.isFetching}
+          isLoading={equipmentQuery.isFetching}
         />
       ) : null}
     </section>

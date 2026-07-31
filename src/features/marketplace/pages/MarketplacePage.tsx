@@ -25,7 +25,7 @@ export const MarketplacePage = () => {
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedLocation, filters.mineral, filters.listingType, filters.verifiedOnly]);
+  }, [debouncedLocation, filters.machineType, filters.maxDailyRate, filters.availableOnly]);
 
   const handleSearch = () => {
     setSearchQuery(searchInput.trim());
@@ -43,18 +43,18 @@ export const MarketplacePage = () => {
     () => ({
       searchQuery,
       location: debouncedLocation.trim() || undefined,
-      mineral: filters.mineral || undefined,
-      listingType: filters.listingType || undefined,
-      verifiedOnly: filters.verifiedOnly || undefined,
+      machineType: filters.machineType !== '' ? Number(filters.machineType) : undefined,
+      maxDailyRate: filters.maxDailyRate !== '' ? Number(filters.maxDailyRate) : undefined,
+      availableOnly: filters.availableOnly,
       page,
       pageSize: PAGE_SIZE,
       onPageChange: setPage,
     }),
     [
       debouncedLocation,
-      filters.listingType,
-      filters.mineral,
-      filters.verifiedOnly,
+      filters.availableOnly,
+      filters.machineType,
+      filters.maxDailyRate,
       page,
       searchQuery,
     ],

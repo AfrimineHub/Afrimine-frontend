@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
-import { MapPin, Globe, Layers, Eye, ChevronDown } from 'lucide-react';
-import { LISTING_CATEGORY_OPTIONS, MINERAL_TYPES } from '@/features/listings/constants';
+import { MapPin, Truck, Banknote, CheckCircle2, ChevronDown } from 'lucide-react';
+import { MACHINE_TYPES } from '@/features/marketplace/equipmentTypes';
 import type { MarketplaceFilters } from '@/features/marketplace/types';
 
-const LISTING_TYPE_OPTIONS = [
-  { label: 'All types', value: '' },
-  ...LISTING_CATEGORY_OPTIONS.map((option) => ({ label: option.label, value: option.label })),
+const MACHINE_TYPE_OPTIONS = [
+  { label: 'All equipment', value: '' },
+  ...MACHINE_TYPES.map((type) => ({ label: type.label, value: String(type.value) })),
 ];
-
-const MINERAL_OPTIONS = [{ label: 'All minerals', value: '' }, ...MINERAL_TYPES];
 
 interface FilterBarProps {
   filters: MarketplaceFilters;
@@ -105,33 +103,38 @@ export const FilterBar = ({ filters, onFiltersChange }: FilterBarProps) => {
       </div>
 
       <FilterDropdown
-        icon={Globe}
-        label="Minerals"
-        value={filters.mineral}
-        options={MINERAL_OPTIONS}
-        onChange={(value) => updateFilter('mineral', value)}
+        icon={Truck}
+        label="Equipment"
+        value={filters.machineType}
+        options={MACHINE_TYPE_OPTIONS}
+        onChange={(value) => updateFilter('machineType', value)}
       />
 
-      <FilterDropdown
-        icon={Layers}
-        label="Listing Type"
-        value={filters.listingType}
-        options={LISTING_TYPE_OPTIONS}
-        onChange={(value) => updateFilter('listingType', value)}
-      />
+      <div className="flex items-center gap-2 px-4 py-2 text-gray-500 border-r border-gray-100 border-r-0 sm:border-r">
+        <Banknote size={18} className="shrink-0 text-gray-400" />
+        <input
+          type="number"
+          min={0}
+          value={filters.maxDailyRate}
+          onChange={(event) => updateFilter('maxDailyRate', event.target.value)}
+          placeholder="Max daily rate"
+          className="w-full min-w-[120px] bg-transparent text-sm font-medium text-gray-700 placeholder:text-gray-400 outline-none sm:w-36"
+          aria-label="Filter by maximum daily rate"
+        />
+      </div>
 
       <button
         type="button"
-        onClick={() => updateFilter('verifiedOnly', !filters.verifiedOnly)}
+        onClick={() => updateFilter('availableOnly', !filters.availableOnly)}
         className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm w-full sm:w-auto sm:ml-auto cursor-pointer transition-colors ${
-          filters.verifiedOnly
+          filters.availableOnly
             ? 'bg-yellow-400 font-semibold text-gray-900'
             : 'bg-gray-200 text-gray-500 hover:text-gray-700'
         }`}
-        aria-pressed={filters.verifiedOnly}
+        aria-pressed={filters.availableOnly}
       >
-        <Eye size={18} className={filters.verifiedOnly ? 'text-gray-900' : 'text-gray-400'} />
-        <span className="font-medium">Only Verified Listings</span>
+        <CheckCircle2 size={18} className={filters.availableOnly ? 'text-gray-900' : 'text-gray-400'} />
+        <span className="font-medium">Available Now Only</span>
       </button>
     </div>
   );
