@@ -136,7 +136,7 @@ export default function SupplierOnboardingPage() {
               baseCity={location.baseCity}
               machinesCount={assets.length}
               cacUploaded={documents.cacUploaded}
-              alreadySubmitted={status === 'pending_verification' || status === 'verified'}
+              alreadySubmitted={submitted}
               onBack={() => goTo(4)}
               onSubmitted={() => statusQuery.refetch()}
               onGoToDashboard={() => navigate(SUPPLIER_DASHBOARD_PATH, { replace: true })}

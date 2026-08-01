@@ -46,7 +46,7 @@ export function Step5Submission({
         </div>
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Thank you for registering!</h2>
         <p className="text-sm text-slate-500 mb-2 max-w-md mx-auto">
-          Our field agents in the Jos / Nasarawa hub will contact you within 24 hours to complete
+          Our agents will contact you within 24 hours to complete
           physical verification.
         </p>
         <div className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#CA8A04] mb-8">
