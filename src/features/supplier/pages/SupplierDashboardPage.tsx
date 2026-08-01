@@ -9,6 +9,7 @@ import { useSupplierStatusQuery } from '@/features/supplier/onboarding/onboardin
 import { useSupplierAssetsQuery } from '@/features/supplier/onboarding/assetsQueries';
 import { useSupplierBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
 import { normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
+import { ACCOUNT_STATUS } from '@/features/supplier/constants';
 
 function normalizeSupplierStats(raw: unknown): Partial<SupplierDashboardStats> {
   if (!raw || typeof raw !== 'object') return {};
@@ -46,12 +47,10 @@ function normalizeAssetsCount(raw: unknown): number | undefined {
   return undefined;
 }
 
-function normalizeVerificationPending(raw: unknown): boolean | undefined {
-  if (!raw || typeof raw !== 'object') return undefined;
-  const r = raw as Record<string, unknown>;
-  const value = r.status ?? r.verificationStatus ?? r.supplierStatus;
-  if (typeof value !== 'string') return undefined;
-  return value.toUpperCase() === 'PENDING';
+function normalizeVerificationPending(raw: unknown): boolean {
+  if (!raw || typeof raw !== 'object') return false;
+  const status = (raw as Record<string, unknown>).status;
+  return status === ACCOUNT_STATUS.Pending;
 }
 
 const STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {

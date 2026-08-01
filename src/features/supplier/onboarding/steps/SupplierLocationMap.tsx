@@ -14,16 +14,18 @@ interface SupplierLocationMapProps {
   latitude?: number;
   longitude?: number;
   onLocationChange: (latitude: number, longitude: number) => void;
-  locating: boolean;
 }
 
 const DEFAULT_POSITION: LatLngExpression = [6.5244, 3.3792];
 
-function MapClickHandler({
-  onLocationChange,
-}: {
-  onLocationChange: (latitude: number, longitude: number) => void;
-}) {
+interface MapClickHandlerProps {
+  onLocationChange: (
+    latitude: number,
+    longitude: number,
+  ) => void;
+}
+
+function MapClickHandler({onLocationChange,}:MapClickHandlerProps) {
   useMapEvents({
     click(event) {
       onLocationChange(
