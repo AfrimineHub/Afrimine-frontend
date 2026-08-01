@@ -17,7 +17,8 @@ import {
   normalizeSupplierLocation,
   normalizeSupplierDocuments,
   normalizeVerificationStatus,
-  hasCompletedLocation,
+  isOnboardingSubmitted,
+  getOnboardingStep,
 } from '@/features/supplier/onboarding/onboardingNormalize';
 import { normalizeAssetsList } from '@/features/supplier/onboarding/onboardingNormalize';
 import { clampStep } from '@/features/supplier/types';
@@ -39,14 +40,16 @@ export default function SupplierOnboardingPage() {
   const assets = useMemo(() => normalizeAssetsList(assetsQuery.data), [assetsQuery.data]);
   const status = useMemo(() => normalizeVerificationStatus(statusQuery.data), [statusQuery.data]);
 
+  const submitted = statusQuery.isSuccess && isOnboardingSubmitted(statusQuery.data);
+
   const furthestCompletedStep = useMemo((): OnboardingStep => {
-    if (status === 'pending_verification' || status === 'verified') return 5;
-    if (!identity.otpVerified || !identity.fullName || !identity.companyName) return 1;
-    if (!hasCompletedLocation(location)) return 2;
-    if (assets.length === 0) return 3;
-    if (!documents.cacUploaded) return 4;
-    return 5;
-  }, [status, identity, location, assets, documents]);
+    if (submitted) return 5;
+    if (statusQuery.isSuccess) {
+      const backendStep = getOnboardingStep(statusQuery.data);
+      if (backendStep != null) return clampStep(backendStep);
+    }
+    return 1;
+  }, [submitted, statusQuery.isSuccess, statusQuery.data]);
 
   const [manualStep, setManualStep] = useState<OnboardingStep | null>(null);
   const currentStep = manualStep ?? furthestCompletedStep;
@@ -84,6 +87,7 @@ export default function SupplierOnboardingPage() {
               initialValue={identity}
               onContinue={() => {
                 profileQuery.refetch();
+                statusQuery.refetch();
                 goTo(2);
               }}
               isEmailVerified={isUserEmailVerified(user)}
@@ -96,6 +100,7 @@ export default function SupplierOnboardingPage() {
               onBack={() => goTo(1)}
               onContinue={() => {
                 profileQuery.refetch();
+                statusQuery.refetch();
                 goTo(3);
               }}
             />
@@ -107,6 +112,7 @@ export default function SupplierOnboardingPage() {
               onBack={() => goTo(2)}
               onContinue={() => {
                 assetsQuery.refetch();
+                statusQuery.refetch();
                 goTo(4);
               }}
             />
@@ -118,6 +124,7 @@ export default function SupplierOnboardingPage() {
               onBack={() => goTo(3)}
               onContinue={() => {
                 profileQuery.refetch();
+                statusQuery.refetch();
                 goTo(5);
               }}
             />

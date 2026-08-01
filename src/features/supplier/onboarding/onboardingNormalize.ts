@@ -33,17 +33,26 @@ function asRecord(raw: unknown): Record<string, unknown> {
   return raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
 }
 
-export function getAccountStatus(statusData: unknown): number | undefined {
+export function getAccountStatus(statusData: unknown): string | undefined {
   const value = asRecord(statusData).status;
-  return typeof value === 'number' ? value : undefined;
+  return typeof value === 'string' ? value : undefined;
 }
 
 export function isSupplierBlocked(statusData: unknown): boolean {
   return isAccountBlocked(getAccountStatus(statusData));
 }
 
+export function isOnboardingSubmitted(statusData: unknown): boolean {
+  return asRecord(statusData).isSubmitted === true;
+}
+
 export function isSupplierPendingReview(statusData: unknown): boolean {
   return getAccountStatus(statusData) === ACCOUNT_STATUS.Pending;
+}
+
+export function getOnboardingStep(statusData: unknown): number | undefined {
+  const value = asRecord(statusData).onboardingStep;
+  return typeof value === 'number' ? value : undefined;
 }
 
 export function normalizeSupplierIdentity(raw: unknown): SupplierIdentity {
@@ -113,40 +122,4 @@ export function normalizeVerificationStatus(raw: unknown): 'draft' | 'pending_ve
   if (value === 'VERIFIED' || value === 'APPROVED') return 'verified';
   if (value === 'REJECTED') return 'rejected';
   return 'draft';
-}
-
-/**
- * Whether the supplier has finished the onboarding wizard — NOT whether
- * admin has approved them. Deliberately independent of AccountStatus,
- * since AccountStatus defaults to Pending for brand-new accounts too and
- * can't distinguish "never started" from "submitted, awaiting review".
- *
- * Preferred: backend adds `onboardingSubmittedAt` to GET /suppliers/status,
- * set exactly when POST /suppliers/submit succeeds — this function switches
- * to trusting it automatically the moment it appears in the response.
- * Until then, falls back to checking profile-field completeness from
- * GET /suppliers/me. Delete the fallback branch once the real field ships.
- */
-export function isOnboardingSubmitted(statusData: unknown, profileData: unknown): boolean {
-  const status = asRecord(statusData);
-
-  if (typeof status.onboardingSubmittedAt === 'string') {
-    return true;
-  }
-  if ('onboardingSubmittedAt' in status) {
-    // Field exists but is null — authoritative "not submitted yet".
-    return false;
-  }
-
-  // Fallback: field doesn't exist on this backend response yet.
-  const profile = asRecord(profileData);
-  return Boolean(
-    profile.companyName &&
-      profile.businessPhone &&
-      profile.businessEmail &&
-      profile.primaryBaseCity &&
-      profile.yardAddress &&
-      Array.isArray(profile.documents) &&
-      profile.documents.length > 0,
-  );
 }
