@@ -55,6 +55,7 @@ import SupplierBookingsPage from "@/features/supplier/pages/SupplierBookingsPage
 import { SupplierOnboardingGuard } from "@/features/supplier/components/SupplierOnboardingGuard";
 import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashboardEntry";
 import { EquipmentdetailsPage } from "@/features/marketplace";
+import SupplierAccountRestrictedPage from "@/features/supplier/pages/SupplierAccountRestrictedPage";
 
 export const router = createBrowserRouter([
   {
@@ -147,6 +148,10 @@ export const router = createBrowserRouter([
               {
                 path: "supplier/onboarding",
                 element: <SupplierOnboardingPage />,
+              },
+              {
+                path: "supplier/restricted",
+                element: <SupplierAccountRestrictedPage />,
               },
               {
                 element: <SupplierOnboardingGuard requireComplete />,

@@ -25,6 +25,27 @@ export const ONBOARDING_STEPS = [
   { step: 5 as const, title: 'Submit', description: 'Verification' },
 ];
 
+export const ACCOUNT_STATUS = {
+  Pending: 0,
+  Active: 1,
+  Suspended: 2,
+  Banned: 3,
+  Deactivated: 4,
+} as const;
+
+export type AccountStatusValue = (typeof ACCOUNT_STATUS)[keyof typeof ACCOUNT_STATUS];
+export const SUPPLIER_ACCOUNT_RESTRICTED_PATH = '/supplier/restricted';
+
+const BLOCKED_STATUSES: AccountStatusValue[] = [
+  ACCOUNT_STATUS.Suspended,
+  ACCOUNT_STATUS.Banned,
+  ACCOUNT_STATUS.Deactivated,
+];
+
+export function isAccountBlocked(status: unknown): boolean {
+  return typeof status === 'number' && BLOCKED_STATUSES.includes(status as AccountStatusValue);
+}
+
 export const SUPPLIER_ONBOARDING_STORAGE_KEY = 'afrimine.supplier.onboarding';
 export const SUPPLIER_ONBOARDING_PATH = '/supplier/onboarding';
 export const SUPPLIER_DASHBOARD_PATH = '/supplier-dashboard';

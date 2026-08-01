@@ -48,11 +48,14 @@ export function useSubmitSupplierOnboardingMutation() {
   });
 }
 
-export function useSupplierProfileQuery() {
+export function useSupplierProfileQuery(
+  options?: Pick<UseQueryOptions<unknown>, 'enabled'>,
+) {
   return useQuery({
     queryKey: SUPPLIER_PROFILE_QUERY_KEY,
     queryFn: fetchSupplierProfile,
     staleTime: 60 * 1000,
+    ...options,
   });
 }
 

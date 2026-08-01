@@ -25,7 +25,9 @@ export function Step2Location({ initialValue, onContinue, onBack }: Step2Locatio
     setValue({ ...value, [key]: next });
   };
 
-  const updateCoordinates = (latitude: number,longitude: number,) => {
+  const updateCoordinates = (latitude: number, longitude: number) => {
+    // Address lookup happens server-side (see syncLocation) rather than
+    // calling a geocoding provider directly from the client.
     setValue((current) => ({
       ...current,
       lat: latitude,
@@ -151,7 +153,6 @@ export function Step2Location({ initialValue, onContinue, onBack }: Step2Locatio
         <SupplierLocationMap
           latitude={value.lat}
           longitude={value.lng}
-          locating={locating}
           onLocationChange={
             updateCoordinates
           }
