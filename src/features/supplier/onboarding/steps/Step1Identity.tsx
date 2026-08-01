@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Input } from '@/shared/inputs/Input';
 import { Button } from '@/shared/buttons/Button';
-import { useResendOtpMutation } from '@/features/auth/queries';
+import { useConfirmEmailMutation, useResendOtpMutation } from '@/features/auth/queries';
 import { useUpdateSupplierProfileMutation } from '@/features/supplier/onboarding/onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import type { SupplierIdentity } from '@/features/supplier/types';
+import { useAuth } from '@/features/auth';
 
 interface Step1IdentityProps {
   initialValue: SupplierIdentity;
@@ -13,40 +14,41 @@ interface Step1IdentityProps {
 }
 
 const PHONE_PREFIX = '+234';
-
-type SyncedProfileFields = Pick<SupplierIdentity, 'companyName' | 'phone' | 'email'>;
-
-function profileFieldsEqual(a: SyncedProfileFields, b: SyncedProfileFields): boolean {
-  return a.companyName === b.companyName && a.phone === b.phone && a.email === b.email;
-}
+const CONFIRM_EMAIL_TYPE = 0;
 
 export function Step1Identity({ initialValue, onContinue, isEmailVerified }: Step1IdentityProps) {
+  const { user } = useAuth()
   const [value, setValue] = useState<SupplierIdentity>(initialValue);
   const resendOtp = useResendOtpMutation();
+  const confirmEmail = useConfirmEmailMutation();
   const updateProfile = useUpdateSupplierProfileMutation();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [otpSent, setOtpSent] = useState(value.otpVerified);
 
-  const lastSyncedRef = useRef<SyncedProfileFields>({
-    companyName: value.companyName,
-    phone: value.phone,
-    email: value.email,
-  });
-
-  useEffect(() => {
-    if (isEmailVerified && !value.otpVerified) {
-      setValue({ ...value, otpVerified: true });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEmailVerified]);
-
-  const verified = isEmailVerified || value.otpVerified;
+  // Tracks which exact email address was actually confirmed via OTP this
+  // session — separate from the account's login-email verification, and
+  // separate from `value.email`, so editing the field after verifying it
+  // correctly re-requires verification instead of staying "verified" stale.
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(
+    initialValue.otpVerified ? initialValue.email.trim().toLowerCase() : null,
+  );
 
   const update = <K extends keyof SupplierIdentity>(key: K, next: SupplierIdentity[K]) => {
     setValue({ ...value, [key]: next });
   };
+
+  const normalizedBusinessEmail = value.email.trim().toLowerCase();
+
+  // The account's login email was verified at registration — but that only
+  // covers THAT address. If the business email here differs from it, it
+  // hasn't been verified by anyone, regardless of account status.
+  const businessEmailMatchesAccount =
+    Boolean(user?.email) && normalizedBusinessEmail === user!.email.trim().toLowerCase();
+  const accountEmailVerified = isEmailVerified && businessEmailMatchesAccount;
+  const otpVerifiedForCurrentEmail = verifiedEmail !== null && verifiedEmail === normalizedBusinessEmail;
+  const verified = accountEmailVerified || otpVerifiedForCurrentEmail;
 
   const phoneLocal = value.phone.startsWith(PHONE_PREFIX)
     ? value.phone.slice(PHONE_PREFIX.length)
@@ -76,13 +78,35 @@ export function Step1Identity({ initialValue, onContinue, isEmailVerified }: Ste
     }
 
     let nextValue = value;
+
     if (!verified) {
-      if (!otpSent || otp.replace(/\D/g, '').length < 6) {
+      if (!otpSent) {
+        setError('Send the verification code to your business email first.');
+        return;
+      }
+      const cleanOtp = otp.replace(/\D/g, '');
+      if (cleanOtp.length < 6) {
         setError('Enter the 6-digit verification code to continue.');
         return;
       }
-      // Email was already verified at registration for most users; accept code locally for onboarding gate.
-      nextValue = { ...value, otpVerified: true, phone: `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}` };
+
+      try {
+        await confirmEmail.mutateAsync({
+          email: value.email.trim(),
+          otp: cleanOtp,
+          type: CONFIRM_EMAIL_TYPE,
+        });
+      } catch (err) {
+        setError(getApiErrorMessage(err, 'That code is incorrect or has expired.'));
+        return;
+      }
+
+      setVerifiedEmail(normalizedBusinessEmail);
+      nextValue = {
+        ...value,
+        otpVerified: true,
+        phone: `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}`,
+      };
       setValue(nextValue);
     } else {
       const normalizedPhone = `${PHONE_PREFIX}${phoneLocal.replace(/\D/g, '')}`;
@@ -92,20 +116,15 @@ export function Step1Identity({ initialValue, onContinue, isEmailVerified }: Ste
       }
     }
 
-    const candidateFields: SyncedProfileFields = {
-      companyName: nextValue.companyName,
-      phone: nextValue.phone,
-      email: nextValue.email,
-    };
-
-    if (!profileFieldsEqual(candidateFields, lastSyncedRef.current)) {
-      try {
-        await updateProfile.mutateAsync(candidateFields);
-        lastSyncedRef.current = candidateFields;
-      } catch (err) {
-        setError(getApiErrorMessage(err, 'Could not save your profile details. Please try again.'));
-        return;
-      }
+    try {
+      await updateProfile.mutateAsync({
+        companyName: nextValue.companyName,
+        phone: nextValue.phone,
+        email: nextValue.email,
+      });
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Could not save your profile details. Please try again.'));
+      return;
     }
 
     onContinue();
@@ -196,8 +215,12 @@ export function Step1Identity({ initialValue, onContinue, isEmailVerified }: Ste
         </p>
       )}
 
-      <Button type="button" onClick={handleContinue} disabled={updateProfile.isPending}>
-        {updateProfile.isPending ? 'Saving…' : 'Continue'}
+      <Button 
+        type="button" 
+        onClick={handleContinue} 
+        disabled={updateProfile.isPending || confirmEmail.isPending}
+      >
+        {confirmEmail.isPending ? 'Verifying…' : updateProfile.isPending ? 'Saving…' : 'Continue'}
       </Button>
     </div>
   );
