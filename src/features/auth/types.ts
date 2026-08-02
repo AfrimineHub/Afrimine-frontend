@@ -1,13 +1,13 @@
 /**
  * Backend enum:
- * Vendor = 1, Buyer = 2, Investor = 3, Supplier = 1, SuperAdmin = 6
+ * Vendor = 1, Buyer = 2, Investor = 3, Supplier = 1, SuperAdmin = 5
  */
 export const USER_TYPES = {
   vendor: 1,
   buyer: 2,
   investor: 3,
   supplier: 1,
-  superAdmin: 6,
+  superAdmin: 5,
 } as const;
 
 export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
