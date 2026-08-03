@@ -1,4 +1,4 @@
-import { ACCOUNT_STATUS, isAccountBlocked } from '../constants';
+import { ACCOUNT_STATUS, ASSET_STATUS_FROM_ENUM, isAccountBlocked } from '../constants';
 import { MACHINE_TYPE_FROM_ENUM } from './assetsApi';
 import {
   createEmptyMachine,
@@ -102,6 +102,20 @@ function normalizeMachineType(raw: unknown): string {
   return '';
 }
 
+function normalizeAssetStatus(raw: unknown): string | undefined {
+  if (typeof raw === 'number' && ASSET_STATUS_FROM_ENUM[raw]) {
+    return ASSET_STATUS_FROM_ENUM[raw];
+  }
+  if (typeof raw === 'string') {
+    const asNum = Number(raw);
+    if (!Number.isNaN(asNum) && ASSET_STATUS_FROM_ENUM[asNum]) {
+      return ASSET_STATUS_FROM_ENUM[asNum];
+    }
+    return raw;
+  }
+  return undefined;
+}
+
 /** GET /assets or /assets/{id} → MachineAsset for display/edit. */
 export function normalizeMachineAsset(raw: unknown): MachineAsset | null {
   if (!raw || typeof raw !== 'object') return null;
@@ -122,7 +136,7 @@ export function normalizeMachineAsset(raw: unknown): MachineAsset | null {
     dailyRentalRate: String(num(r, ['dailyRentalRate']) ?? ''),
     mobilizationFeePerKm: String(num(r, ['mobilizationFeePerKm']) ?? ''),
     description: str(r, ['description']) || undefined,
-    status: str(r, ['status']) || undefined,
+    status: normalizeAssetStatus(r.status),
   };
 }
 

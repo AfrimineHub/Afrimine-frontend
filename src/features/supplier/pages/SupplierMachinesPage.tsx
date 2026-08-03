@@ -12,7 +12,7 @@ import {
 } from '@/features/supplier/onboarding/assetsQueries';
 import { normalizeAssetsList } from '@/features/supplier/onboarding/onboardingNormalize';
 import {
-  ASSET_STATUS,
+  ASSET_STATUS_ENUM,
   isAssetAvailable,
   MACHINE_TYPES,
   SUPPLIER_MACHINES_PATH,
@@ -56,7 +56,7 @@ export default function SupplierMachinesPage() {
       await updateMutation.mutateAsync({
         assetId,
         payload: {
-          status: nextAvailable ? ASSET_STATUS.Available : ASSET_STATUS.Unavailable,
+          status: nextAvailable ? ASSET_STATUS_ENUM.Available : ASSET_STATUS_ENUM.Inactive,
         },
       });
     } catch (err) {

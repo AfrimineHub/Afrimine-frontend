@@ -8,9 +8,9 @@ import { ToggleSwitch } from '@/features/supplier/components/ToggleSwitch';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { createEmptyMachine, type MachineAsset } from '@/features/supplier/types';
 import {
-  ASSET_STATUS,
   isAssetAvailable,
   SUPPLIER_MACHINES_PATH,
+  toAssetStatusEnum,
 } from '@/features/supplier/constants';
 import {
   useSupplierAssetQuery,
@@ -36,7 +36,7 @@ function toUpdatePayload(machine: MachineAsset): UpdateAssetPayload {
     dailyRentalRate: Number(machine.dailyRentalRate),
     mobilizationFeePerKm: Number(machine.mobilizationFeePerKm),
     description: machine.description,
-    status: machine.status,
+    status: toAssetStatusEnum(machine.status),
   };
 }
 
@@ -166,7 +166,7 @@ export default function EditMachinePage() {
             onChange={(checked) =>
               setMachine((prev) => ({
                 ...prev,
-                status: checked ? ASSET_STATUS.Available : ASSET_STATUS.Unavailable,
+                status: checked ? 'Available' : 'Inactive',
               }))
             }
           />

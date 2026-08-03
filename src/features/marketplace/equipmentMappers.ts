@@ -16,14 +16,17 @@ function formatNaira(amount: number): string {
 }
 
 export function mapEquipmentToCard(asset: MarketplaceEquipmentDto): ListingCardData {
+  const isAvailable = asset.status.trim().toLowerCase() === 'available';
+
   return {
     id: asset.id,
     title: `${asset.brand} ${asset.model}`.trim(),
     category: asset.machineType,
     badgeColor: CATEGORY_BADGE_COLOR,
-    // The browse endpoint doesn't return a location per item (only supplier-city
-    // filtering) — show status instead until that's added to the response.
-    location: asset.status,
+    // The browse endpoint does not return supplier city, so show availability
+    // explicitly instead of placing raw status text under a location icon.
+    metaText: isAvailable ? 'Available now' : asset.status,
+    metaKind: 'status',
     spec: `${asset.engineHours.toLocaleString()} hrs`,
     subSpec: `${asset.yearOfManufacture}`,
     price: `${formatNaira(asset.dailyRentalRate)}/day`,

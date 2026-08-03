@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { Input } from '@/shared/inputs/Input';
 import { Select } from '@/shared/Select';
@@ -7,7 +7,19 @@ import { SUPPLIER_BASE_CITIES } from '@/features/supplier/constants';
 import type { SupplierLocation } from '@/features/supplier/types';
 import { useSyncLocationMutation } from '../onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
-import { SupplierLocationMap } from './SupplierLocationMap';
+
+// Leaflet + react-leaflet are ~470 KB on their own. Loading them only when a
+// supplier actually reaches this step (rather than in the main bundle) keeps
+// them out of every other page's initial download.
+const SupplierLocationMap = lazy(() =>
+  import('./SupplierLocationMap').then((m) => ({ default: m.SupplierLocationMap })),
+);
+
+function MapSkeleton() {
+  return (
+    <div className="h-72 animate-pulse rounded-xl border border-slate-300 bg-slate-200" />
+  );
+}
 
 interface Step2LocationProps {
   initialValue: SupplierLocation;
@@ -150,13 +162,15 @@ export function Step2Location({ initialValue, onContinue, onBack }: Step2Locatio
         </div>
 
 
-        <SupplierLocationMap
-          latitude={value.lat}
-          longitude={value.lng}
-          onLocationChange={
-            updateCoordinates
-          }
-        />
+        <Suspense fallback={<MapSkeleton />}>
+          <SupplierLocationMap
+            latitude={value.lat}
+            longitude={value.lng}
+            onLocationChange={
+              updateCoordinates
+            }
+          />
+        </Suspense>
 
 
         <Button
