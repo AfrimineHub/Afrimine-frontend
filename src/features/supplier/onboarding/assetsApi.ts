@@ -12,6 +12,16 @@ export const MACHINE_TYPE_ENUM: Record<string, number> = {
   compactor: 6,
 };
 
+export const MACHINE_TYPE_FROM_ENUM: Record<number, string> = {
+  0: 'excavator',
+  1: 'bulldozer',
+  2: 'payloader',
+  3: 'tipper',
+  4: 'grader',
+  5: 'crane',
+  6: 'compactor',
+};
+
 export interface CreateAssetPayload {
   machineType: number;
   brand: string;
@@ -22,7 +32,11 @@ export interface CreateAssetPayload {
   dailyRentalRate: number;
   mobilizationFeePerKm: number;
   description?: string;
+  /** Marketplace availability — e.g. "Available" | "Unavailable" */
+  status?: string;
 }
+
+export type UpdateAssetPayload = Partial<CreateAssetPayload>;
 
 export async function createAsset(payload: CreateAssetPayload): Promise<unknown> {
   const { data } = await apiClient.post(supplierAssetApiPaths.assets, payload);
@@ -36,9 +50,14 @@ export async function fetchAssets(): Promise<unknown> {
 
 export async function updateAsset(
   assetId: string,
-  payload: Partial<CreateAssetPayload>,
+  payload: UpdateAssetPayload,
 ): Promise<unknown> {
   const { data } = await apiClient.put(supplierAssetApiPaths.asset(assetId), payload);
+  return extractApiData<unknown>(data);
+}
+
+export async function fetchAsset(assetId: string): Promise<unknown> {
+  const { data } = await apiClient.get(supplierAssetApiPaths.asset(assetId));
   return extractApiData<unknown>(data);
 }
 

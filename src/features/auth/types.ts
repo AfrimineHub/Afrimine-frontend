@@ -1,16 +1,26 @@
 /**
- * Backend enum:
+ * Backend enum (Vendor and Supplier share value 1 — one seller role).
  * Vendor = 1, Buyer = 2, Investor = 3, Supplier = 1, SuperAdmin = 5
+ *
+ * Use `isSellerRole` / `USER_TYPES.supplier` for equipment sellers.
+ * `USER_TYPES.vendor` is kept as an alias for older RoleGuard / schema call sites.
  */
 export const USER_TYPES = {
+  /** @deprecated Alias of supplier — same backend value (1). Prefer `supplier`. */
   vendor: 1,
   buyer: 2,
   investor: 3,
+  /** Equipment seller (and legacy mineral vendor) — backend type 1 */
   supplier: 1,
   superAdmin: 5,
 } as const;
 
 export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES];
+
+/** Type 1: equipment supplier / vendor (indistinguishable on the backend). */
+export function isSellerRole(type: UserType | null | undefined): boolean {
+  return type === USER_TYPES.supplier;
+}
 
 export const USER_STATUS = {
   active: 1,

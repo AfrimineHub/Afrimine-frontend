@@ -1,24 +1,21 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { Button } from '@/shared/buttons/Button';
 import {
   useApproveBookingMutation,
   useDeclineBookingMutation,
-  useSupplierBookingsQuery,
+  useBookingsQuery,
 } from '@/features/supplier/bookings/bookingsQueries';
-import { normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
+import {
+  BOOKING_STATUS_STYLES,
+  normalizeBookingsList,
+} from '@/features/supplier/bookings/bookingsUtils';
+import { SUPPLIER_BOOKINGS_PATH } from '@/features/supplier/constants';
 import { getApiErrorMessage } from '@/lib/api/errors';
-import type { ActiveLeaseRow } from '@/features/supplier/types';
-
-const STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {
-  pending: 'bg-amber-50 text-amber-800',
-  active: 'bg-emerald-50 text-emerald-800',
-  completed: 'bg-slate-100 text-slate-600',
-  declined: 'bg-red-50 text-red-700',
-};
 
 export default function SupplierBookingsPage() {
-  const bookingsQuery = useSupplierBookingsQuery();
+  const bookingsQuery = useBookingsQuery();
   const approveMutation = useApproveBookingMutation();
   const declineMutation = useDeclineBookingMutation();
 
@@ -86,14 +83,19 @@ export default function SupplierBookingsPage() {
             >
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="font-semibold text-slate-900">{booking.machineName}</p>
+                  <Link
+                    to={`${SUPPLIER_BOOKINGS_PATH}/${booking.id}`}
+                    className="font-semibold text-slate-900 hover:text-[#CA8A04] hover:underline"
+                  >
+                    {booking.machineName}
+                  </Link>
                   <p className="text-sm text-slate-500">
                     {booking.minerName} · {booking.leasePeriod}
                   </p>
                   <p className="mt-1 text-xs text-slate-400">Next: {booking.nextMilestone}</p>
                 </div>
                 <span
-                  className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLES[booking.status]}`}
+                  className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${BOOKING_STATUS_STYLES[booking.status]}`}
                 >
                   {booking.status}
                 </span>
@@ -131,7 +133,7 @@ export default function SupplierBookingsPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="flex gap-3">
+                    <div className="flex flex-wrap gap-3">
                       <Button type="button" variant="outline" onClick={() => setDecliningId(booking.id)}>
                         Decline
                       </Button>
@@ -142,8 +144,25 @@ export default function SupplierBookingsPage() {
                       >
                         {approveMutation.isPending ? 'Approving…' : 'Approve'}
                       </Button>
+                      <Link
+                        to={`${SUPPLIER_BOOKINGS_PATH}/${booking.id}`}
+                        className="inline-flex items-center text-sm font-semibold text-[#CA8A04] hover:underline"
+                      >
+                        View details
+                      </Link>
                     </div>
                   )}
+                </div>
+              )}
+
+              {booking.status !== 'pending' && (
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <Link
+                    to={`${SUPPLIER_BOOKINGS_PATH}/${booking.id}`}
+                    className="text-sm font-semibold text-[#CA8A04] hover:underline"
+                  >
+                    View details
+                  </Link>
                 </div>
               )}
             </div>

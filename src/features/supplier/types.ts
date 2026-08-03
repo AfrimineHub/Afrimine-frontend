@@ -39,6 +39,7 @@ export interface MachineAsset {
   dailyRentalRate: string;
   mobilizationFeePerKm: string;
   description?: string;
+  status?: string;
   frontPhotoName?: string;
   sidePhotoName?: string;
   serialPhotoName?: string;

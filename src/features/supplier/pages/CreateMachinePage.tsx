@@ -5,6 +5,9 @@ import { Button } from '@/shared/buttons/Button';
 import { MachineAssetForm } from '@/features/supplier/components/MachineAssetForm';
 import { FileDropzone } from '@/features/supplier/components/FileDropzone';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
+import { SubscriptionRequiredNotice } from '@/features/subscription/components/SubscriptionRequiredNotice';
+import { canCreatePostOnboardingListing } from '@/features/subscription/listingAccess';
+import { useVendorSubscriptionQuery } from '@/features/vendor/dashboardQueries';
 import { createEmptyMachine } from '@/features/supplier/types';
 import { SUPPLIER_MACHINES_PATH } from '@/features/supplier/constants';
 import {
@@ -24,6 +27,7 @@ function extractCreatedAssetId(created: unknown): string | undefined {
 
 export default function CreateMachinePage() {
   const navigate = useNavigate();
+  const subscriptionQuery = useVendorSubscriptionQuery();
   const createAsset = useCreateAssetMutation();
   const uploadPhotos = useUploadAssetPhotosMutation();
 
@@ -31,6 +35,7 @@ export default function CreateMachinePage() {
   const [photos, setPhotos] = useState<AssetPhotosPayload>({});
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const canCreateListing = canCreatePostOnboardingListing(subscriptionQuery.data);
 
   const setPhoto = (
     key: keyof AssetPhotosPayload,
@@ -113,52 +118,62 @@ export default function CreateMachinePage() {
         Add heavy equipment to your yard catalog for miners to discover.
       </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="mx-auto max-w-2xl space-y-4 rounded-3xl border border-slate-200 bg-white p-5 sm:p-8 shadow-sm"
-      >
-        {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
-            {error}
-          </p>
-        )}
-
-        <MachineAssetForm
-          machine={machine}
-          index={0}
-          canRemove={false}
-          onChange={setMachine}
-          onRemove={() => undefined}
-        />
-
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Machine photos
-          </p>
-          <FileDropzone
-            label="Front photo"
-            accept="image/*"
-            fileName={machine.frontPhotoName}
-            onFile={(file) => setPhoto('frontPhoto', 'frontPhotoName', file)}
-          />
-          <FileDropzone
-            label="Side photo"
-            accept="image/*"
-            fileName={machine.sidePhotoName}
-            onFile={(file) => setPhoto('sidePhoto', 'sidePhotoName', file)}
-          />
-          <FileDropzone
-            label="Serial number plate"
-            accept="image/*"
-            fileName={machine.serialPhotoName}
-            onFile={(file) => setPhoto('serialPlatePhoto', 'serialPhotoName', file)}
-          />
+      {subscriptionQuery.isLoading ? (
+        <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-8">
+          Loading subscription…
         </div>
+      ) : !canCreateListing ? (
+        <div className="mx-auto max-w-2xl">
+          <SubscriptionRequiredNotice description="Your first machine can be added during onboarding. To publish another machine after onboarding, upgrade to a paid subscription first." />
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="mx-auto max-w-2xl space-y-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8"
+        >
+          {error && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+              {error}
+            </p>
+          )}
 
-        <Button type="submit" disabled={submitting}>
-          {submitting ? 'Listing…' : 'List Machine'}
-        </Button>
-      </form>
+          <MachineAssetForm
+            machine={machine}
+            index={0}
+            canRemove={false}
+            onChange={setMachine}
+            onRemove={() => undefined}
+          />
+
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+              Machine photos
+            </p>
+            <FileDropzone
+              label="Front photo"
+              accept="image/*"
+              fileName={machine.frontPhotoName}
+              onFile={(file) => setPhoto('frontPhoto', 'frontPhotoName', file)}
+            />
+            <FileDropzone
+              label="Side photo"
+              accept="image/*"
+              fileName={machine.sidePhotoName}
+              onFile={(file) => setPhoto('sidePhoto', 'sidePhotoName', file)}
+            />
+            <FileDropzone
+              label="Serial number plate"
+              accept="image/*"
+              fileName={machine.serialPhotoName}
+              onFile={(file) => setPhoto('serialPlatePhoto', 'serialPhotoName', file)}
+            />
+          </div>
+
+          <Button type="submit" disabled={submitting}>
+            {submitting ? 'Listing…' : 'List Machine'}
+          </Button>
+        </form>
+      )}
     </SupplierLayout>
   );
 }
