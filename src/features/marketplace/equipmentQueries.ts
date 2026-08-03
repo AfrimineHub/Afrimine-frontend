@@ -48,6 +48,7 @@ export function useCreateBookingMutation() {
     mutationFn: (payload: CreateBookingPayload) => createBooking(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MARKETPLACE_EQUIPMENT_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
     },
   });
 }

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/hooks/useAuth';
-import { USER_TYPES } from '@/features/auth/types';
+import { isSellerRole } from '@/features/auth/types';
 import { SUPPLIER_ONBOARDING_PATH, SUPPLIER_ACCOUNT_RESTRICTED_PATH } from '@/features/supplier/constants';
 import { useSupplierStatusQuery } from '../onboarding/onboardingQueries';
 import { isOnboardingSubmitted, isSupplierBlocked } from '../onboarding/onboardingNormalize';
@@ -17,7 +17,7 @@ export function SupplierOnboardingGuard({
 }: SupplierOnboardingGuardProps) {
   const { user, isLoading: authLoading } = useAuth();
   const location = useLocation();
-  const isSupplier = user?.type === USER_TYPES.supplier;
+  const isSupplier = isSellerRole(user?.type);
 
   const statusQuery = useSupplierStatusQuery({ enabled: isSupplier });
 

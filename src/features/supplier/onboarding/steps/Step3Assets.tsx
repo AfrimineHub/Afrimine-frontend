@@ -6,12 +6,14 @@ import { FileDropzone } from '@/features/supplier/components/FileDropzone';
 import { createEmptyMachine, type MachineAsset } from '@/features/supplier/types';
 import {
   useCreateAssetMutation,
+  useUpdateAssetMutation,
   useUploadAssetPhotosMutation,
 } from '@/features/supplier/onboarding/assetsQueries';
 import {
   MACHINE_TYPE_ENUM,
   type AssetPhotosPayload,
   type CreateAssetPayload,
+  type UpdateAssetPayload,
 } from '@/features/supplier/onboarding/assetsApi';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
@@ -51,6 +53,7 @@ export function Step3Assets({ initialValue, onContinue, onBack }: Step3AssetsPro
   const [error, setError] = useState<string | null>(null);
   const [savingIndex, setSavingIndex] = useState<number | null>(null);
   const createAsset = useCreateAssetMutation();
+  const updateAsset = useUpdateAssetMutation();
   const uploadPhotos = useUploadAssetPhotosMutation();
   const machines = machinesState.length > 0 ? machinesState : [createEmptyMachine()];
 
@@ -127,6 +130,19 @@ export function Step3Assets({ initialValue, onContinue, onBack }: Step3AssetsPro
           machine = { ...machine, remoteId: createdId };
           next[i] = machine;
           setMachinesState(next);
+        } else {
+          const payload: UpdateAssetPayload = {
+            machineType: MACHINE_TYPE_ENUM[machine.machineType],
+            brand: machine.brand.trim(),
+            model: machine.model.trim(),
+            yearOfManufacture: Number(machine.yearOfManufacture),
+            engineHours: Number(machine.engineHours),
+            hasCertifiedOperator: machine.includesOperator,
+            dailyRentalRate: Number(machine.dailyRentalRate),
+            mobilizationFeePerKm: Number(machine.mobilizationFeePerKm),
+            description: machine.description,
+          };
+          await updateAsset.mutateAsync({ assetId: machine.remoteId, payload });
         }
 
         const pendingPhotos = photoFilesRef.current[i];

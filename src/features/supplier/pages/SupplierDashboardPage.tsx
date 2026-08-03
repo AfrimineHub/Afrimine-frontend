@@ -3,12 +3,12 @@ import { Plus, Truck, CalendarClock, Wallet, Lock } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { SUPPLIER_MACHINES_PATH, SUPPLIER_BOOKINGS_PATH } from '@/features/supplier/constants';
-import type { ActiveLeaseRow, SupplierDashboardStats } from '@/features/supplier/types';
+import type { SupplierDashboardStats } from '@/features/supplier/types';
 import { useSupplierStatsQuery } from '@/features/supplier/dashboard/dashboardQueries';
 import { useSupplierStatusQuery } from '@/features/supplier/onboarding/onboardingQueries';
 import { useSupplierAssetsQuery } from '@/features/supplier/onboarding/assetsQueries';
-import { useSupplierBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
-import { normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
+import { useBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
+import { BOOKING_STATUS_STYLES, normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
 import { ACCOUNT_STATUS } from '@/features/supplier/constants';
 
 function normalizeSupplierStats(raw: unknown): Partial<SupplierDashboardStats> {
@@ -53,12 +53,7 @@ function normalizeVerificationPending(raw: unknown): boolean {
   return status === ACCOUNT_STATUS.Pending;
 }
 
-const STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {
-  pending: 'bg-amber-50 text-amber-800',
-  active: 'bg-emerald-50 text-emerald-800',
-  completed: 'bg-slate-100 text-slate-600',
-  declined: 'bg-red-50 text-red-700',
-};
+const STATUS_STYLES = BOOKING_STATUS_STYLES;
 
 export default function SupplierDashboardPage() {
   const { user } = useAuth();
@@ -66,7 +61,7 @@ export default function SupplierDashboardPage() {
   const statsQuery = useSupplierStatsQuery();
   const statusQuery = useSupplierStatusQuery();
   const assetsQuery = useSupplierAssetsQuery();
-  const bookingsQuery = useSupplierBookingsQuery();
+  const bookingsQuery = useBookingsQuery();
 
   const normalizedStats = normalizeSupplierStats(statsQuery.data);
   const assetsCount = normalizeAssetsCount(assetsQuery.data);
@@ -187,7 +182,14 @@ export default function SupplierDashboardPage() {
               <tbody>
                 {leases.map((lease) => (
                   <tr key={lease.id} className="border-t border-slate-100">
-                    <td className="px-5 py-3 font-medium text-slate-900">{lease.machineName}</td>
+                    <td className="px-5 py-3 font-medium text-slate-900">
+                      <Link
+                        to={`${SUPPLIER_BOOKINGS_PATH}/${lease.id}`}
+                        className="hover:text-[#CA8A04] hover:underline"
+                      >
+                        {lease.machineName}
+                      </Link>
+                    </td>
                     <td className="px-5 py-3 text-slate-600">{lease.minerName}</td>
                     <td className="px-5 py-3 text-slate-600">{lease.leasePeriod}</td>
                     <td className="px-5 py-3 text-slate-600">{lease.nextMilestone}</td>

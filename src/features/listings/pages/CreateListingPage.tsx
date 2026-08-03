@@ -2,8 +2,14 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { CreateListingForm } from '@/features/listings/components/CreateListingForm';
+import { SubscriptionRequiredNotice } from '@/features/subscription/components/SubscriptionRequiredNotice';
+import { canCreatePostOnboardingListing } from '@/features/subscription/listingAccess';
+import { useVendorSubscriptionQuery } from '@/features/vendor/dashboardQueries';
 
 const CreateListingPage: React.FC = () => {
+  const subscriptionQuery = useVendorSubscriptionQuery();
+  const canCreateListing = canCreatePostOnboardingListing(subscriptionQuery.data);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -22,7 +28,15 @@ const CreateListingPage: React.FC = () => {
           </p>
         </div>
 
-        <CreateListingForm />
+        {subscriptionQuery.isLoading ? (
+          <div className="rounded-xl border border-gray-200 bg-white px-4 py-6 text-sm text-gray-500">
+            Loading subscription…
+          </div>
+        ) : canCreateListing ? (
+          <CreateListingForm />
+        ) : (
+          <SubscriptionRequiredNotice description="Your first equipment listing is created during onboarding. To publish additional seller listings after onboarding, upgrade to a paid subscription first." />
+        )}
       </div>
     </div>
   );

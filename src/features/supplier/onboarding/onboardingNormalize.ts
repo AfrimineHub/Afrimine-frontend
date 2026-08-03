@@ -1,10 +1,10 @@
 import { ACCOUNT_STATUS, isAccountBlocked } from '../constants';
-
-import { 
-  createEmptyMachine, 
-  type MachineAsset, 
-  type SupplierIdentity, 
-  type SupplierLocation 
+import { MACHINE_TYPE_FROM_ENUM } from './assetsApi';
+import {
+  createEmptyMachine,
+  type MachineAsset,
+  type SupplierIdentity,
+  type SupplierLocation,
 } from '@/features/supplier/types';
 
 function str(r: Record<string, unknown>, keys: string[]): string {
@@ -88,6 +88,44 @@ export function normalizeSupplierDocuments(raw: unknown): { cacUploaded: boolean
   };
 }
 
+function normalizeMachineType(raw: unknown): string {
+  if (typeof raw === 'number' && MACHINE_TYPE_FROM_ENUM[raw]) {
+    return MACHINE_TYPE_FROM_ENUM[raw];
+  }
+  if (typeof raw === 'string') {
+    const asNum = Number(raw);
+    if (!Number.isNaN(asNum) && MACHINE_TYPE_FROM_ENUM[asNum]) {
+      return MACHINE_TYPE_FROM_ENUM[asNum];
+    }
+    return raw.toLowerCase();
+  }
+  return '';
+}
+
+/** GET /assets or /assets/{id} → MachineAsset for display/edit. */
+export function normalizeMachineAsset(raw: unknown): MachineAsset | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const remoteId = str(r, ['id']);
+  if (!remoteId) return null;
+
+  const base = createEmptyMachine();
+  return {
+    ...base,
+    remoteId,
+    machineType: normalizeMachineType(r.machineType),
+    brand: str(r, ['brand']),
+    model: str(r, ['model']),
+    yearOfManufacture: String(num(r, ['yearOfManufacture']) ?? ''),
+    engineHours: String(num(r, ['engineHours']) ?? ''),
+    includesOperator: bool(r, ['hasCertifiedOperator']),
+    dailyRentalRate: String(num(r, ['dailyRentalRate']) ?? ''),
+    mobilizationFeePerKm: String(num(r, ['mobilizationFeePerKm']) ?? ''),
+    description: str(r, ['description']) || undefined,
+    status: str(r, ['status']) || undefined,
+  };
+}
+
 /** GET /assets → list of MachineAsset for display/edit. */
 export function normalizeAssetsList(raw: unknown): MachineAsset[] {
   const items: unknown[] = Array.isArray(raw)
@@ -96,23 +134,7 @@ export function normalizeAssetsList(raw: unknown): MachineAsset[] {
       ? ((raw as Record<string, unknown>).items as unknown[])
       : [];
 
-  return items.map((item) => {
-    const r = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
-    const base = createEmptyMachine();
-    return {
-      ...base,
-      remoteId: str(r, ['id']) || undefined,
-      machineType: str(r, ['machineType']),
-      brand: str(r, ['brand']),
-      model: str(r, ['model']),
-      yearOfManufacture: String(num(r, ['yearOfManufacture']) ?? ''),
-      engineHours: String(num(r, ['engineHours']) ?? ''),
-      includesOperator: bool(r, ['hasCertifiedOperator']),
-      dailyRentalRate: String(num(r, ['dailyRentalRate']) ?? ''),
-      mobilizationFeePerKm: String(num(r, ['mobilizationFeePerKm']) ?? ''),
-      description: str(r, ['description']) || undefined,
-    };
-  });
+  return items.map(normalizeMachineAsset).filter((m): m is MachineAsset => m !== null);
 }
 
 export function normalizeVerificationStatus(raw: unknown): 'draft' | 'pending_verification' | 'verified' | 'rejected' {

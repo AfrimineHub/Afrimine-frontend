@@ -7,23 +7,33 @@ import {
   type BookingStatusFilter,
 } from './bookingsApi';
 
-export const SUPPLIER_BOOKINGS_QUERY_KEY = ['supplier', 'bookings'] as const;
+/** Shared with buyer + supplier — GET bookings is role-scoped on the backend. */
+export const BOOKINGS_QUERY_KEY = ['bookings'] as const;
 
-export function useSupplierBookingsQuery(status?: BookingStatusFilter) {
+/** @deprecated Use BOOKINGS_QUERY_KEY */
+export const SUPPLIER_BOOKINGS_QUERY_KEY = BOOKINGS_QUERY_KEY;
+
+export function useBookingsQuery(status?: BookingStatusFilter) {
   return useQuery({
-    queryKey: [...SUPPLIER_BOOKINGS_QUERY_KEY, status ?? 'all'],
+    queryKey: [...BOOKINGS_QUERY_KEY, status ?? 'all'],
     queryFn: () => fetchBookings(status),
     staleTime: 30 * 1000,
   });
 }
 
-export function useSupplierBookingQuery(bookingId: string | undefined) {
+/** @deprecated Use useBookingsQuery */
+export const useSupplierBookingsQuery = useBookingsQuery;
+
+export function useBookingQuery(bookingId: string | undefined) {
   return useQuery({
-    queryKey: [...SUPPLIER_BOOKINGS_QUERY_KEY, bookingId],
+    queryKey: [...BOOKINGS_QUERY_KEY, 'detail', bookingId],
     queryFn: () => fetchBooking(bookingId as string),
     enabled: Boolean(bookingId),
   });
 }
+
+/** @deprecated Use useBookingQuery */
+export const useSupplierBookingQuery = useBookingQuery;
 
 export function useApproveBookingMutation() {
   const queryClient = useQueryClient();
@@ -31,7 +41,7 @@ export function useApproveBookingMutation() {
   return useMutation({
     mutationFn: (bookingId: string) => approveBooking(bookingId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: SUPPLIER_BOOKINGS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY });
     },
   });
 }
@@ -43,7 +53,7 @@ export function useDeclineBookingMutation() {
     mutationFn: ({ bookingId, reason }: { bookingId: string; reason: string }) =>
       declineBooking(bookingId, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: SUPPLIER_BOOKINGS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY });
     },
   });
 }

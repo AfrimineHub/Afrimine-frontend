@@ -51,10 +51,14 @@ import SupplierOnboardingPage from "@/features/supplier/pages/SupplierOnboarding
 import SupplierDashboardPage from "@/features/supplier/pages/SupplierDashboardPage";
 import SupplierMachinesPage from "@/features/supplier/pages/SupplierMachinesPage";
 import CreateMachinePage from "@/features/supplier/pages/CreateMachinePage";
+import EditMachinePage from "@/features/supplier/pages/EditMachinePage";
 import SupplierBookingsPage from "@/features/supplier/pages/SupplierBookingsPage";
+import SupplierBookingDetailPage from "@/features/supplier/pages/SupplierBookingDetailPage";
 import { SupplierOnboardingGuard } from "@/features/supplier/components/SupplierOnboardingGuard";
 import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashboardEntry";
 import { EquipmentdetailsPage } from "@/features/marketplace";
+import MyBookingsPage from "@/features/marketplace/myBookings/pages/MyBookingsPage";
+import MyBookingDetailPage from "@/features/marketplace/myBookings/pages/MyBookingDetailPage";
 import SupplierAccountRestrictedPage from "@/features/supplier/pages/SupplierAccountRestrictedPage";
 
 export const router = createBrowserRouter([
@@ -136,7 +140,11 @@ export const router = createBrowserRouter([
           { path: "notification", element: <NotificationsPage /> },
           {
             element: <RoleGuard allowed={[USER_TYPES.buyer]} />,
-            children: [{ path: "buyer-dashboard", element: <BuyerDashboardPage /> }],
+            children: [
+              { path: "buyer-dashboard", element: <BuyerDashboardPage /> },
+              { path: "my-bookings", element: <MyBookingsPage /> },
+              { path: "my-bookings/:id", element: <MyBookingDetailPage /> },
+            ],
           },
           {
             element: <RoleGuard allowed={[USER_TYPES.investor]} />,
@@ -159,13 +167,15 @@ export const router = createBrowserRouter([
                   { path: "supplier-dashboard", element: <SupplierDashboardPage /> },
                   { path: "supplier/machines", element: <SupplierMachinesPage /> },
                   { path: "supplier/machines/new", element: <CreateMachinePage /> },
+                  { path: "supplier/machines/:id/edit", element: <EditMachinePage /> },
                   { path: "supplier/bookings", element: <SupplierBookingsPage /> },
+                  { path: "supplier/bookings/:id", element: <SupplierBookingDetailPage /> },
                 ],
               },
             ],
           },
           {
-            element: <RoleGuard allowed={[USER_TYPES.vendor, USER_TYPES.supplier]} />,
+            element: <RoleGuard allowed={[USER_TYPES.supplier]} />,
             children: [
               {
                 path: "vendor-dashboard",

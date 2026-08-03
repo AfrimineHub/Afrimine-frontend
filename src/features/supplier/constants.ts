@@ -51,4 +51,18 @@ export const SUPPLIER_ONBOARDING_PATH = '/supplier/onboarding';
 export const SUPPLIER_DASHBOARD_PATH = '/supplier-dashboard';
 export const SUPPLIER_MACHINES_PATH = '/supplier/machines';
 export const SUPPLIER_BOOKINGS_PATH = '/supplier/bookings';
+export const BUYER_BOOKINGS_PATH = '/my-bookings';
+
+export const ASSET_STATUS = {
+  Available: 'Available',
+  Unavailable: 'Unavailable',
+} as const;
+
+export type AssetStatusValue = (typeof ASSET_STATUS)[keyof typeof ASSET_STATUS];
+
+export function isAssetAvailable(status: string | undefined): boolean {
+  if (!status) return true;
+  const s = status.toLowerCase();
+  return s === 'available' || s === 'active' || s === 'listed';
+}
 

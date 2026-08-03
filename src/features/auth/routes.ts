@@ -1,4 +1,4 @@
-import { USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
+import { isSellerRole, USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
 import {
   SUPPLIER_DASHBOARD_PATH,
   SUPPLIER_ONBOARDING_PATH,
@@ -7,12 +7,13 @@ import {
 const SHARED_AUTHENTICATED_PREFIXES = ['/messages', '/notification'];
 const FALLBACK_HOME = '/marketplace';
 
+/** Seller (type 1) home is always the supplier equipment dashboard. */
 export function getRoleHomePath(type: UserType | undefined): string {
+  if (isSellerRole(type)) {
+    return SUPPLIER_DASHBOARD_PATH;
+  }
+
   switch (type) {
-    case USER_TYPES.supplier:
-      return SUPPLIER_DASHBOARD_PATH;
-    case USER_TYPES.vendor:
-      return '/vendor-dashboard';
     case USER_TYPES.buyer:
       return '/buyer-dashboard';
     case USER_TYPES.investor:
@@ -26,31 +27,25 @@ export function getRoleHomePath(type: UserType | undefined): string {
 
 
 export function getRoleRoutePrefixes(type: UserType): string[] {
+  if (isSellerRole(type)) {
+    return [
+      SUPPLIER_DASHBOARD_PATH,
+      SUPPLIER_ONBOARDING_PATH,
+      '/supplier/',
+      '/vendor-dashboard',
+      '/my-ad',
+      '/dashboard/',
+      '/vendor-profile',
+      '/vendor/',
+      '/my-order',
+    ];
+  }
+
   switch (type) {
     case USER_TYPES.superAdmin:
       return ['/admin'];
-    case USER_TYPES.supplier:
-      return [
-        SUPPLIER_DASHBOARD_PATH,
-        SUPPLIER_ONBOARDING_PATH,
-        '/supplier/',
-        '/vendor-dashboard',
-        '/my-ad',
-        '/dashboard/',
-        '/vendor-profile',
-        '/vendor/',
-        '/my-order',
-      ];
-    case USER_TYPES.vendor:
-      return [
-        '/vendor-dashboard',
-        '/my-ad',
-        '/dashboard/',
-        '/vendor-profile',
-        '/vendor/',
-      ];
     case USER_TYPES.buyer:
-      return ['/buyer-dashboard', '/my-order', '/rfq'];
+      return ['/buyer-dashboard', '/my-order', '/my-bookings', '/rfq'];
     case USER_TYPES.investor:
       return ['/investor-dashboard'];
     default:
@@ -95,15 +90,15 @@ export function isPathAllowedForUser(path: string, user: AuthUser | null | undef
       return true;
     }
 
-    const allKnownTypes: UserType[] = [
+    // Distinct role types only (seller is one value — don't double-count vendor+supplier).
+    const otherRoles: UserType[] = [
       USER_TYPES.superAdmin,
-      USER_TYPES.vendor,
       USER_TYPES.supplier,
       USER_TYPES.buyer,
       USER_TYPES.investor,
     ];
 
-    for (const roleType of allKnownTypes) {
+    for (const roleType of otherRoles) {
       if (roleType === user.type) continue;
       if (pathMatchesAnyPrefix(normalized, getRoleRoutePrefixes(roleType))) {
         return false;

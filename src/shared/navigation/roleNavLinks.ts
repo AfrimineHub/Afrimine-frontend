@@ -1,5 +1,5 @@
 import { getHomePathForUser } from '@/features/auth/routes';
-import { USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
+import { isSellerRole, USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
 import {
   SUPPLIER_DASHBOARD_PATH,
   SUPPLIER_MACHINES_PATH,
@@ -28,16 +28,13 @@ export function isNavLinkActive(currentPath: string, linkPath: string, user?: Au
 }
 
 export function getProfilePathForUser(user: AuthUser | null | undefined): string | null {
-  switch (user?.type) {
-    case USER_TYPES.vendor:
-      return '/vendor-profile';
-    case USER_TYPES.supplier:
-      return '/vendor-profile';
-    case USER_TYPES.superAdmin:
-      return '/admin/user-management';
-    default:
-      return null;
+  if (isSellerRole(user?.type)) {
+    return '/vendor-profile';
   }
+  if (user?.type === USER_TYPES.superAdmin) {
+    return '/admin/user-management';
+  }
+  return null;
 }
 
 export function getAccountMenuLinks(user: AuthUser | null | undefined): RoleNavLink[] {
@@ -48,7 +45,7 @@ export function getAccountMenuLinks(user: AuthUser | null | undefined): RoleNavL
     links.push({ label: 'Profile', path: profilePath });
   }
 
-  if (user?.type === USER_TYPES.vendor || user?.type === USER_TYPES.supplier) {
+  if (isSellerRole(user?.type)) {
     links.push({ label: 'KYC / Verification', path: '/dashboard/my-kyc' });
   }
 
@@ -70,21 +67,15 @@ export function getNavLinksForUser(
 
   links.push({ label: 'Dashboard', path: getHomePathForUser(user) });
 
-  if (type === USER_TYPES.supplier) {
+  if (isSellerRole(type)) {
     links.push(
       { label: 'My Machines', path: SUPPLIER_MACHINES_PATH },
       { label: 'Bookings', path: '/supplier/bookings' },
       { label: 'Payouts', path: '/dashboard/my-payouts' },
     );
-  } else if (type === USER_TYPES.vendor) {
-    links.push(
-      { label: 'My Listings', path: '/my-ad' },
-      { label: 'Buyer RFQs', path: '/dashboard/buyer-rfqs' },
-      { label: 'Quotes', path: '/dashboard/my-quotes' },
-      { label: 'My Orders', path: '/my-order' },
-    );
   } else if (type === USER_TYPES.buyer) {
     links.push(
+      { label: 'My Bookings', path: '/my-bookings' },
       { label: 'My Orders', path: '/my-order' },
       { label: 'RFQ', path: '/rfq' },
     );

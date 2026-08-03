@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { MapPin, Truck } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
+import { USER_TYPES } from '@/features/auth/types';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import { useAssetDetailQuery, useAssetPricingQuery, useCreateBookingMutation } from '../equipmentQueries';
 import { LOGISTICS_TYPE_OPTIONS } from '../equipmentTypes';
@@ -44,7 +45,7 @@ export default function EquipmentDetailPage() {
   const [siteAddress, setSiteAddress] = useState('');
   const [minerPhone, setMinerPhone] = useState('');
   const [distanceKm, setDistanceKm] = useState('');
-  const [logisticsType, setLogisticsType] = useState(LOGISTICS_TYPE_OPTIONS[0].value);
+  const [logisticsType, setLogisticsType] = useState<number>(LOGISTICS_TYPE_OPTIONS[0].value);
   const [formError, setFormError] = useState<string | null>(null);
 
   const totalDays = useMemo(() => daysBetween(startDate, endDate), [startDate, endDate]);
@@ -110,6 +111,7 @@ export default function EquipmentDetailPage() {
   }
 
   const isAvailable = asset.status?.toLowerCase() === 'available';
+  const isBuyer = user?.type === USER_TYPES.buyer;
   const bookingError =
     createBooking.isError && getApiErrorMessage(createBooking.error, 'Could not submit your booking request.');
 
@@ -186,7 +188,11 @@ export default function EquipmentDetailPage() {
               <Link to="/auth/login" className="font-bold text-yellow-700 hover:underline">
                 Log in
               </Link>{' '}
-              to request this equipment.
+              as a buyer to request this equipment.
+            </div>
+          ) : !isBuyer ? (
+            <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+              Only buyer accounts can request equipment bookings.
             </div>
           ) : !isAvailable ? (
             <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
@@ -195,8 +201,15 @@ export default function EquipmentDetailPage() {
           ) : createBooking.isSuccess ? (
             <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
               Booking request sent. The supplier has 24 hours to approve it — track it from{' '}
-              <Link to="/my-order" className="font-bold hover:underline">
-                My Orders
+              <Link
+                to={
+                  createBooking.data?.bookingId
+                    ? `/my-bookings/${createBooking.data.bookingId}`
+                    : '/my-bookings'
+                }
+                className="font-bold hover:underline"
+              >
+                My Bookings
               </Link>
               .
             </div>
