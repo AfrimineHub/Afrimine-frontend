@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
-import { MapPin } from 'lucide-react';
+import { CircleDot, MapPin } from 'lucide-react';
 
 export type ListingCardData = {
   id: string;
   title: string;
   category: string;
   badgeColor: string;
-  location: string;
+  metaText: string;
+  metaKind: 'location' | 'status';
   spec: string;
   subSpec: string;
   price: string;
@@ -14,6 +15,8 @@ export type ListingCardData = {
 };
 
 export const ListingCard = ({ data }: { data: ListingCardData }) => {
+  const MetaIcon = data.metaKind === 'location' ? MapPin : CircleDot;
+
   return (
     <article className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
       <div className="h-36 bg-gradient-to-br from-gray-100 to-gray-50 relative">
@@ -45,8 +48,8 @@ export const ListingCard = ({ data }: { data: ListingCardData }) => {
         </div>
 
         <div className="flex items-center gap-2 text-xs text-gray-500">
-          <MapPin size={14} className="text-gray-300" />
-          <span className="truncate">{data.location}</span>
+          <MetaIcon size={14} className="text-gray-300" />
+          <span className="truncate">{data.metaText}</span>
         </div>
 
         <div className="flex items-center justify-between pt-2 border-t border-gray-100">

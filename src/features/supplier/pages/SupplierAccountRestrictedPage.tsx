@@ -5,12 +5,13 @@ import { Ban, Lock, PauseCircle, LogOut } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useSupplierStatusQuery } from '../onboarding/onboardingQueries';
 import { getAccountStatus } from '../onboarding/onboardingNormalize';
-import { ACCOUNT_STATUS } from '@/features/supplier/constants';
+import { ACCOUNT_STATUS, type AccountStatusValue } from '@/features/supplier/constants';
 
 const SUPPORT_EMAIL = 'support@afrimine.com'; // confirm the real inbox before shipping
 
-const STATUS_CONTENT: Record<number, { icon: typeof Ban; title: string; body: string; tone: string }
-> = {
+type RestrictedContent = { icon: typeof Ban; title: string; body: string; tone: string };
+
+const STATUS_CONTENT: Partial<Record<AccountStatusValue, RestrictedContent>> = {
   [ACCOUNT_STATUS.Suspended]: {
     icon: PauseCircle,
     title: 'Your account is suspended',
@@ -42,7 +43,7 @@ export default function SupplierAccountRestrictedPage() {
   const { logout } = useAuth();
   const statusQuery = useSupplierStatusQuery();
   const status = getAccountStatus(statusQuery.data);
-  const content = (status != null && STATUS_CONTENT[status]) || FALLBACK_CONTENT;
+  const content = (status != null && STATUS_CONTENT[status as AccountStatusValue]) || FALLBACK_CONTENT;
   const Icon = content.icon;
 
   return (

@@ -35,7 +35,7 @@ const CreateListingPage: React.FC = () => {
         ) : canCreateListing ? (
           <CreateListingForm />
         ) : (
-          <SubscriptionRequiredNotice description="Your first equipment listing is created during onboarding. To publish additional seller listings after onboarding, upgrade to a paid subscription first." />
+          <SubscriptionRequiredNotice description="A paid subscription is required to publish new seller listings from the dashboard. Upgrade your plan to continue." />
         )}
       </div>
     </div>

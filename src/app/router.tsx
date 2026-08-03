@@ -1,65 +1,113 @@
+import { lazy, Suspense, type ReactElement } from "react";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import AuthLayout from '../layouts/AuthLayout';
-import LoginPage from '../features/auth/pages/LoginPage';
-import ForgotPasswordPage from '../features/auth/pages/ForgotPasswordPage';
-import AccountRegistrationPage from '../features/auth/pages/AccountRegistrationPage';
-import { KycPage } from '@/features/vendor/pages/profile';
-import ProfileSetupPage from '../features/auth/pages/ProfileSetupPage';
-import AccountCreatedPage from '../features/auth/pages/AccountCreatedPage';
-import AccountSetupSuccessPage from '../features/auth/pages/AccountSetupSuccessPage';
-import ConfirmEmailPage from '../features/auth/pages/ConfirmEmailPage';
-import ResendOtpPage from '../features/auth/pages/ResendOtpPage';
 import MainLayout from "@/layouts/Mainlayout/MainLayout";
-import MarketplacePage from "@/features/marketplace/pages/MarketplacePage";
-import MyAdsPage from "@/features/marketplace/myAds/pages/MyAdsPage";
-import CreateListingPage from "@/features/listings/pages/CreateListingPage";
-import EditListingPage from "@/features/listings/pages/EditListingPage";
-import ViewListingPage from "@/features/listings/pages/ViewListingPage";
-import MyOrdersPage from "@/features/marketplace/myOrders/pages/MyOrderPage";
-import OrderDetailPage from "@/features/marketplace/myOrders/pages/OrderDetailPage";
-import AdminOrderDetailPage from "@/features/admin/pages/AdminOrderDetailPage";
-import MessagesPage from "@/features/messages/pages/MessagesPage";
-import LandingPage from "@/features/landing/pages/LandingPage";
-import { QuotesListPage } from "@/features/vendor/pages/quotes/QuotesListPage";
-import { QuoteDetailsPage } from "@/features/vendor/pages/quotes/QuoteDetailsPage";
-import VendorProfilePage from "@/features/vendor/pages/profile/VendorProfilePage";
-import CompanyDetailsPage from "@/features/vendor/pages/profile/CompanyDetails";
-import PayoutPage from "@/features/vendor/pages/payouts/PayoutsPage";
-import SubscriptionPage from "@/features/subscription/pages/SubscriptionPage";
-import RfqPage from "@/features/rfq/pages/RfqPage";
-import RfqQuotesPage from "@/features/rfq/pages/RfqQuotesPage";
-import VendorOpenRfqsPage from "@/features/vendor/pages/rfqs/VendorOpenRfqsPage";
-import NotificationsPage from "@/features/notification/pages/NotificationPage";
-import AdminDashboard from "@/features/admin/pages/AdminDashboardPage";
-import UsersManagementPage from "@/features/admin/pages/UsersManagementPage";
-import AdminListingsManagement from "@/features/admin/pages/AdminListingsManagement";
-import AdminAllQuotesPage from "@/features/admin/pages/AdminAllQuotesPage";
-import AdminOrderTrackingPage from "@/features/admin/pages/AdminOrderTrackingPage";
-import AdminDisputePage from "@/features/admin/pages/AdminDisputePage";
-import DisputeResolutionPage from "@/features/admin/pages/DisputeResolutionPage";
-import RevenueDashboard from "@/features/admin/pages/RevenueDashboard";
-import AdminVendorWithdrawals from "@/features/admin/pages/AdminVendorWithdrawals";
-import KYCVerificationQueue from "@/features/admin/pages/KYCVerificationQueue";
-import KYCReviewDetail from "@/features/admin/components/KYCReviewDetail";
 import { GuestOnly } from "@/features/auth/components/GuestRoute";
 import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { RoleGuard } from "@/features/auth/components/RoleGuard";
 import { USER_TYPES } from "@/features/auth/types";
-import BuyerDashboardPage from "@/features/buyer/pages/BuyerDashboardPage";
-import InvestorDashboardPage from "@/features/investor/pages/InvestorDashboardPage";
-import SupplierOnboardingPage from "@/features/supplier/pages/SupplierOnboardingPage";
-import SupplierDashboardPage from "@/features/supplier/pages/SupplierDashboardPage";
-import SupplierMachinesPage from "@/features/supplier/pages/SupplierMachinesPage";
-import CreateMachinePage from "@/features/supplier/pages/CreateMachinePage";
-import EditMachinePage from "@/features/supplier/pages/EditMachinePage";
-import SupplierBookingsPage from "@/features/supplier/pages/SupplierBookingsPage";
-import SupplierBookingDetailPage from "@/features/supplier/pages/SupplierBookingDetailPage";
 import { SupplierOnboardingGuard } from "@/features/supplier/components/SupplierOnboardingGuard";
 import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashboardEntry";
-import { EquipmentdetailsPage } from "@/features/marketplace";
-import MyBookingsPage from "@/features/marketplace/myBookings/pages/MyBookingsPage";
-import MyBookingDetailPage from "@/features/marketplace/myBookings/pages/MyBookingDetailPage";
-import SupplierAccountRestrictedPage from "@/features/supplier/pages/SupplierAccountRestrictedPage";
+
+// ---------------------------------------------------------------------------
+// Lazily-loaded pages.
+// Each page becomes its own chunk, only downloaded when a user navigates to
+// it, instead of all shipping in the single main bundle.
+// ---------------------------------------------------------------------------
+
+// Auth
+const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
+const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage'));
+const AccountRegistrationPage = lazy(() => import('../features/auth/pages/AccountRegistrationPage'));
+const KycPage = lazy(() =>
+  import('@/features/vendor/pages/profile').then((m) => ({ default: m.KycPage })),
+);
+const ProfileSetupPage = lazy(() => import('../features/auth/pages/ProfileSetupPage'));
+const AccountCreatedPage = lazy(() => import('../features/auth/pages/AccountCreatedPage'));
+const AccountSetupSuccessPage = lazy(() => import('../features/auth/pages/AccountSetupSuccessPage'));
+const ConfirmEmailPage = lazy(() => import('../features/auth/pages/ConfirmEmailPage'));
+const ResendOtpPage = lazy(() => import('../features/auth/pages/ResendOtpPage'));
+
+// Marketplace / listings
+const MarketplacePage = lazy(() => import("@/features/marketplace/pages/MarketplacePage"));
+const MyAdsPage = lazy(() => import("@/features/marketplace/myAds/pages/MyAdsPage"));
+const CreateListingPage = lazy(() => import("@/features/listings/pages/CreateListingPage"));
+const EditListingPage = lazy(() => import("@/features/listings/pages/EditListingPage"));
+const ViewListingPage = lazy(() => import("@/features/listings/pages/ViewListingPage"));
+const MyOrdersPage = lazy(() => import("@/features/marketplace/myOrders/pages/MyOrderPage"));
+const OrderDetailPage = lazy(() => import("@/features/marketplace/myOrders/pages/OrderDetailPage"));
+const EquipmentdetailsPage = lazy(() =>
+  import("@/features/marketplace").then((m) => ({ default: m.EquipmentdetailsPage })),
+);
+const MyBookingsPage = lazy(() => import("@/features/marketplace/myBookings/pages/MyBookingsPage"));
+const MyBookingDetailPage = lazy(() => import("@/features/marketplace/myBookings/pages/MyBookingDetailPage"));
+
+// Misc
+const MessagesPage = lazy(() => import("@/features/messages/pages/MessagesPage"));
+const LandingPage = lazy(() => import("@/features/landing/pages/LandingPage"));
+const NotificationsPage = lazy(() => import("@/features/notification/pages/NotificationPage"));
+
+// Vendor
+const QuotesListPage = lazy(() =>
+  import("@/features/vendor/pages/quotes/QuotesListPage").then((m) => ({ default: m.QuotesListPage })),
+);
+const QuoteDetailsPage = lazy(() =>
+  import("@/features/vendor/pages/quotes/QuoteDetailsPage").then((m) => ({ default: m.QuoteDetailsPage })),
+);
+const VendorProfilePage = lazy(() => import("@/features/vendor/pages/profile/VendorProfilePage"));
+const CompanyDetailsPage = lazy(() => import("@/features/vendor/pages/profile/CompanyDetails"));
+const PayoutPage = lazy(() => import("@/features/vendor/pages/payouts/PayoutsPage"));
+const SubscriptionPage = lazy(() => import("@/features/subscription/pages/SubscriptionPage"));
+const RfqPage = lazy(() => import("@/features/rfq/pages/RfqPage"));
+const RfqQuotesPage = lazy(() => import("@/features/rfq/pages/RfqQuotesPage"));
+const VendorOpenRfqsPage = lazy(() => import("@/features/vendor/pages/rfqs/VendorOpenRfqsPage"));
+
+// Admin
+const AdminDashboard = lazy(() => import("@/features/admin/pages/AdminDashboardPage"));
+const UsersManagementPage = lazy(() => import("@/features/admin/pages/UsersManagementPage"));
+const AdminListingsManagement = lazy(() => import("@/features/admin/pages/AdminListingsManagement"));
+const AdminAllQuotesPage = lazy(() => import("@/features/admin/pages/AdminAllQuotesPage"));
+const AdminOrderDetailPage = lazy(() => import("@/features/admin/pages/AdminOrderDetailPage"));
+const AdminOrderTrackingPage = lazy(() => import("@/features/admin/pages/AdminOrderTrackingPage"));
+const AdminDisputePage = lazy(() => import("@/features/admin/pages/AdminDisputePage"));
+const DisputeResolutionPage = lazy(() => import("@/features/admin/pages/DisputeResolutionPage"));
+const RevenueDashboard = lazy(() => import("@/features/admin/pages/RevenueDashboard"));
+const AdminVendorWithdrawals = lazy(() => import("@/features/admin/pages/AdminVendorWithdrawals"));
+const KYCVerificationQueue = lazy(() => import("@/features/admin/pages/KYCVerificationQueue"));
+const KYCReviewDetail = lazy(() => import("@/features/admin/components/KYCReviewDetail"));
+
+// Buyer / investor
+const BuyerDashboardPage = lazy(() => import("@/features/buyer/pages/BuyerDashboardPage"));
+const InvestorDashboardPage = lazy(() => import("@/features/investor/pages/InvestorDashboardPage"));
+
+// Supplier
+const SupplierOnboardingPage = lazy(() => import("@/features/supplier/pages/SupplierOnboardingPage"));
+const SupplierDashboardPage = lazy(() => import("@/features/supplier/pages/SupplierDashboardPage"));
+const SupplierMachinesPage = lazy(() => import("@/features/supplier/pages/SupplierMachinesPage"));
+const CreateMachinePage = lazy(() => import("@/features/supplier/pages/CreateMachinePage"));
+const EditMachinePage = lazy(() => import("@/features/supplier/pages/EditMachinePage"));
+const SupplierBookingsPage = lazy(() => import("@/features/supplier/pages/SupplierBookingsPage"));
+const SupplierBookingDetailPage = lazy(() => import("@/features/supplier/pages/SupplierBookingDetailPage"));
+const SupplierAccountRestrictedPage = lazy(() => import("@/features/supplier/pages/SupplierAccountRestrictedPage"));
+
+// ---------------------------------------------------------------------------
+// Suspense wrapper. Layouts (AuthLayout / MainLayout) render an <Outlet />
+// for their children, so wrapping each individual lazy route element here
+// (rather than once around the whole router) keeps fallback UI scoped to
+// just the piece of the screen that's still loading.
+// ---------------------------------------------------------------------------
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <p className="text-sm text-slate-500">Loading…</p>
+    </div>
+  );
+}
+
+function s(element: ReactElement): ReactElement {
+  return <Suspense fallback={<RouteFallback />}>{element}</Suspense>;
+}
 
 export const router = createBrowserRouter([
   {
@@ -70,7 +118,7 @@ export const router = createBrowserRouter([
         path: "login",
         element: (
           <GuestOnly>
-            <LoginPage />
+            {s(<LoginPage />)}
           </GuestOnly>
         ),
       },
@@ -78,7 +126,7 @@ export const router = createBrowserRouter([
         path: "forgot-password",
         element: (
           <GuestOnly>
-            <ForgotPasswordPage />
+            {s(<ForgotPasswordPage />)}
           </GuestOnly>
         ),
       },
@@ -86,7 +134,7 @@ export const router = createBrowserRouter([
         path: "confirm-email",
         element: (
           <GuestOnly>
-            <ConfirmEmailPage />
+            {s(<ConfirmEmailPage />)}
           </GuestOnly>
         ),
       },
@@ -94,7 +142,7 @@ export const router = createBrowserRouter([
         path: "resend-otp",
         element: (
           <GuestOnly>
-            <ResendOtpPage />
+            {s(<ResendOtpPage />)}
           </GuestOnly>
         ),
       },
@@ -102,74 +150,74 @@ export const router = createBrowserRouter([
         path: "register",
         element: (
           <GuestOnly>
-            <AccountRegistrationPage />
+            {s(<AccountRegistrationPage />)}
           </GuestOnly>
         ),
         handle: { step: '1/3' },
       },
       {
         path: "kyc",
-        element: <KycPage />,
+        element: s(<KycPage />),
         handle: { step: '2/3' },
       },
       {
         path: "profile-setup",
-        element: <ProfileSetupPage />,
+        element: s(<ProfileSetupPage />),
         handle: { step: '3/3' },
       },
-      { path: "created", element: <AccountCreatedPage /> },
-      { path: "setup-successful", element: <AccountSetupSuccessPage /> },
+      { path: "created", element: s(<AccountCreatedPage />) },
+      { path: "setup-successful", element: s(<AccountSetupSuccessPage />) },
     ],
   },
   {
     path: "/",
     element: <MainLayout />,
     children: [
-      { index: true, element: <LandingPage /> },
-      { path: "home", element: <LandingPage /> },
-      { path: "marketplace", element: <MarketplacePage /> },
-      { path: "equipment/:id", element: <EquipmentdetailsPage /> },
+      { index: true, element: s(<LandingPage />) },
+      { path: "home", element: s(<LandingPage />) },
+      { path: "marketplace", element: s(<MarketplacePage />) },
+      { path: "equipment/:id", element: s(<EquipmentdetailsPage />) },
       {
         element: <ProtectedRoute />,
         children: [
-          { path: "messages", element: <MessagesPage /> },
-          { path: "my-order", element: <MyOrdersPage /> },
-          { path: "my-order/:orderId", element: <OrderDetailPage /> },
-          { path: "rfq", element: <RfqPage /> },
-          { path: "rfq/:rfqId/quotes", element: <RfqQuotesPage /> },
-          { path: "notification", element: <NotificationsPage /> },
+          { path: "messages", element: s(<MessagesPage />) },
+          { path: "my-order", element: s(<MyOrdersPage />) },
+          { path: "my-order/:orderId", element: s(<OrderDetailPage />) },
+          { path: "rfq", element: s(<RfqPage />) },
+          { path: "rfq/:rfqId/quotes", element: s(<RfqQuotesPage />) },
+          { path: "notification", element: s(<NotificationsPage />) },
           {
             element: <RoleGuard allowed={[USER_TYPES.buyer]} />,
             children: [
-              { path: "buyer-dashboard", element: <BuyerDashboardPage /> },
-              { path: "my-bookings", element: <MyBookingsPage /> },
-              { path: "my-bookings/:id", element: <MyBookingDetailPage /> },
+              { path: "buyer-dashboard", element: s(<BuyerDashboardPage />) },
+              { path: "my-bookings", element: s(<MyBookingsPage />) },
+              { path: "my-bookings/:id", element: s(<MyBookingDetailPage />) },
             ],
           },
           {
             element: <RoleGuard allowed={[USER_TYPES.investor]} />,
-            children: [{ path: "investor-dashboard", element: <InvestorDashboardPage /> }],
+            children: [{ path: "investor-dashboard", element: s(<InvestorDashboardPage />) }],
           },
           {
             element: <RoleGuard allowed={[USER_TYPES.supplier]} />,
             children: [
               {
                 path: "supplier/onboarding",
-                element: <SupplierOnboardingPage />,
+                element: s(<SupplierOnboardingPage />),
               },
               {
                 path: "supplier/restricted",
-                element: <SupplierAccountRestrictedPage />,
+                element: s(<SupplierAccountRestrictedPage />),
               },
               {
                 element: <SupplierOnboardingGuard requireComplete />,
                 children: [
-                  { path: "supplier-dashboard", element: <SupplierDashboardPage /> },
-                  { path: "supplier/machines", element: <SupplierMachinesPage /> },
-                  { path: "supplier/machines/new", element: <CreateMachinePage /> },
-                  { path: "supplier/machines/:id/edit", element: <EditMachinePage /> },
-                  { path: "supplier/bookings", element: <SupplierBookingsPage /> },
-                  { path: "supplier/bookings/:id", element: <SupplierBookingDetailPage /> },
+                  { path: "supplier-dashboard", element: s(<SupplierDashboardPage />) },
+                  { path: "supplier/machines", element: s(<SupplierMachinesPage />) },
+                  { path: "supplier/machines/new", element: s(<CreateMachinePage />) },
+                  { path: "supplier/machines/:id/edit", element: s(<EditMachinePage />) },
+                  { path: "supplier/bookings", element: s(<SupplierBookingsPage />) },
+                  { path: "supplier/bookings/:id", element: s(<SupplierBookingDetailPage />) },
                 ],
               },
             ],
@@ -181,40 +229,40 @@ export const router = createBrowserRouter([
                 path: "vendor-dashboard",
                 element: (
                   <SupplierOnboardingGuard requireComplete>
-                    <VendorDashboardEntry />
+                    {s(<VendorDashboardEntry />)}
                   </SupplierOnboardingGuard>
                 ),
               },
-              { path: "my-ad", element: <MyAdsPage /> },
-              { path: "my-ad/new", element: <CreateListingPage /> },
-              { path: "my-ad/:id", element: <ViewListingPage /> },
-              { path: "my-ad/:id/edit", element: <EditListingPage /> },
-              { path: "/dashboard/my-quotes", element: <QuotesListPage /> },
-              { path: "/dashboard/buyer-rfqs", element: <VendorOpenRfqsPage /> },
-              { path: "/dashboard/my-quotes/:id", element: <QuoteDetailsPage /> },
-              { path: "/dashboard/my-subscription", element: <SubscriptionPage /> },
-              { path: "/dashboard/my-payouts", element: <PayoutPage /> },
-              { path: "/dashboard/my-kyc", element: <KycPage /> },
-              { path: "/vendor-profile", element: <VendorProfilePage /> },
-              { path: "/vendor/company-details", element: <CompanyDetailsPage /> },
+              { path: "my-ad", element: s(<MyAdsPage />) },
+              { path: "my-ad/new", element: s(<CreateListingPage />) },
+              { path: "my-ad/:id", element: s(<ViewListingPage />) },
+              { path: "my-ad/:id/edit", element: s(<EditListingPage />) },
+              { path: "/dashboard/my-quotes", element: s(<QuotesListPage />) },
+              { path: "/dashboard/buyer-rfqs", element: s(<VendorOpenRfqsPage />) },
+              { path: "/dashboard/my-quotes/:id", element: s(<QuoteDetailsPage />) },
+              { path: "/dashboard/my-subscription", element: s(<SubscriptionPage />) },
+              { path: "/dashboard/my-payouts", element: s(<PayoutPage />) },
+              { path: "/dashboard/my-kyc", element: s(<KycPage />) },
+              { path: "/vendor-profile", element: s(<VendorProfilePage />) },
+              { path: "/vendor/company-details", element: s(<CompanyDetailsPage />) },
               { path: "/vendor", element: <Navigate to="/vendor-profile" replace /> },
             ],
           },
           {
             element: <RoleGuard allowed={[USER_TYPES.superAdmin]} />,
             children: [
-              { path: "/admin", element: <AdminDashboard /> },
-              { path: "/admin/listings", element: <AdminListingsManagement /> },
-              { path: "/admin/all-quotes", element: <AdminAllQuotesPage /> },
-              { path: "/admin/order-tracker", element: <AdminOrderTrackingPage /> },
-              { path: "/admin/orders/:orderId", element: <AdminOrderDetailPage /> },
-              { path: "/admin/dispute", element: <AdminDisputePage /> },
-              { path: "/admin/dispute/:disputeId", element: <DisputeResolutionPage /> },
-              { path: "/admin/revenue", element: <RevenueDashboard /> },
-              { path: "/admin/vendor-withdrawals", element: <AdminVendorWithdrawals /> },
-              { path: "/admin/kyc/verification-queue", element: <KYCVerificationQueue /> },
-              { path: "/admin/kyc/review/:submissionId", element: <KYCReviewDetail /> },
-              { path: "/admin/user-management", element: <UsersManagementPage /> },
+              { path: "/admin", element: s(<AdminDashboard />) },
+              { path: "/admin/listings", element: s(<AdminListingsManagement />) },
+              { path: "/admin/all-quotes", element: s(<AdminAllQuotesPage />) },
+              { path: "/admin/order-tracker", element: s(<AdminOrderTrackingPage />) },
+              { path: "/admin/orders/:orderId", element: s(<AdminOrderDetailPage />) },
+              { path: "/admin/dispute", element: s(<AdminDisputePage />) },
+              { path: "/admin/dispute/:disputeId", element: s(<DisputeResolutionPage />) },
+              { path: "/admin/revenue", element: s(<RevenueDashboard />) },
+              { path: "/admin/vendor-withdrawals", element: s(<AdminVendorWithdrawals />) },
+              { path: "/admin/kyc/verification-queue", element: s(<KYCVerificationQueue />) },
+              { path: "/admin/kyc/review/:submissionId", element: s(<KYCReviewDetail />) },
+              { path: "/admin/user-management", element: s(<UsersManagementPage />) },
             ],
           },
         ],

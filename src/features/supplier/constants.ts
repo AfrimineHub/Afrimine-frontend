@@ -53,12 +53,21 @@ export const SUPPLIER_MACHINES_PATH = '/supplier/machines';
 export const SUPPLIER_BOOKINGS_PATH = '/supplier/bookings';
 export const BUYER_BOOKINGS_PATH = '/my-bookings';
 
-export const ASSET_STATUS = {
-  Available: 'Available',
-  Unavailable: 'Unavailable',
+export const ASSET_STATUS_ENUM = {
+  Available: 0,
+  Rented: 1,
+  UnderMaintenance: 2,
+  Inactive: 3,
 } as const;
 
-export type AssetStatusValue = (typeof ASSET_STATUS)[keyof typeof ASSET_STATUS];
+export type AssetStatusValue = (typeof ASSET_STATUS_ENUM)[keyof typeof ASSET_STATUS_ENUM];
+
+export const ASSET_STATUS_FROM_ENUM: Record<number, string> = {
+  0: 'Available',
+  1: 'Rented',
+  2: 'UnderMaintenance',
+  3: 'Inactive',
+};
 
 export function isAssetAvailable(status: string | undefined): boolean {
   if (!status) return true;
@@ -66,3 +75,7 @@ export function isAssetAvailable(status: string | undefined): boolean {
   return s === 'available' || s === 'active' || s === 'listed';
 }
 
+export function toAssetStatusEnum(status: string | undefined): number | undefined {
+  if (!status) return undefined;
+  return (ASSET_STATUS_ENUM as Record<string, number>)[status];
+}

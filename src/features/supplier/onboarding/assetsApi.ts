@@ -32,8 +32,7 @@ export interface CreateAssetPayload {
   dailyRentalRate: number;
   mobilizationFeePerKm: number;
   description?: string;
-  /** Marketplace availability — e.g. "Available" | "Unavailable" */
-  status?: string;
+  status?: number;
 }
 
 export type UpdateAssetPayload = Partial<CreateAssetPayload>;
