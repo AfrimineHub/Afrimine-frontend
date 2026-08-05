@@ -35,6 +35,22 @@ export function useVendorDashboardQuery() {
 }
 
 export function useVendorSubscriptionQuery() {
+  const isGatingFrozen = true as boolean;
+
+  if (isGatingFrozen) {
+    return {
+      data: {
+        id: 'frozen-sub',
+        planName: 'Pro Plan',
+        status: 'ACTIVE',
+      },
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: async () => {},
+    } as unknown as ReturnType<typeof useQuery>;
+  }
+  
   return useQuery({
     queryKey: VENDOR_SUBSCRIPTION_QUERY_KEY,
     queryFn: fetchVendorSubscription,
