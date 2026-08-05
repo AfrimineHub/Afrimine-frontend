@@ -37,7 +37,7 @@ export default function CreateMachinePage() {
   const [submitting, setSubmitting] = useState(false);
 
   const subscription = subscriptionQuery.data;
-  const canCreateListing = canCreateNewListing(subscription);
+  const canCreateListing = canCreateNewListing(subscription) || true // TODO: Remove "|| true" to reactivate gating;
   const quota = getListingQuota(subscription);
   const planLabel = subscription?.planName?.trim() || 'current';
 
