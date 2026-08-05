@@ -6,9 +6,21 @@ export interface ListingQuota {
   remaining: number;
 }
 
+const isGatingFrozen = true as boolean; // TODO: Remove to unfreeze subscription
+
 export function getListingQuota(
   subscription: VendorSubscription | null | undefined,
 ): ListingQuota {
+
+  // Freeze sub gating globally. Remove to unfreeze subscription
+  if (isGatingFrozen) {
+    return {
+      used: 0,
+      limit: 999,
+      remaining: 999,
+    };
+  }
+
   const limit = subscription?.listingsLimit ?? 0;
   const used = subscription?.listingsUsed ?? 0;
   const remaining =
@@ -19,34 +31,11 @@ export function getListingQuota(
   return { limit, used, remaining };
 }
 
-
-
-function isFutureDate(value: string | null | undefined): boolean {
-  if (!value) return false;
-  const timestamp = new Date(value).getTime();
-  return Number.isFinite(timestamp) && timestamp > Date.now();
-}
-
-export function hasActivePaidSubscription(
-  subscription: VendorSubscription | null | undefined,
-): boolean {
-  const planId = subscription?.planId?.trim().toLowerCase();
-  if (!planId || planId === 'free') return false;
-
-  const status = subscription?.status?.trim().toLowerCase();
-  if (status === 'none' || status === 'past_due') return false;
-
-  // A canceled plan can still be active until the current paid period ends.
-  if (status === 'canceled') {
-    return isFutureDate(subscription?.renewsAt);
-  }
-
-  return true;
-}
-
 export function canCreateNewListing(
   subscription: VendorSubscription | null | undefined,
 ): boolean {
+  if (isGatingFrozen) return true; // TODO: Remove to unfreeze subscription
+
   if (!subscription) return false;
   return getListingQuota(subscription).remaining > 0;
 }
