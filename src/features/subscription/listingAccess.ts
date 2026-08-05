@@ -1,5 +1,26 @@
 import type { VendorSubscription } from '@/features/vendor/dashboardTypes';
 
+export interface ListingQuota {
+  limit: number;
+  used: number;
+  remaining: number;
+}
+
+export function getListingQuota(
+  subscription: VendorSubscription | null | undefined,
+): ListingQuota {
+  const limit = subscription?.listingsLimit ?? 0;
+  const used = subscription?.listingsUsed ?? 0;
+  const remaining =
+    typeof subscription?.listingsRemaining === 'number'
+      ? subscription.listingsRemaining
+      : Math.max(limit - used, 0);
+ 
+  return { limit, used, remaining };
+}
+
+
+
 function isFutureDate(value: string | null | undefined): boolean {
   if (!value) return false;
   const timestamp = new Date(value).getTime();
@@ -23,8 +44,10 @@ export function hasActivePaidSubscription(
   return true;
 }
 
-export function canCreatePostOnboardingListing(
+export function canCreateNewListing(
   subscription: VendorSubscription | null | undefined,
 ): boolean {
-  return hasActivePaidSubscription(subscription);
+  if (!subscription) return false;
+  return getListingQuota(subscription).remaining > 0;
 }
+
