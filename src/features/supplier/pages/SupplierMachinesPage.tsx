@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Pencil, Plus, Trash2, Truck } from 'lucide-react';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { ToggleSwitch } from '@/features/supplier/components/ToggleSwitch';
-import { canCreatePostOnboardingListing } from '@/features/subscription/listingAccess';
+import { canCreateNewListing } from '@/features/subscription/listingAccess';
 import { useVendorSubscriptionQuery } from '@/features/vendor/dashboardQueries';
 import {
   useDeleteAssetMutation,
@@ -34,7 +34,7 @@ export default function SupplierMachinesPage() {
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const machines = normalizeAssetsList(assetsQuery.data);
-  const canCreateListing = canCreatePostOnboardingListing(subscriptionQuery.data);
+  const canCreateListing = canCreateNewListing(subscriptionQuery.data);
 
   const handleDelete = async (assetId: string) => {
     if (!window.confirm('Remove this machine from your yard? This cannot be undone.')) return;
