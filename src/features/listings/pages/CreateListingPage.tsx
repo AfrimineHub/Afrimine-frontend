@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { CreateListingForm } from '@/features/listings/components/CreateListingForm';
 import { SubscriptionRequiredNotice } from '@/features/subscription/components/SubscriptionRequiredNotice';
-import { canCreatePostOnboardingListing } from '@/features/subscription/listingAccess';
+import { canCreateNewListing } from '@/features/subscription/listingAccess';
 import { useVendorSubscriptionQuery } from '@/features/vendor/dashboardQueries';
 
 const CreateListingPage: React.FC = () => {
   const subscriptionQuery = useVendorSubscriptionQuery();
-  const canCreateListing = canCreatePostOnboardingListing(subscriptionQuery.data);
+  const canCreateListing = canCreateNewListing(subscriptionQuery.data);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
