@@ -6,7 +6,7 @@ import { MachineAssetForm } from '@/features/supplier/components/MachineAssetFor
 import { FileDropzone } from '@/features/supplier/components/FileDropzone';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { SubscriptionRequiredNotice } from '@/features/subscription/components/SubscriptionRequiredNotice';
-import { canCreatePostOnboardingListing } from '@/features/subscription/listingAccess';
+import { canCreateNewListing, getListingQuota } from '@/features/subscription/listingAccess';
 import { useVendorSubscriptionQuery } from '@/features/vendor/dashboardQueries';
 import { createEmptyMachine } from '@/features/supplier/types';
 import { SUPPLIER_MACHINES_PATH } from '@/features/supplier/constants';
@@ -35,7 +35,11 @@ export default function CreateMachinePage() {
   const [photos, setPhotos] = useState<AssetPhotosPayload>({});
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const canCreateListing = canCreatePostOnboardingListing(subscriptionQuery.data);
+
+  const subscription = subscriptionQuery.data;
+  const canCreateListing = canCreateNewListing(subscription) || true // TODO: Remove "|| true" to reactivate gating;
+  const quota = getListingQuota(subscription);
+  const planLabel = subscription?.planName?.trim() || 'current';
 
   const setPhoto = (
     key: keyof AssetPhotosPayload,
@@ -122,9 +126,24 @@ export default function CreateMachinePage() {
         <div className="mx-auto max-w-2xl rounded-3xl border border-slate-200 bg-white p-5 text-sm text-slate-500 shadow-sm sm:p-8">
           Loading subscription…
         </div>
+      ) : subscriptionQuery.isError ? (
+        <div className="mx-auto max-w-2xl rounded-3xl border border-red-100 bg-red-50 p-5 text-sm text-red-600 shadow-sm sm:p-8" role="alert">
+          <p>{getApiErrorMessage(subscriptionQuery.error, 'Could not load your subscription.')}</p>
+          <button
+            type="button"
+            onClick={() => subscriptionQuery.refetch()}
+            className="mt-3 text-sm font-semibold text-red-700 underline hover:text-red-800"
+          >
+            Try again
+          </button>
+        </div>
       ) : !canCreateListing ? (
         <div className="mx-auto max-w-2xl">
-          <SubscriptionRequiredNotice description="Your first machine can be added during onboarding. To publish another machine after onboarding, upgrade to a paid subscription first." />
+          <SubscriptionRequiredNotice
+            title="Listing limit reached"
+            description={`You've used all ${quota.used} of ${quota.limit} listing${quota.limit === 1 ? '' : 's'} on your ${planLabel} plan. Upgrade to list more machines.`}
+            ctaLabel="Upgrade plan"
+          />
         </div>
       ) : (
         <form
