@@ -220,6 +220,13 @@ export interface AdminKycQueueItem {
   submittedAt: string;
 }
 
+export interface AdminKycDocument {
+  fileName: string;
+  downloadUrl: string;
+  fileSizeBytes: number | null;
+  documentType: string;
+}
+
 export interface AdminKycDetail {
   id: string;
   userId: string;
@@ -236,6 +243,7 @@ export interface AdminKycDetail {
   documentFileName: string | null;
   documentFileSizeBytes: number | null;
   documentDownloadUrl: string | null;
+  documents: AdminKycDocument[] | null;
   status: string | null;
 }
 

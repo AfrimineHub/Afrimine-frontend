@@ -23,6 +23,14 @@ import {
 import { formatAdminDateTime, formatFileSize } from '@/features/admin/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
+const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+
+function isImageUrl(url?: string | null): boolean {
+  if (!url) return false;
+  const clean = url.split('?')[0].toLowerCase();
+  return IMAGE_EXTENSIONS.some((ext) => clean.endsWith(ext));
+}
+
 const KYCReviewDetail = () => {
   const { submissionId } = useParams<{ submissionId: string }>();
   const navigate = useNavigate();
@@ -35,6 +43,20 @@ const KYCReviewDetail = () => {
   const userData = detailQuery.data;
   const loadError =
     detailQuery.isError && getApiErrorMessage(detailQuery.error, 'Could not load KYC submission.');
+
+  const documents =
+    userData?.documents && userData.documents.length > 0
+      ? userData.documents
+      : userData?.documentDownloadUrl
+        ? [
+            {
+              fileName: userData.documentFileName ?? 'Submitted document',
+              downloadUrl: userData.documentDownloadUrl,
+              fileSizeBytes: userData.documentFileSizeBytes ?? undefined,
+              documentType: userData.documentType ?? 'Document',
+            },
+          ]
+        : [];
 
   const handleApprove = async () => {
     if (!submissionId) return;
@@ -180,44 +202,79 @@ const KYCReviewDetail = () => {
                 <FileText size={18} className="text-amber-500" /> Document Information
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-                {[
-                  { label: 'Document Type', value: userData.documentType ?? '—', icon: FileText },
-                  { label: 'Document ID', value: userData.documentIdNumber ?? '—', icon: ShieldCheck },
-                  { label: 'Issuing Country', value: userData.country ?? '—', icon: Globe },
-                ].map((item) => (
-                  <div key={item.label} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
-                      {item.label}
-                    </p>
-                    <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                      <item.icon size={14} className="text-slate-400" /> {item.value}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-2 border-dashed border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center bg-slate-50/30">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-slate-300">
-                  <FileText size={32} />
+              {(userData.documentType || userData.documentIdNumber || userData.country) && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                  {[
+                    { label: 'Document Type', value: userData.documentType ?? '—', icon: FileText },
+                    { label: 'Document ID', value: userData.documentIdNumber ?? '—', icon: ShieldCheck },
+                    { label: 'Issuing Country', value: userData.country ?? '—', icon: Globe },
+                  ].map((item) => (
+                    <div key={item.label} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                        {item.label}
+                      </p>
+                      <p className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                        <item.icon size={14} className="text-slate-400" /> {item.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm font-bold text-slate-600 mb-1">
-                  {userData.documentFileName ?? 'Submitted document'}
-                </p>
-                <p className="text-xs font-medium text-slate-400 mb-6">
-                  {formatFileSize(userData.documentFileSizeBytes)}
-                </p>
-                {userData.documentDownloadUrl ? (
-                  <a
-                    href={userData.documentDownloadUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-2 text-xs font-black text-blue-600 uppercase tracking-widest hover:underline"
-                  >
-                    <Download size={14} /> Download Document
-                  </a>
-                ) : null}
-              </div>
+              )}
+
+              {documents.length === 0 ? (
+                <div className="border-2 border-dashed border-slate-200 rounded-2xl p-12 flex flex-col items-center justify-center bg-slate-50/30">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 text-slate-300">
+                    <FileText size={32} />
+                  </div>
+                  <p className="text-sm font-bold text-slate-600">No documents submitted</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {documents.map((doc, index) => {
+                    const previewable = isImageUrl(doc.downloadUrl);
+                    return (
+                      <a
+                        key={`${doc.downloadUrl}-${index}`}
+                        href={doc.downloadUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="group block rounded-2xl border border-slate-200 bg-slate-50/30 overflow-hidden hover:border-blue-200 hover:shadow-sm transition-all"
+                      >
+                        <div className="h-36 bg-slate-100 flex items-center justify-center overflow-hidden">
+                          {previewable ? (
+                            <img
+                              src={doc.downloadUrl}
+                              alt={doc.fileName}
+                              className="h-full w-full object-cover group-hover:scale-105 transition-transform"
+                            />
+                          ) : (
+                            <div className="text-slate-300">
+                              <FileText size={40} />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4">
+                          <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">
+                            {doc.documentType}
+                          </p>
+                          <p className="text-xs font-bold text-slate-700 truncate" title={doc.fileName}>
+                            {doc.fileName}
+                          </p>
+                          <div className="mt-2 flex items-center justify-between">
+                            <p className="text-[11px] font-medium text-slate-400">
+                              {formatFileSize(doc.fileSizeBytes)}
+                            </p>
+                            <span className="flex items-center gap-1 text-[10px] font-black text-blue-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                              {previewable ? <ExternalLink size={11} /> : <Download size={11} />}
+                              View
+                            </span>
+                          </div>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
             </section>
           </div>
         ) : null}
