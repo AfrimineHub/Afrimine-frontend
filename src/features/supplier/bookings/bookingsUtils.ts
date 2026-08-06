@@ -37,6 +37,8 @@ export interface BookingDetail extends ActiveLeaseRow {
   totalAmount?: number;
   currency?: string;
   logisticsType?: string;
+  paymentLink?: string;
+  payscrowTransactionNumber?: string
 }
 
 export function normalizeBooking(raw: unknown): BookingDetail | null {

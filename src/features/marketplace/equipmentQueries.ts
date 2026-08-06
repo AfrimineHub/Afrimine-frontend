@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { BOOKINGS_QUERY_KEY } from '@/features/supplier/bookings/bookingsQueries';
 import {
   createBooking,
   fetchAssetDetail,
@@ -48,7 +49,7 @@ export function useCreateBookingMutation() {
     mutationFn: (payload: CreateBookingPayload) => createBooking(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MARKETPLACE_EQUIPMENT_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY});
     },
   });
 }

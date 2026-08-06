@@ -29,6 +29,14 @@ export function useBookingQuery(bookingId: string | undefined) {
     queryKey: [...BOOKINGS_QUERY_KEY, 'detail', bookingId],
     queryFn: () => fetchBooking(bookingId as string),
     enabled: Boolean(bookingId),
+    refetchOnWindowFocus: true,
+    refetchInterval: (query) => {
+      const raw = query.state.data as Record<string, unknown> | undefined;
+      const paymentLink = raw?.paymentLink;
+      const transactionNumber = raw?.payscrowTransactionNumber;
+      const awaitingPayment = typeof paymentLink === 'string' && paymentLink && !transactionNumber;
+      return awaitingPayment ? 8000 : false;
+    },
   });
 }
 

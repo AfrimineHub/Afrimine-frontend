@@ -47,8 +47,8 @@ export async function fetchAssetPricing(
 
 export async function createBooking(
   payload: CreateBookingPayload,
-): Promise<{ bookingId: string }> {
-  const { data } = await apiClient.post<ApiResponse<{ bookingId: string }>>(
+): Promise<unknown> {
+  const { data } = await apiClient.post<ApiResponse<unknown>>(
     'bookings',
     payload,
   );
