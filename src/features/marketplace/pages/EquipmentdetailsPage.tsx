@@ -4,6 +4,8 @@ import { MapPin, Truck } from 'lucide-react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { USER_TYPES } from '@/features/auth/types';
 import { getApiErrorMessage } from '@/lib/api/errors';
+import { normalizeBooking } from '@/features/supplier/bookings/bookingsUtils';
+import { BookingPaymentCta } from '@/features/supplier/components/BookingPaymentCta';
 import { useAssetDetailQuery, useAssetPricingQuery, useCreateBookingMutation } from '../equipmentQueries';
 import { LOGISTICS_TYPE_OPTIONS } from '../equipmentTypes';
 
@@ -56,6 +58,12 @@ export default function EquipmentDetailPage() {
   });
 
   const createBooking = useCreateBookingMutation();
+
+  // createBooking.data is now `unknown` (see equipmentApi.ts) since the
+  // backend returns the full booking, not just { bookingId }. Run it through
+  // the same normalizer the bookings pages use so we get a typed, safe shape
+  // instead of guessing field names here too.
+  const createdBooking = createBooking.isSuccess ? normalizeBooking(createBooking.data) : null;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -199,19 +207,22 @@ export default function EquipmentDetailPage() {
               This machine isn&apos;t currently available to book.
             </div>
           ) : createBooking.isSuccess ? (
-            <div className="rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
-              Booking request sent. The supplier has 24 hours to approve it — track it from{' '}
-              <Link
-                to={
-                  createBooking.data?.bookingId
-                    ? `/my-bookings/${createBooking.data.bookingId}`
-                    : '/my-bookings'
-                }
-                className="font-bold hover:underline"
-              >
-                My Bookings
-              </Link>
-              .
+            <div className="space-y-3 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
+              <p>
+                Booking request sent. The supplier has 24 hours to approve it — track it from{' '}
+                <Link
+                  to={createdBooking ? `/my-bookings/${createdBooking.id}` : '/my-bookings'}
+                  className="font-bold hover:underline"
+                >
+                  My Bookings
+                </Link>
+                .
+              </p>
+              {createdBooking ? (
+                <div className="border-t border-emerald-100 pt-3">
+                  <BookingPaymentCta booking={createdBooking} />
+                </div>
+              ) : null}
             </div>
           ) : (
             <form className="space-y-4" onSubmit={handleSubmit}>

@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
-import {
-  useBookingsQuery,
-} from '@/features/supplier/bookings/bookingsQueries';
+import { BookingPaymentCta } from '@/features/supplier/components/BookingPaymentCta';
+import { useBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
 import {
   BOOKING_STATUS_STYLES,
   normalizeBookingsList,
@@ -45,24 +44,31 @@ export default function MyBookingsPage() {
         ) : (
           <div className="mt-6 space-y-4">
             {bookings.map((booking) => (
-              <Link
+              <div
                 key={booking.id}
-                to={`${BUYER_BOOKINGS_PATH}/${booking.id}`}
-                className="block rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#EAB308]"
+                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-[#EAB308]"
               >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="font-semibold text-slate-900">{booking.machineName}</p>
-                    <p className="text-sm text-slate-500">{booking.leasePeriod}</p>
-                    <p className="mt-1 text-xs text-slate-400">Next: {booking.nextMilestone}</p>
+                <Link to={`${BUYER_BOOKINGS_PATH}/${booking.id}`} className="block">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-900">{booking.machineName}</p>
+                      <p className="text-sm text-slate-500">{booking.leasePeriod}</p>
+                      <p className="mt-1 text-xs text-slate-400">Next: {booking.nextMilestone}</p>
+                    </div>
+                    <span
+                      className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${BOOKING_STATUS_STYLES[booking.status]}`}
+                    >
+                      {booking.status}
+                    </span>
                   </div>
-                  <span
-                    className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${BOOKING_STATUS_STYLES[booking.status]}`}
-                  >
-                    {booking.status}
-                  </span>
-                </div>
-              </Link>
+                </Link>
+
+                {booking.status !== 'declined' && (
+                  <div className="mt-4 border-t border-slate-100 pt-4">
+                    <BookingPaymentCta booking={booking} />
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         )}
