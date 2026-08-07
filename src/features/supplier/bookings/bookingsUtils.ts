@@ -39,6 +39,7 @@ export interface BookingDetail extends ActiveLeaseRow {
   logisticsType?: string;
   paymentLink?: string;
   payscrowTransactionNumber?: string
+  paymentStatus?: 'Pending' | 'Paid' | 'Failed';
 }
 
 export function normalizeBooking(raw: unknown): BookingDetail | null {
@@ -59,6 +60,8 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
     (startDate && endDate ? `${formatDate(startDate)} – ${formatDate(endDate)}` : startDate ? formatDate(startDate) : '—');
   const nextMilestone = pickString(r, ['nextMilestone', 'currentMilestone']) ?? '—';
   const status = normalizeBookingStatus(r.status);
+  const paymentLink = pickString(r, ['paymentLink']);
+  const payscrowTransactionNumber = pickString(r, ['payscrowTransactionNumber']);
 
   const logisticsRaw = r.logisticsType;
   let logisticsType: string | undefined;
@@ -83,6 +86,13 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
     totalAmount: pickNumber(r, ['totalAmount', 'estimatedTotal', 'amount']),
     currency: pickString(r, ['currency']) ?? 'NGN',
     logisticsType,
+    paymentLink,
+    payscrowTransactionNumber,
+    paymentStatus: pickString(r, ['paymentStatus']) as
+  | 'Pending'
+  | 'Paid'
+  | 'Failed'
+  | undefined,
   };
 }
 
