@@ -1,40 +1,50 @@
 import { Button } from '@/shared/buttons/Button';
 import type { BookingDetail } from '@/features/supplier/bookings/bookingsUtils';
+import { BUYER_BOOKINGS_PATH } from '../constants';
+import { useNavigate } from 'react-router-dom';
 
-type PaymentState = 'paid' | 'awaiting-link' | 'awaiting-payment';
+type PaymentState = 'awaiting-link' | 'awaiting-payment' | 'paid';
 
 function getPaymentState(
-  booking: Pick<BookingDetail, 'paymentLink' | 'payscrowTransactionNumber'>,
+  booking: Pick<BookingDetail, 'paymentStatus'| 'paymentLink'>,
 ): PaymentState {
-  if (booking.payscrowTransactionNumber) return 'paid';
-  if (booking.paymentLink) return 'awaiting-payment';
+   if (booking.paymentStatus === 'Paid') {
+    return 'paid';
+  }
+   if (booking.paymentLink) {
+    return 'awaiting-payment';
+  }
+
   return 'awaiting-link';
 }
 
 export function BookingPaymentCta({ booking }: { booking: BookingDetail }) {
   const state = getPaymentState(booking);
-
-  if (state === 'paid') {
-    return (
-      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-emerald-700">
-        Payment received
-      </span>
-    );
-  }
+  const navigate = useNavigate();
 
   if (state === 'awaiting-link') {
     return (
-      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-500">
-        Generating payment link…
-      </span>
+      <>
+      <h3 className="font-semibold">
+        Preparing your payment
+      </h3>
+      <p className="text-sm text-slate-500">
+        We're generating your secure payment link.
+        This usually takes only a few moments.
+      </p>
+      </>
     );
   }
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-700">
-        Payment pending
-      </span>
+      <h3 className="font-semibold">
+          Complete your payment
+      </h3>
+      <p className="text-sm text-slate-500">
+          Your booking has been created successfully.
+          Complete payment now to continue processing your booking.
+      </p>
       <Button
         type="button"
         onClick={(e) => {
@@ -44,6 +54,12 @@ export function BookingPaymentCta({ booking }: { booking: BookingDetail }) {
         }}
       >
         Complete payment
+      </Button>
+      <Button
+          variant="secondary"
+          onClick={() => navigate(BUYER_BOOKINGS_PATH)}
+      >
+          Pay later
       </Button>
     </div>
   );
