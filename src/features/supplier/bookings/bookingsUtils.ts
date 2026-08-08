@@ -26,6 +26,52 @@ function normalizeBookingStatus(raw: unknown): ActiveLeaseRow['status'] {
   return 'pending';
 }
 
+export interface BookingMilestone {
+  name: string;
+  amount: number;
+  status: 'Locked' | 'Pending' | 'Released' | string;
+  releasedAt?: string | null;
+  description?: string;
+}
+
+export interface BookingPaymentBreakdown {
+  totalEscrow: number;
+  platformFee: number;
+  supplierShare: number;
+  milestone1Amount: number;
+  milestone2Amount: number;
+  milestone3Amount: number;
+  currency: string;
+}
+
+function normalizeMilestone(raw: unknown): BookingMilestone | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const name = pickString(r, ['name']);
+  if (!name) return null;
+  return {
+    name,
+    amount: pickNumber(r, ['amount']) ?? 0,
+    status: pickString(r, ['status']) ?? 'Locked',
+    releasedAt: pickString(r, ['releasedAt']) ?? null,
+    description: pickString(r, ['description']),
+  };
+}
+
+function normalizePaymentBreakdown(raw: unknown): BookingPaymentBreakdown | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  return {
+    totalEscrow: pickNumber(r, ['totalEscrow']) ?? 0,
+    platformFee: pickNumber(r, ['platformFee']) ?? 0,
+    supplierShare: pickNumber(r, ['supplierShare']) ?? 0,
+    milestone1Amount: pickNumber(r, ['milestone1Amount']) ?? 0,
+    milestone2Amount: pickNumber(r, ['milestone2Amount']) ?? 0,
+    milestone3Amount: pickNumber(r, ['milestone3Amount']) ?? 0,
+    currency: pickString(r, ['currency']) ?? 'NGN',
+  };
+}
+
 export interface BookingDetail extends ActiveLeaseRow {
   assetId?: string;
   siteAddress?: string;
@@ -38,8 +84,13 @@ export interface BookingDetail extends ActiveLeaseRow {
   currency?: string;
   logisticsType?: string;
   paymentLink?: string;
-  payscrowTransactionNumber?: string
+  payscrowTransactionNumber?: string;
   paymentStatus?: 'Pending' | 'Paid' | 'Failed';
+  milestones?: BookingMilestone[];
+  paymentBreakdown?: BookingPaymentBreakdown;
+  logisticsStatus?: string;
+  gitInsuranceActive?: boolean;
+  insurancePolicyNumber?: string | null;
 }
 
 export function normalizeBooking(raw: unknown): BookingDetail | null {
@@ -58,7 +109,19 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
   const leasePeriod =
     pickString(r, ['leasePeriod']) ??
     (startDate && endDate ? `${formatDate(startDate)} – ${formatDate(endDate)}` : startDate ? formatDate(startDate) : '—');
-  const nextMilestone = pickString(r, ['nextMilestone', 'currentMilestone']) ?? '—';
+
+  // Milestone data only exists on the detail endpoint (GET /bookings/{id}), not the list.
+  const milestones = [r.milestone1, r.milestone2, r.milestone3]
+    .map(normalizeMilestone)
+    .filter((m): m is BookingMilestone => m !== null);
+  const paymentBreakdown = normalizePaymentBreakdown(r.paymentBreakdown);
+  const nextMilestoneFromDetail = milestones.find((m) => m.status !== 'Released')?.name;
+
+  const nextMilestone =
+    nextMilestoneFromDetail ??
+    pickString(r, ['nextMilestone', 'currentMilestone']) ??
+    '—';
+
   const status = normalizeBookingStatus(r.status);
   const paymentLink = pickString(r, ['paymentLink']);
   const payscrowTransactionNumber = pickString(r, ['payscrowTransactionNumber']);
@@ -89,10 +152,15 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
     paymentLink,
     payscrowTransactionNumber,
     paymentStatus: pickString(r, ['paymentStatus']) as
-  | 'Pending'
-  | 'Paid'
-  | 'Failed'
-  | undefined,
+      | 'Pending'
+      | 'Paid'
+      | 'Failed'
+      | undefined,
+    milestones: milestones.length ? milestones : undefined,
+    paymentBreakdown: paymentBreakdown ?? undefined,
+    logisticsStatus: pickString(r, ['logisticsStatus']),
+    gitInsuranceActive: typeof r.gitInsuranceActive === 'boolean' ? (r.gitInsuranceActive as boolean) : undefined,
+    insurancePolicyNumber: pickString(r, ['insurancePolicyNumber']) ?? null,
   };
 }
 

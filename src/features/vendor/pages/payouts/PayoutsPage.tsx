@@ -3,27 +3,28 @@ import { PayoutsStatsGrid } from '../../components/payouts/PayoutsGrid';
 import { RequestPayout } from '../../components/payouts/RequestPayout';
 import { TransactionsTable } from '../../components/payouts/TransactionTable';
 import { TransactionsHistoryFilter } from '../../components/payouts/TransactionHistoryFilter';
-import { useVendorPayoutSummaryQuery } from '@/features/vendor/dashboardQueries';
-import { mapPayoutItemToTransaction } from '@/features/vendor/dashboardUtils';
+import { useWalletBalanceQuery, useWalletTransactionsQuery } from '@/features/supplier/wallet/walletQueries';
+import { mapWalletTransactionToRow } from '@/features/supplier/wallet/walletUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 const PayoutPage = () => {
   const [filter, setFilter] = useState('all');
-  const payoutQuery = useVendorPayoutSummaryQuery();
+  const balanceQuery = useWalletBalanceQuery();
+  const transactionsQuery = useWalletTransactionsQuery();
 
   const transactions = useMemo(
-    () => (payoutQuery.data?.recentPayouts ?? []).map(mapPayoutItemToTransaction),
-    [payoutQuery.data?.recentPayouts],
+    () => (transactionsQuery.data ?? []).map(mapWalletTransactionToRow),
+    [transactionsQuery.data],
   );
 
   const filteredTransactions = transactions.filter((tx) => {
     if (filter === 'all') return true;
-    return tx.status === filter;
+    return tx.type === filter;
   });
 
   const loadError =
-    payoutQuery.isError &&
-    getApiErrorMessage(payoutQuery.error, 'Could not load payout summary.');
+    (balanceQuery.isError && getApiErrorMessage(balanceQuery.error, 'Could not load wallet balance.')) ||
+    (transactionsQuery.isError && getApiErrorMessage(transactionsQuery.error, 'Could not load transaction history.'));
 
   return (
     <section className="min-h-screen bg-gray-50 py-8 px-4">
@@ -31,7 +32,7 @@ const PayoutPage = () => {
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Your Payouts</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Track, manage, and review all your payout transactions
+            Track, manage, and review all your wallet transactions
           </p>
         </div>
 
@@ -42,13 +43,17 @@ const PayoutPage = () => {
         ) : null}
 
         <div className="bg-white rounded-xl shadow-sm p-5">
-          <PayoutsStatsGrid summary={payoutQuery.data} isLoading={payoutQuery.isLoading} />
+          <PayoutsStatsGrid
+            balance={balanceQuery.data}
+            transactionsCount={transactionsQuery.data?.length}
+            isLoading={balanceQuery.isLoading}
+          />
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-5">
           <RequestPayout
-            availableAmount={payoutQuery.data?.pendingAmount}
-            currency={payoutQuery.data?.currency}
+            availableAmount={balanceQuery.data?.availableBalance}
+            currency={balanceQuery.data?.currency}
           />
         </div>
 
@@ -56,20 +61,20 @@ const PayoutPage = () => {
           <div className="mb-4 space-y-3">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Transaction History</h2>
-              <p className="text-sm text-gray-500">View your past payout transactions</p>
+              <p className="text-sm text-gray-500">View your wallet's credit and debit history</p>
             </div>
 
             <TransactionsHistoryFilter value={filter} onChange={setFilter} />
           </div>
 
-          {payoutQuery.isLoading ? (
+          {transactionsQuery.isLoading ? (
             <div className="space-y-3" aria-busy="true">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="h-12 bg-gray-100 rounded animate-pulse" />
               ))}
             </div>
           ) : filteredTransactions.length === 0 ? (
-            <p className="text-sm text-gray-500 py-8 text-center">No payout transactions yet.</p>
+            <p className="text-sm text-gray-500 py-8 text-center">No wallet transactions yet.</p>
           ) : (
             <TransactionsTable transactions={filteredTransactions} />
           )}
