@@ -54,6 +54,7 @@ import type {
   AdminRevenueTransactionsQueryParams,
   AdminUsersQueryParams,
   AdminWithdrawalsQueryParams,
+  UpdateAdminUserPayload,
 } from '@/features/admin/types';
 
 const STALE_TIME = 60 * 1000;
@@ -119,8 +120,15 @@ export function useReactivateAdminUserMutation() {
 
 export function useUpdateAdminUserMutation() {
   const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: (userId: string) => updateAdminUser(userId),
+    mutationFn: ({
+      userId,
+      payload,
+    }:{
+      userId: string;
+      payload: UpdateAdminUserPayload;
+    }) => updateAdminUser(userId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_USERS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ADMIN_USERS_STATS_QUERY_KEY });
