@@ -3,6 +3,8 @@ import {
   useBanAdminUserMutation,
   useReactivateAdminUserMutation,
   useSuspendAdminUserMutation,
+  useUpdateAdminUserMutation,
+  useDeleteAdminUserMutation,
 } from '@/features/admin/queries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
@@ -16,6 +18,9 @@ export const ActionButtons = ({ userId, accountStatus }: ActionButtonsProps) => 
   const suspendMutation = useSuspendAdminUserMutation();
   const banMutation = useBanAdminUserMutation();
   const reactivateMutation = useReactivateAdminUserMutation();
+  const updateMutation = useUpdateAdminUserMutation();
+  const deleteMutation = useDeleteAdminUserMutation();
+
 
   const isActive = accountStatus === 'Active';
   const isBusy =
@@ -49,6 +54,24 @@ export const ActionButtons = ({ userId, accountStatus }: ActionButtonsProps) => 
     }
   };
 
+  const handleUpdate = async () => {
+    setActionError(null);
+    try {
+      await updateMutation.mutateAsync(userId);
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, 'Could not reactivate user.'));
+    }
+  };
+
+  const handleDelete = async () => {
+    setActionError(null);
+    try {
+      await deleteMutation.mutateAsync(userId);
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, 'Could not reactivate user.'));
+    }
+  };
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-3">
@@ -72,14 +95,32 @@ export const ActionButtons = ({ userId, accountStatus }: ActionButtonsProps) => 
             </button>
           </>
         ) : (
-          <button
-            type="button"
-            onClick={handleReactivate}
-            disabled={isBusy}
-            className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
-          >
-            Reactivate
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={handleReactivate}
+              disabled={isBusy}
+              className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
+            >
+              Reactivate
+            </button>
+            <button
+              type="button"
+              onClick={handleUpdate}
+              disabled={isBusy}
+              className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
+            >
+              Update
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isBusy}
+              className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
+            >
+              Delete
+            </button>
+          </>
         )}
       </div>
       {actionError ? <span className="text-[11px] text-red-600">{actionError}</span> : null}
