@@ -12,6 +12,7 @@ const STATUS_LABELS: Record<string, string> = {
   verified: 'Verified',
   pending_verification: 'Pending Review',
   rejected: 'Rejected',
+  active: 'Active',
   draft: 'Incomplete',
 };
 
