@@ -1,14 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { Button } from '@/shared/buttons/Button';
 import { Input } from '@/shared/inputs/Input';
-import { Select } from '@/shared/Select';
-import { useRequestPayoutMutation } from '@/features/escrow/queries';
+import { useRequestWithdrawalMutation } from '@/features/supplier/wallet/walletQueries';
+import { formatWalletAmount } from '@/features/supplier/wallet/walletUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
-
-const paymentMethods = [
-  { label: 'Paystack', value: 'paystack' },
-  { label: 'Bank Transfer', value: 'transfer' },
-];
 
 interface RequestPayoutProps {
   availableAmount?: number;
@@ -17,11 +12,10 @@ interface RequestPayoutProps {
 
 export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps) => {
   const [amount, setAmount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('paystack');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const payoutMutation = useRequestPayoutMutation();
+  const withdrawalMutation = useRequestWithdrawalMutation();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -30,7 +24,7 @@ export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps)
 
     const parsedAmount = Number(amount.replace(/,/g, ''));
     if (!parsedAmount || parsedAmount <= 0) {
-      setError('Enter a valid payout amount.');
+      setError('Enter a valid withdrawal amount.');
       return;
     }
 
@@ -40,26 +34,27 @@ export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps)
     }
 
     try {
-      const result = await payoutMutation.mutateAsync({
+      const result = await withdrawalMutation.mutateAsync({
         amount: parsedAmount,
-        paymentMethod,
+        currency: currency ?? undefined,
       });
-      setMessage(result.message ?? 'Payout request submitted successfully.');
+      setMessage(result || 'Withdrawal request submitted successfully.');
       setAmount('');
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not submit payout request.'));
+      setError(getApiErrorMessage(err, 'Could not submit withdrawal request.'));
     }
   };
 
   return (
     <div className="bg-gray-500/10 p-8">
       <div className="p-4">
-        <h3 className="font-bold text-3l text-gray-700">Request Payout</h3>
+        <h3 className="font-bold text-3l text-gray-700">Request Withdrawal</h3>
         <p className="text-gray-500">
           Withdraw your available balance
-          {availableAmount != null
-            ? ` (${currency?.trim().toUpperCase() === 'USD' ? '$' : '₦'}${availableAmount.toLocaleString()})`
-            : ''}
+          {availableAmount != null ? ` (${formatWalletAmount(availableAmount, currency)})` : ''}
+        </p>
+        <p className="mt-1 text-xs text-gray-400">
+          Funds are sent to the bank account on file in your supplier profile.
         </p>
       </div>
 
@@ -69,13 +64,6 @@ export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps)
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="e.g. 50000"
-        />
-        <Select
-          label="Payment method"
-          placeholder="Select method"
-          options={paymentMethods}
-          value={paymentMethod}
-          onChange={(val) => setPaymentMethod(val)}
         />
 
         {message ? (
@@ -90,8 +78,8 @@ export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps)
           </p>
         ) : null}
 
-        <Button type="submit" fullWidth disabled={payoutMutation.isPending}>
-          {payoutMutation.isPending ? 'Submitting…' : 'Request Payout'}
+        <Button type="submit" fullWidth disabled={withdrawalMutation.isPending}>
+          {withdrawalMutation.isPending ? 'Submitting…' : 'Request Withdrawal'}
         </Button>
       </form>
     </div>

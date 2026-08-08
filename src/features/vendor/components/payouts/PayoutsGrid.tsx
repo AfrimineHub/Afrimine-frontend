@@ -1,47 +1,44 @@
 import React from 'react';
 import { Clock, Wallet, DollarSign, TrendingUp, type LucideIcon } from 'lucide-react';
-import type { VendorPayoutSummary } from '@/features/vendor/dashboardTypes';
-import { formatVendorAmount } from '@/features/vendor/dashboardUtils';
+import type { WalletBalance } from '@/features/supplier/wallet/walletTypes';
+import { formatWalletAmount } from '@/features/supplier/wallet/walletUtils';
 
 type Stat = {
   label: string;
   value: string;
   icon: LucideIcon;
-  color: string;
   bg: string;
   smallText: string;
 };
 
 interface PayoutsStatsGridProps {
-  summary?: VendorPayoutSummary;
+  balance?: WalletBalance;
+  transactionsCount?: number;
   isLoading?: boolean;
 }
 
-export const PayoutsStatsGrid: React.FC<PayoutsStatsGridProps> = ({ summary, isLoading }) => {
-  const currency = summary?.currency;
+export const PayoutsStatsGrid: React.FC<PayoutsStatsGridProps> = ({ balance, transactionsCount, isLoading }) => {
+  const currency = balance?.currency;
 
   const stats: Stat[] = [
     {
-      label: 'Pending',
-      value: summary ? formatVendorAmount(summary.pendingAmount, currency) : '—',
-      icon: Clock,
-      color: 'text-white',
+      label: 'Available Balance',
+      value: balance ? formatWalletAmount(balance.availableBalance, currency) : '—',
+      icon: Wallet,
       bg: 'bg-green-400',
-      smallText: 'Awaiting processing',
+      smallText: 'Ready to withdraw',
     },
     {
-      label: 'Total Paid',
-      value: summary ? formatVendorAmount(summary.totalPaid, currency) : '—',
-      icon: Wallet,
-      color: 'text-white',
+      label: 'Pending Balance',
+      value: balance ? formatWalletAmount(balance.pendingBalance, currency) : '—',
+      icon: Clock,
       bg: 'bg-yellow-600',
-      smallText: 'All time payouts',
+      smallText: 'Locked in escrow',
     },
     {
       label: 'Recent Activity',
-      value: summary ? String(summary.recentPayouts.length) : '—',
+      value: transactionsCount != null ? String(transactionsCount) : '—',
       icon: TrendingUp,
-      color: 'text-white',
       bg: 'bg-blue-400',
       smallText: 'Latest transactions',
     },
@@ -49,9 +46,8 @@ export const PayoutsStatsGrid: React.FC<PayoutsStatsGridProps> = ({ summary, isL
       label: 'Currency',
       value: currency?.trim().toUpperCase() || '—',
       icon: DollarSign,
-      color: 'text-white',
       bg: 'bg-purple-400',
-      smallText: 'Payout currency',
+      smallText: 'Wallet currency',
     },
   ];
 
