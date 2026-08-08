@@ -93,17 +93,6 @@ export const ActionButtons = ({ userId, accountStatus }: ActionButtonsProps) => 
             >
               Ban
             </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={handleReactivate}
-              disabled={isBusy}
-              className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
-            >
-              Reactivate
-            </button>
             <button
               type="button"
               onClick={handleUpdate}
@@ -119,6 +108,17 @@ export const ActionButtons = ({ userId, accountStatus }: ActionButtonsProps) => 
               className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
             >
               Delete
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              onClick={handleReactivate}
+              disabled={isBusy}
+              className="bg-[#1E293B] hover:bg-slate-800 text-white text-[11px] font-bold px-3 py-1.5 rounded-md uppercase tracking-wide transition-colors disabled:opacity-50"
+            >
+              Reactivate
             </button>
           </>
         )}
