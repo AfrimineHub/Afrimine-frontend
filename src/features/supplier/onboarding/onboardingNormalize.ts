@@ -1,10 +1,11 @@
-import { ACCOUNT_STATUS, ASSET_STATUS_FROM_ENUM, isAccountBlocked } from '../constants';
+import { ASSET_STATUS_FROM_ENUM, isAccountBlocked } from '../constants';
 import { MACHINE_TYPE_FROM_ENUM } from './assetsApi';
 import {
   createEmptyMachine,
   type MachineAsset,
   type SupplierIdentity,
   type SupplierLocation,
+  type SupplierVerificationStatus,
 } from '@/features/supplier/types';
 
 function str(r: Record<string, unknown>, keys: string[]): string {
@@ -47,7 +48,7 @@ export function isOnboardingSubmitted(statusData: unknown): boolean {
 }
 
 export function isSupplierPendingReview(statusData: unknown): boolean {
-  return getAccountStatus(statusData) === ACCOUNT_STATUS.Pending;
+  return normalizeVerificationStatus(statusData) === 'pending_verification';
 }
 
 export function getOnboardingStep(statusData: unknown): number | undefined {
@@ -151,11 +152,13 @@ export function normalizeAssetsList(raw: unknown): MachineAsset[] {
   return items.map(normalizeMachineAsset).filter((m): m is MachineAsset => m !== null);
 }
 
-export function normalizeVerificationStatus(raw: unknown): 'draft' | 'pending_verification' | 'verified' | 'rejected' {
+export function normalizeVerificationStatus(raw: unknown):SupplierVerificationStatus {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const value = str(r, ['status', 'verificationStatus', 'supplierStatus']).toUpperCase();
   if (value === 'PENDING') return 'pending_verification';
   if (value === 'VERIFIED' || value === 'APPROVED') return 'verified';
   if (value === 'REJECTED') return 'rejected';
+  if (value === 'ACTIVE') return 'active';
+
   return 'draft';
 }

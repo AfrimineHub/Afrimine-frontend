@@ -2,7 +2,8 @@ export type SupplierVerificationStatus =
   | 'draft'
   | 'pending_verification'
   | 'verified'
-  | 'rejected';
+  | 'rejected'
+  | 'active';
 
 export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 

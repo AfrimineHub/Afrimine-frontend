@@ -42,6 +42,8 @@ import {
   rejectAdminListing,
   rejectAdminWithdrawal,
   suspendAdminUser,
+  updateAdminUser,
+  deleteAdminUser,
 } from '@/features/admin/api';
 import type {
   AdminKycQueueQueryParams,
@@ -108,6 +110,28 @@ export function useReactivateAdminUserMutation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) => reactivateAdminUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_USERS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ADMIN_USERS_STATS_QUERY_KEY });
+    },
+  });
+}
+
+export function useUpdateAdminUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => updateAdminUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ADMIN_USERS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ADMIN_USERS_STATS_QUERY_KEY });
+    },
+  });
+}
+
+export function useDeleteAdminUserMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => deleteAdminUser(userId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ADMIN_USERS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ADMIN_USERS_STATS_QUERY_KEY });

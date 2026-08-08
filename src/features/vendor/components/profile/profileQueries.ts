@@ -9,15 +9,9 @@ import {
   normalizeVerificationStatus,
   isSupplierBlocked,
 } from '@/features/supplier/onboarding/onboardingNormalize';
-import type { SupplierIdentity } from '@/features/supplier/types';
+import type { SupplierIdentity, SupplierVerificationStatus } from '@/features/supplier/types';
 
 export interface VendorProfileFormData extends SupplierIdentity {
-  /**
-   * Not part of SupplierIdentity — pulled separately because
-   * VendorProfileResponseDto (swagger) shows GET /suppliers/me returning
-   * a `country` field alongside the identity fields. Unverified against a
-   * real response — confirm the key name once you have one.
-   */
   country: string;
 }
 
@@ -41,7 +35,7 @@ export function useVendorProfileQuery() {
 }
 
 export interface VendorAccountStatus {
-  verification: 'draft' | 'pending_verification' | 'verified' | 'rejected';
+  verification: SupplierVerificationStatus;
   blocked: boolean;
 }
 
