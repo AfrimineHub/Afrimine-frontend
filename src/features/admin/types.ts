@@ -66,6 +66,15 @@ export interface AdminUserListItem {
   createdAt: string;
 }
 
+
+const ACCOUNT_STATUS_OPTIONS = [
+  { value: 0, label: 'Pending' },
+  { value: 1, label: 'Active' },
+  { value: 2, label: 'Suspended' },
+  { value: 3, label: 'Banned' },
+  { value: 4, label: 'Deactivated' },
+] as const;
+
 export interface AdminUsersQueryParams extends AdminPagedQueryParams {
   role?: string;
   kycStatus?: string;
@@ -249,4 +258,12 @@ export interface AdminKycDetail {
 
 export interface AdminKycQueueQueryParams extends AdminPagedQueryParams {
   status?: string;
+}
+
+export interface UpdateAdminUserPayload {
+  fullName?: string;
+  phoneNumber?: string;
+  email?: string;
+  role?: number;
+  accountStatus?: number;
 }

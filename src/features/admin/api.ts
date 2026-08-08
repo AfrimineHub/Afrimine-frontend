@@ -26,6 +26,7 @@ import type {
   AdminUsersStats,
   AdminWithdrawalListItem,
   AdminWithdrawalsQueryParams,
+  UpdateAdminUserPayload,
 } from '@/features/admin/types';
 
 type RawPagedResult<T> = {
@@ -94,8 +95,11 @@ export async function reactivateAdminUser(userId: string): Promise<void> {
   await apiClient.post(`${adminApiPaths.users}/${userId}/reactivate`);
 }
 
-export async function updateAdminUser(userId: string): Promise<void> {
-  await apiClient.put(`${adminApiPaths.users}/${userId}`);
+export async function updateAdminUser(
+  userId: string, 
+  payload: UpdateAdminUserPayload
+  ): Promise<void> {
+  await apiClient.put(`${adminApiPaths.users}/${userId}`, payload);
 }
 
 export async function deleteAdminUser(userId: string): Promise<void> {

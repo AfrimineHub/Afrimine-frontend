@@ -197,7 +197,7 @@ const UsersManagementPage = () => {
                         />
                       </td>
                       <td className="py-4 px-2">
-                        <ActionButtons userId={user.id} accountStatus={accountLabel} />
+                        <ActionButtons user={user} />
                       </td>
                     </tr>
                   );
