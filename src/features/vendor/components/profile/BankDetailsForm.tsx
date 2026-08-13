@@ -14,7 +14,8 @@ interface BankDetailsFormProps {
   onCancel?: () => void;
 }
 
-export const BankDetailsForm = ({ initialValues }: BankDetailsFormProps) => {
+export const BankDetailsForm = ({ initialValues, onSuccess,
+  onCancel, }: BankDetailsFormProps) => {
   const banksQuery = useBanksQuery();
   const updateProfileMutation = useUpdateSupplierProfileMutation();
 
@@ -59,6 +60,7 @@ export const BankDetailsForm = ({ initialValues }: BankDetailsFormProps) => {
     try {
       const result = await updateProfileMutation.mutateAsync(payload);
       setMessage(typeof result === 'string' ? result : 'Bank details saved.');
+      onSuccess?.();
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not save bank details.'));
     }
@@ -109,9 +111,25 @@ export const BankDetailsForm = ({ initialValues }: BankDetailsFormProps) => {
           </p>
         ) : null}
 
-        <Button type="submit" fullWidth disabled={updateProfileMutation.isPending || banksQuery.isLoading}>
-          {updateProfileMutation.isPending ? 'Saving…' : 'Save Bank Details'}
-        </Button>
+        <div className="flex gap-3">
+          {onCancel && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+            >
+              Cancel
+            </Button>
+          )}
+
+          <Button
+            type="submit"
+            fullWidth
+            disabled={updateProfileMutation.isPending || banksQuery.isLoading}
+          >
+            {updateProfileMutation.isPending ? 'Saving…' : 'Save Bank Details'}
+          </Button>
+        </div>
       </form>
     </div>
   );
