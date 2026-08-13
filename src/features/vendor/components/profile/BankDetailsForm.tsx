@@ -10,6 +10,8 @@ import type { SupplierProfileUpdateInput } from '@/features/supplier/onboarding/
 
 interface BankDetailsFormProps {
   initialValues?: SupplierBankDetails;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 export const BankDetailsForm = ({ initialValues }: BankDetailsFormProps) => {
