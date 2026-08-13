@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { InputField } from './InputField';
+import { Input } from '@/shared/inputs/Input';
 import { useVendorProfileQuery, useUpdateVendorProfileMutation } from './profileQueries';
 
 export const ProfileForm = () => {
@@ -32,19 +32,19 @@ export const ProfileForm = () => {
 
   return (
     <div className="grid md:grid-cols-2 gap-6">
-      <InputField label="Full Name" value={profile.fullName} disabled />
-      <InputField
+      <Input label="Full Name" value={profile.fullName} disabled />
+      <Input
         label="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <InputField
+      <Input
         label="Phone Number"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
       />
-      <InputField label="Country" value={profile.country || '—'} disabled />
+      <Input label="Country" value={profile.country || '—'} disabled />
 
       <div className="md:col-span-2 flex items-center gap-3">
         <button
