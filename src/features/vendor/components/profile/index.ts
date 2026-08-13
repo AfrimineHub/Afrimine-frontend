@@ -10,3 +10,6 @@ export * from './VerificationSection';
 export * from './DocumentItem';
 export * from './KycProgressCard'
 export * from './StatusTag';
+export * from './BankDetailsForm';
+export * from './BankDetailsSection';
+export * from './bankTypes';

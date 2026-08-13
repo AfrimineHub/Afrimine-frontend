@@ -23,6 +23,7 @@ export interface SupplierIdentity {
   bankCode?: string;
   bankAccountNumber?: string;
   bankAccountName?: string;
+  officeAddress?: string;
 }
 
 export interface SupplierLocation {

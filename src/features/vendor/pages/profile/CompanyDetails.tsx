@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import { SectionCard } from "../../components/profile";
 import { KycStepper } from "../../components/profile";
 import { uploadSupplierCacCertificate } from "@/features/supplier/onboarding/onboardingApi";
-import { useUpdateVendorProfileMutation, useVendorProfileQuery } from "../../components/profile/profileQueries";
+import { 
+  useUpdateVendorProfileMutation, 
+  useVendorProfileQuery 
+} from "../../components/profile/profileQueries";
 
 const CompanyDetailsPage = () => {
   const { data: profile, isLoading, isError } = useVendorProfileQuery();
   const updateProfile = useUpdateVendorProfileMutation();
-  const updateAddress = useUpdateCompanyAddressMutation();
 
   const [companyName, setCompanyName] = useState('');
   const [officeAddress, setOfficeAddress] = useState('');
@@ -18,13 +20,18 @@ const CompanyDetailsPage = () => {
   useEffect(() => {
     if (profile) {
       setCompanyName(profile.companyName);
-      // setOfficeAddress(profile.officeAddress);
+      setOfficeAddress(profile.officeAddress ?? '');
     }
   }, [profile]);
 
   const handleSaveCompanyInfo = () => {
     updateProfile.mutate({ companyName, phone: profile!.phone, email: profile!.email });
-    updateAddress.mutate({ officeAddress });
+    updateProfile.mutate({
+      officeAddress,
+      companyName: "",
+      phone: "",
+      email: ""
+    });
   };
 
   const handleCacUpload = async (file: File) => {
@@ -192,18 +199,18 @@ const CompanyDetailsPage = () => {
       </SectionCard>
 
       <div className="flex justify-end items-center gap-3 pt-4">
-        {(updateProfile.isError || updateAddress.isError) && (
+        {(updateProfile.isError || updateProfile.isError) && (
           <span className="text-sm text-red-600">Couldn't save changes.</span>
         )}
-        {(updateProfile.isSuccess && updateAddress.isSuccess) && (
+        {(updateProfile.isSuccess && updateProfile.isSuccess) && (
           <span className="text-sm text-green-600">Saved</span>
         )}
         <button
           onClick={handleSaveCompanyInfo}
-          disabled={updateProfile.isPending || updateAddress.isPending}
+          disabled={updateProfile.isPending || updateProfile.isPending}
           className="bg-yellow-500 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-yellow-600 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {updateProfile.isPending || updateAddress.isPending ? 'Saving…' : 'Save Company Details'}
+          {updateProfile.isPending || updateProfile.isPending ? 'Saving…' : 'Save Company Details'}
         </button>
       </div>
     </div>

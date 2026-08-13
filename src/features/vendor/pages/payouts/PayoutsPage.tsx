@@ -73,7 +73,7 @@ const PayoutPage = () => {
               <p className="mt-3 text-xs text-amber-700">
                 You haven't added a payout bank account yet.
               </p><Link to={`${SUPPLIER_PROFILE_PATH}#bank-details`} className="font-semibold underline hover:text-amber-900">
-                  Add one in your profile
+                  Add bank details in your profile
                 </Link>
             </>
           ) : null}

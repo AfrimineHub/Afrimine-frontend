@@ -14,13 +14,23 @@ import { submitSupplierOnboarding } from '@/features/supplier/onboarding/onboard
 
 export interface VendorProfileFormData extends SupplierIdentity {
   country: string;
+  officeAddress?: string;
 }
 
 function normalizeVendorProfileFormData(raw: unknown): VendorProfileFormData {
   const identity = normalizeSupplierIdentity(raw);
   const record = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
   const country = typeof record.country === 'string' ? record.country : '';
-  return { ...identity, country };
+  const officeAddress =
+    typeof record.officeAddress === 'string'
+      ? record.officeAddress
+      : '';
+
+  return {
+     ...identity, 
+     country,
+     officeAddress,
+  };
 }
 
 export const vendorProfileKeys = {
@@ -56,7 +66,7 @@ export function useVendorAccountStatusQuery() {
 export function useUpdateVendorProfileMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (identity: Pick<SupplierIdentity, 'companyName' | 'phone' | 'email'>) =>
+    mutationFn: (identity: Pick<SupplierIdentity, 'companyName' | 'phone' | 'email' | 'officeAddress'>) =>
       updateSupplierProfile(identity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorProfileKeys.profile });
@@ -73,3 +83,4 @@ export function useSubmitKycMutation() {
     },
   });
 }
+
