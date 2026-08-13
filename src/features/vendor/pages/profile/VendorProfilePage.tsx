@@ -1,11 +1,29 @@
+import { useSupplierProfileQuery } from "@/features/supplier/onboarding/onboardingQueries";
 import { SectionCard } from "../../components/profile";
 import { ProfileForm } from "../../components/profile";
 import { ProfilePhoto } from "../../components/profile";
 import { AccountStatus } from "../../components/profile";
 import { SecuritySettings } from "../../components/profile";
 import { KycStepper } from "../../components/profile";
+import { BankDetailsForm } from "../../components/profile/BankDetailsForm";
+import type { SupplierBankDetails } from "../../components/profile/bankTypes";
+
+function extractBankDetails(raw: unknown): SupplierBankDetails | undefined {
+  if (!raw || typeof raw !== 'object') return undefined;
+  const r = raw as Record<string, unknown>;
+  const bankAccountNumber = typeof r.bankAccountNumber === 'string' ? r.bankAccountNumber : undefined;
+  if (!bankAccountNumber) return undefined;
+  return {
+    bankName: typeof r.bankName === 'string' ? r.bankName : undefined,
+    bankCode: typeof r.bankCode === 'string' ? r.bankCode : undefined,
+    bankAccountNumber,
+    bankAccountName: typeof r.bankAccountName === 'string' ? r.bankAccountName : undefined,
+  };
+}
 
 const VendorProfilePage = () => {
+  const profileQuery = useSupplierProfileQuery();
+  const bankDetails = extractBankDetails(profileQuery.data);
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
@@ -27,6 +45,14 @@ const VendorProfilePage = () => {
         subtitle="Update your personal details"
       >
         <ProfileForm />
+      </SectionCard>
+
+       {/* Bank Details for Payouts */}
+      <SectionCard
+        title="Payout Bank Account"
+        subtitle="Where your withdrawals are sent"
+      >
+        <BankDetailsForm initialValues={bankDetails} />
       </SectionCard>
 
       {/* Profile Photo */}

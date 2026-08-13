@@ -8,9 +8,10 @@ import { getApiErrorMessage } from '@/lib/api/errors';
 interface RequestPayoutProps {
   availableAmount?: number;
   currency?: string | null;
+  hasBankDetails: boolean;
 }
 
-export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps) => {
+export const RequestPayout = ({ availableAmount, currency, hasBankDetails }: RequestPayoutProps) => {
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -21,6 +22,11 @@ export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps)
     event.preventDefault();
     setError(null);
     setMessage(null);
+
+    if (!hasBankDetails) {
+      setError('Add your bank account details before requesting a withdrawal.');
+      return;
+    }
 
     const parsedAmount = Number(amount.replace(/,/g, ''));
     if (!parsedAmount || parsedAmount <= 0) {
@@ -78,7 +84,11 @@ export const RequestPayout = ({ availableAmount, currency }: RequestPayoutProps)
           </p>
         ) : null}
 
-        <Button type="submit" fullWidth disabled={withdrawalMutation.isPending}>
+        <Button 
+          type="submit" 
+          fullWidth 
+          disabled={withdrawalMutation.isPending || !hasBankDetails}
+        >
           {withdrawalMutation.isPending ? 'Submitting…' : 'Request Withdrawal'}
         </Button>
       </form>

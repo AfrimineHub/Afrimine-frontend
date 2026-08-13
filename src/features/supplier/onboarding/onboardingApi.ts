@@ -24,19 +24,35 @@ export interface SupplierProfileUpdatePayload {
   companyName?: string;
   businessPhone?: string;
   businessEmail?: string;
+  bankName?: string;
+  bankCode?: string;
+  bankAccountNumber?: string;
+  bankAccountName?: string;
 }
+
+export type SupplierProfileUpdateInput = Partial<
+  Pick<
+    SupplierIdentity,
+    'companyName' | 'phone' | 'email' | 'bankName' | 'bankCode' | 'bankAccountNumber' | 'bankAccountName'
+  >
+>;
+
 
 export async function updateSupplierProfile(
-  identity: Pick<SupplierIdentity, 'companyName' | 'phone' | 'email'>,
-): Promise<void> {
-  const payload: SupplierProfileUpdatePayload = {
-    companyName: identity.companyName,
-    businessPhone: identity.phone,
-    businessEmail: identity.email,
-  };
-  await apiClient.patch(supplierOnboardingApiPaths.profile, payload);
-}
+  identity: SupplierProfileUpdateInput
+): Promise<unknown> {
+  const payload: SupplierProfileUpdatePayload = {};
+  if (identity.companyName !== undefined) payload.companyName = identity.companyName;
+  if (identity.phone !== undefined) payload.businessPhone = identity.phone;
+  if (identity.email !== undefined) payload.businessEmail = identity.email;
+  if (identity.bankName !== undefined) payload.bankName = identity.bankName;
+  if (identity.bankCode !== undefined) payload.bankCode = identity.bankCode;
+  if (identity.bankAccountNumber !== undefined) payload.bankAccountNumber = identity.bankAccountNumber;
+  if (identity.bankAccountName !== undefined) payload.bankAccountName = identity.bankAccountName;
 
+  const { data } = await apiClient.patch(supplierOnboardingApiPaths.profile, payload);
+  return extractApiData<unknown>(data);
+}
 
 export async function uploadSupplierCacCertificate(file: File): Promise<void> {
   const formData = new FormData();

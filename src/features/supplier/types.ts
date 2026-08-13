@@ -19,6 +19,10 @@ export interface SupplierIdentity {
   phone: string;
   email: string;
   otpVerified: boolean;
+  bankName?: string;
+  bankCode?: string;
+  bankAccountNumber?: string;
+  bankAccountName?: string;
 }
 
 export interface SupplierLocation {
