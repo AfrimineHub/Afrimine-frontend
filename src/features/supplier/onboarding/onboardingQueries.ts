@@ -6,8 +6,9 @@ import {
   syncLocationStep,
   updateSupplierProfile,
   uploadSupplierCacCertificate,
+  type SupplierProfileUpdateInput,
 } from './onboardingApi';
-import type { SupplierIdentity, SupplierLocation } from '@/features/supplier/types';
+import type { SupplierLocation } from '@/features/supplier/types';
 
 export const SUPPLIER_PROFILE_QUERY_KEY = ['supplier', 'profile'] as const;
 export const SUPPLIER_STATUS_QUERY_KEY = ['supplier', 'status'] as const;
@@ -22,7 +23,7 @@ export function useUpdateSupplierProfileMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (identity: Pick<SupplierIdentity, 'companyName' | 'phone' | 'email'>) =>
+    mutationFn: (identity: SupplierProfileUpdateInput) =>
       updateSupplierProfile(identity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SUPPLIER_PROFILE_QUERY_KEY });

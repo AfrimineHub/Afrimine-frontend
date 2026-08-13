@@ -10,6 +10,7 @@ import {
   isSupplierBlocked,
 } from '@/features/supplier/onboarding/onboardingNormalize';
 import type { SupplierIdentity, SupplierVerificationStatus } from '@/features/supplier/types';
+import { submitSupplierOnboarding } from '@/features/supplier/onboarding/onboardingApi';
 
 export interface VendorProfileFormData extends SupplierIdentity {
   country: string;
@@ -59,6 +60,16 @@ export function useUpdateVendorProfileMutation() {
       updateSupplierProfile(identity),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: vendorProfileKeys.profile });
+    },
+  });
+}
+
+export function useSubmitKycMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: submitSupplierOnboarding,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: vendorProfileKeys.status });
     },
   });
 }
