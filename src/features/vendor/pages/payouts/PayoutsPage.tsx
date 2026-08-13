@@ -5,12 +5,24 @@ import { TransactionsTable } from '../../components/payouts/TransactionTable';
 import { TransactionsHistoryFilter } from '../../components/payouts/TransactionHistoryFilter';
 import { useWalletBalanceQuery, useWalletTransactionsQuery } from '@/features/supplier/wallet/walletQueries';
 import { mapWalletTransactionToRow } from '@/features/supplier/wallet/walletUtils';
+import { useSupplierProfileQuery } from '@/features/supplier/onboarding/onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
+import { SUPPLIER_PROFILE_PATH } from '@/features/supplier/constants';
+import { Link } from 'react-router-dom';
+
+function hasBankAccountNumber(raw: unknown): boolean {
+  if (!raw || typeof raw !== 'object') return false;
+  const r = raw as Record<string, unknown>;
+  return typeof r.bankAccountNumber === 'string' && r.bankAccountNumber.length > 0;
+}
 
 const PayoutPage = () => {
   const [filter, setFilter] = useState('all');
   const balanceQuery = useWalletBalanceQuery();
   const transactionsQuery = useWalletTransactionsQuery();
+  const profileQuery = useSupplierProfileQuery();
+
+  const hasBankDetails = hasBankAccountNumber(profileQuery.data);
 
   const transactions = useMemo(
     () => (transactionsQuery.data ?? []).map(mapWalletTransactionToRow),
@@ -54,7 +66,17 @@ const PayoutPage = () => {
           <RequestPayout
             availableAmount={balanceQuery.data?.availableBalance}
             currency={balanceQuery.data?.currency}
+            hasBankDetails={hasBankDetails}
           />
+          {!profileQuery.isLoading && !hasBankDetails ? (
+            <>
+              <p className="mt-3 text-xs text-amber-700">
+                You haven't added a payout bank account yet.
+              </p><Link to={`${SUPPLIER_PROFILE_PATH}#bank-details`} className="font-semibold underline hover:text-amber-900">
+                  Add one in your profile
+                </Link>
+            </>
+          ) : null}
         </div>
 
         <div className="bg-white rounded-xl shadow-sm p-5">

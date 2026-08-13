@@ -47,13 +47,15 @@ const VendorProfilePage = () => {
         <ProfileForm />
       </SectionCard>
 
-       {/* Bank Details for Payouts */}
-      <SectionCard
-        title="Payout Bank Account"
-        subtitle="Where your withdrawals are sent"
-      >
-        <BankDetailsForm initialValues={bankDetails} />
-      </SectionCard>
+      {/* Bank Details for Payouts */}
+      <div id="bank-details" className="scroll-mt-24">
+        <SectionCard
+          title="Payout Bank Account"
+          subtitle="Where your withdrawals are sent"
+        >
+          <BankDetailsForm initialValues={bankDetails} />
+        </SectionCard>
+      </div>
 
       {/* Profile Photo */}
       <SectionCard

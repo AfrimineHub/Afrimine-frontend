@@ -52,6 +52,7 @@ export const SUPPLIER_DASHBOARD_PATH = '/supplier-dashboard';
 export const SUPPLIER_MACHINES_PATH = '/supplier/machines';
 export const SUPPLIER_BOOKINGS_PATH = '/supplier/bookings';
 export const BUYER_BOOKINGS_PATH = '/my-bookings';
+export const SUPPLIER_PROFILE_PATH = '/vendor-profile';
 
 export const ASSET_STATUS_ENUM = {
   Available: 0,
