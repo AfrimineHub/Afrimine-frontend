@@ -155,7 +155,7 @@ export interface AdminOrderSummary {
   completed: number;
   inProgress: number;
   pending: number;
-  failedOrCanceled: number;
+  failedOrCancelled: number;
 }
 
 export interface AdminOrderTimelineStep {
@@ -266,4 +266,43 @@ export interface UpdateAdminUserPayload {
   email?: string;
   role?: number;
   accountStatus?: number;
+}
+
+export interface AdminEscrowItem {
+  id: string;
+  orderId: string;
+  buyerName: string | null;
+  vendorName: string | null;
+  amount: number;
+  currency: string | null;
+  status: string | null;
+  paymentReference: string | null;
+  fundedAt: string | null;
+  releasedAt: string | null;
+  createdAt: string;
+}
+ 
+export interface AdminEscrowQueryParams extends AdminPagedQueryParams {
+  status?: string;
+}
+ 
+export interface AdminMilestoneItem {
+  bookingId: string;
+  milestoneNumber: number;
+  name: string | null;
+  amount: number;
+  status: string | null;
+  releasedAt: string | null;
+  minerName: string | null;
+  supplierName: string | null;
+  bookingStatus: string | null;
+}
+ 
+export interface AdminMilestonesQueryParams extends AdminPagedQueryParams {
+  status?: string;
+}
+ 
+export interface ReleaseAdminMilestoneParams {
+  bookingId: string;
+  milestoneNumber: number;
 }

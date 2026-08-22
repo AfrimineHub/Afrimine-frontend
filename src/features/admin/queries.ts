@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ADMIN_DASHBOARD_QUERY_KEY,
+  ADMIN_ESCROW_QUERY_KEY,
   ADMIN_KYC_DETAIL_QUERY_KEY,
   ADMIN_KYC_QUEUE_QUERY_KEY,
   ADMIN_LISTING_COUNTS_QUERY_KEY,
   ADMIN_LISTINGS_QUERY_KEY,
+  ADMIN_MILESTONES_QUERY_KEY,
   ADMIN_ORDER_QUERY_KEY,
   ADMIN_ORDERS_QUERY_KEY,
   ADMIN_ORDERS_SUMMARY_QUERY_KEY,
@@ -44,10 +46,15 @@ import {
   suspendAdminUser,
   updateAdminUser,
   deleteAdminUser,
+  fetchAdminEscrow,
+  fetchAdminMilestones,
+  releaseAdminMilestone,
 } from '@/features/admin/api';
 import type {
+  AdminEscrowQueryParams,
   AdminKycQueueQueryParams,
   AdminListingsQueryParams,
+  AdminMilestonesQueryParams,
   AdminOrdersQueryParams,
   AdminQuotesQueryParams,
   AdminRejectPayload,
@@ -331,3 +338,33 @@ export function useRejectAdminKycMutation() {
     },
   });
 }
+
+export function useAdminEscrowQuery(params: AdminEscrowQueryParams = {}) {
+  return useQuery({
+    queryKey: [...ADMIN_ESCROW_QUERY_KEY, params],
+    queryFn: () => fetchAdminEscrow(params),
+    staleTime: STALE_TIME,
+  });
+}
+ 
+export function useAdminMilestonesQuery(params: AdminMilestonesQueryParams = {}) {
+  return useQuery({
+    queryKey: [...ADMIN_MILESTONES_QUERY_KEY, params],
+    queryFn: () => fetchAdminMilestones(params),
+    staleTime: STALE_TIME,
+  });
+}
+ 
+export function useReleaseAdminMilestoneMutation() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ bookingId, milestoneNumber }: { bookingId: string; milestoneNumber: number }) =>
+      releaseAdminMilestone(bookingId, milestoneNumber),
+    onSuccess: () => {
+      // Milestone releases can also move a booking's escrow/status, so refresh both lists
+      queryClient.invalidateQueries({ queryKey: ADMIN_MILESTONES_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ADMIN_ESCROW_QUERY_KEY });
+    },
+  });
+}
+ 
