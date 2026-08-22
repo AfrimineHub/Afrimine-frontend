@@ -75,6 +75,8 @@ const RevenueDashboard = lazy(() => import("@/features/admin/pages/RevenueDashbo
 const AdminVendorWithdrawals = lazy(() => import("@/features/admin/pages/AdminVendorWithdrawals"));
 const KYCVerificationQueue = lazy(() => import("@/features/admin/pages/KYCVerificationQueue"));
 const KYCReviewDetail = lazy(() => import("@/features/admin/components/KYCReviewDetail"));
+const EscrowPage = lazy(() => import("@/features/admin/pages/EscrowPage"));
+const MilestonesPage = lazy(() => import("@/features/admin/pages/MilestonesPage"));
 
 // Buyer / investor
 const BuyerDashboardPage = lazy(() => import("@/features/buyer/pages/BuyerDashboardPage"));
@@ -263,6 +265,8 @@ export const router = createBrowserRouter([
               { path: "/admin/kyc/verification-queue", element: s(<KYCVerificationQueue />) },
               { path: "/admin/kyc/review/:submissionId", element: s(<KYCReviewDetail />) },
               { path: "/admin/user-management", element: s(<UsersManagementPage />) },
+              { path: "/admin/escrow", element: s(<EscrowPage />) },
+              { path: "/admin/milestones", element: s(<MilestonesPage />) },
             ],
           },
         ],

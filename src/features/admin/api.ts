@@ -3,12 +3,16 @@ import { extractApiData } from '@/lib/api/extractApiData';
 import { adminApiPaths } from '@/features/admin/config';
 import type {
   AdminDashboard,
+  AdminEscrowItem,
+  AdminEscrowQueryParams,
   AdminKycDetail,
   AdminKycQueueItem,
   AdminKycQueueQueryParams,
   AdminListingCounts,
   AdminListingListItem,
   AdminListingsQueryParams,
+  AdminMilestoneItem,
+  AdminMilestonesQueryParams,
   AdminOrderDetail,
   AdminOrderListItem,
   AdminOrderSummary,
@@ -236,4 +240,24 @@ export async function rejectAdminKyc(
 ): Promise<AdminKycDetail> {
   const { data } = await apiClient.post(`${adminApiPaths.kyc}/${submissionId}/reject`, payload);
   return extractApiData<AdminKycDetail>(data);
+}
+
+export async function fetchAdminEscrow(
+  params: AdminEscrowQueryParams = {},
+): Promise<AdminPagedResult<AdminEscrowItem>> {
+  const { data } = await apiClient.get(adminApiPaths.escrow, { params });
+  const extracted = extractApiData<RawPagedResult<AdminEscrowItem> | AdminEscrowItem[]>(data);
+  return normalizePagedResult(extracted, params);
+}
+ 
+export async function fetchAdminMilestones(
+  params: AdminMilestonesQueryParams = {},
+): Promise<AdminPagedResult<AdminMilestoneItem>> {
+  const { data } = await apiClient.get(adminApiPaths.milestones, { params });
+  const extracted = extractApiData<RawPagedResult<AdminMilestoneItem> | AdminMilestoneItem[]>(data);
+  return normalizePagedResult(extracted, params);
+}
+ 
+export async function releaseAdminMilestone(bookingId: string, milestoneNumber: number): Promise<void> {
+  await apiClient.post(`${adminApiPaths.milestones}/${bookingId}/release/${milestoneNumber}`);
 }

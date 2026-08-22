@@ -16,6 +16,8 @@ export const adminApiPaths = {
   ),
   withdrawals: trimSlash(import.meta.env.VITE_ADMIN_WITHDRAWALS_PATH ?? 'admin/withdrawals'),
   kyc: trimSlash(import.meta.env.VITE_ADMIN_KYC_PATH ?? 'admin/kyc'),
+  escrow: trimSlash(import.meta.env.VITE_ADMIN_ESCROW_PATH ?? 'admin/escrow'),
+  milestones: trimSlash(import.meta.env.VITE_ADMIN_MILESTONES_PATH ?? 'admin/milestones'),
 } as const;
 
 export const ADMIN_DASHBOARD_QUERY_KEY = ['admin', 'dashboard'] as const;
@@ -32,3 +34,5 @@ export const ADMIN_REVENUE_TRANSACTIONS_QUERY_KEY = ['admin', 'revenue', 'transa
 export const ADMIN_WITHDRAWALS_QUERY_KEY = ['admin', 'withdrawals'] as const;
 export const ADMIN_KYC_QUEUE_QUERY_KEY = ['admin', 'kyc', 'queue'] as const;
 export const ADMIN_KYC_DETAIL_QUERY_KEY = ['admin', 'kyc', 'detail'] as const;
+export const ADMIN_ESCROW_QUERY_KEY = ['admin', 'escrow'] as const;
+export const ADMIN_MILESTONES_QUERY_KEY = ['admin', 'milestones'] as const;

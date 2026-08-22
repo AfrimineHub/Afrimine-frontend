@@ -15,6 +15,9 @@ export const sidebarNavigation = [
         { id: 'quotes', label: 'Quotes', icon: 'quotes', path: '/admin/all-quotes' },
         { id: 'orders', label: 'Orders', icon: 'orders', path: '/admin/order-tracker', },
         { id: 'payments', label: 'Revenue', icon: 'payments', path: '/admin/revenue' },
+        { id: 'escrow', label: 'Escrow', icon: 'escrow', path: '/admin/escrow' },
+        { id: 'milestones', label: 'Milestones', icon: 'milestones', path: '/admin/milestones' },
+
         { id: 'withdrawals', label: 'Vendor Withdrawals', icon: 'withdrawals', path: '/admin/vendor-withdrawals' },
       ]
     },
