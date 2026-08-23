@@ -5,6 +5,9 @@ import {
   fetchBooking,
   fetchBookings,
   type BookingStatusFilter,
+  fetchBookingDisputes,
+  type RaiseBookingDisputePayload,
+  raiseBookingDispute,
 } from './bookingsApi';
 
 /** Shared with buyer + supplier — GET bookings is role-scoped on the backend. */
@@ -61,6 +64,33 @@ export function useDeclineBookingMutation() {
     mutationFn: ({ bookingId, reason }: { bookingId: string; reason: string }) =>
       declineBooking(bookingId, reason),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY });
+    },
+  });
+}
+
+export function useBookingDisputesQuery(bookingId: string | undefined) {
+  return useQuery({
+    queryKey: [...BOOKINGS_QUERY_KEY, 'disputes', bookingId],
+    queryFn: () => fetchBookingDisputes(bookingId as string),
+    enabled: Boolean(bookingId),
+    staleTime: 30 * 1000,
+  });
+}
+ 
+export function useRaiseBookingDisputeMutation() {
+  const queryClient = useQueryClient();
+ 
+  return useMutation({
+    mutationFn: ({
+      bookingId,
+      ...payload
+    }: RaiseBookingDisputePayload & { bookingId: string }) => raiseBookingDispute(bookingId, payload),
+    onSuccess: (_, variables) => {
+      // A dispute changes the booking's own state (Active -> Disputed) and pauses
+      // milestone auto-release, so refresh both the detail view and the dispute list.
+      queryClient.invalidateQueries({ queryKey: [...BOOKINGS_QUERY_KEY, 'detail', variables.bookingId] });
+      queryClient.invalidateQueries({ queryKey: [...BOOKINGS_QUERY_KEY, 'disputes', variables.bookingId] });
       queryClient.invalidateQueries({ queryKey: BOOKINGS_QUERY_KEY });
     },
   });

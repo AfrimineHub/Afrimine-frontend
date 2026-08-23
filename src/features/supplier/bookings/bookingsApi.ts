@@ -48,4 +48,35 @@ export interface DeclineBookingPayload {
 export async function declineBooking(bookingId: string, reason: string): Promise<void> {
   const payload: DeclineBookingPayload = { reason };
   await apiClient.put(supplierBookingsApiPaths.decline(bookingId), payload);
-} 
+}
+
+export type BookingDisputeRaisedByRole = 'miner' | 'supplier';
+
+export interface RaiseBookingDisputePayload {
+  description: string;
+  raisedByRole: BookingDisputeRaisedByRole;
+}
+
+export interface BookingDispute {
+  id: string;
+  orderId: string;
+  raisedByName: string | null;
+  reason: string | null;
+  status: string | null;
+  adminNote: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
+}
+
+export async function fetchBookingDisputes(bookingId: string): Promise<BookingDispute[]> {
+  const { data } = await apiClient.get(supplierBookingsApiPaths.disputes(bookingId));
+  const extracted = extractApiData<BookingDispute[] | null>(data);
+  return extracted ?? [];
+}
+ 
+export async function raiseBookingDispute(
+  bookingId: string,
+  payload: RaiseBookingDisputePayload,
+): Promise<void> {
+  await apiClient.post(supplierBookingsApiPaths.disputes(bookingId), payload);
+}

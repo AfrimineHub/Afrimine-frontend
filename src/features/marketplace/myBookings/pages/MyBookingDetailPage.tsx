@@ -40,6 +40,7 @@ export default function MyBookingDetailPage() {
               backTo={BUYER_BOOKINGS_PATH}
               backLabel="Back to My Bookings"
               counterpartLabel="Supplier contact"
+              raisedByRole='miner'
             />
           </>
         )}
