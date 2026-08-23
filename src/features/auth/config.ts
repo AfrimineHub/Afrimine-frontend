@@ -8,6 +8,7 @@ export const authPaths = {
   me: trimSlash(import.meta.env.VITE_AUTH_ME_PATH ?? 'auth/current'),
   resetPassword: trimSlash(import.meta.env.VITE_AUTH_RESET_PASSWORD_PATH ?? 'auth/reset-password'),
   forgotPassword: trimSlash(import.meta.env.VITE_AUTH_FORGOT_PASSWORD_PATH ?? 'auth/forgot-password'),
+  changePassword: trimSlash(import.meta.env.VITE_AUTH_FORGOT_PASSWORD_PATH ?? 'auth/change-password'),
   confirmEmail: trimSlash(import.meta.env.VITE_AUTH_CONFIRM_EMAIL_PATH ?? 'auth/confirm-email'),
   resendOtp: trimSlash(import.meta.env.VITE_AUTH_RESEND_OTP_PATH ?? 'auth/resend-otp'),
 } as const;

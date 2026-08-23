@@ -18,6 +18,7 @@ import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashb
 // Auth
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage'));
+const ChangePasswordPage = lazy(() => import('../features/auth/pages/ChangePasswordPage'));
 const AccountRegistrationPage = lazy(() => import('../features/auth/pages/AccountRegistrationPage'));
 const KycPage = lazy(() =>
   import('@/features/vendor/pages/profile').then((m) => ({ default: m.KycPage })),
@@ -188,6 +189,10 @@ export const router = createBrowserRouter([
           { path: "rfq", element: s(<RfqPage />) },
           { path: "rfq/:rfqId/quotes", element: s(<RfqQuotesPage />) },
           { path: "notification", element: s(<NotificationsPage />) },
+          {
+            path: "change-password",
+            element: s(<ChangePasswordPage />)
+          },
           {
             element: <RoleGuard allowed={[USER_TYPES.buyer]} />,
             children: [

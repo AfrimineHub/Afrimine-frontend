@@ -15,7 +15,7 @@ export const SecuritySettings = () => {
           </div>
         </div>
         <button
-          onClick={() => navigate('/forgot-password')}
+          onClick={() => navigate('/change-password')}
           className="text-sm text-blue-600 cursor-pointer"
         >
           Update

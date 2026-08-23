@@ -82,6 +82,12 @@ export interface ResetPasswordPayload {
   confirmNewPassword: string;
 }
 
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 export interface ConfirmEmailPayload {
   email: string;
   type: number;

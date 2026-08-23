@@ -17,6 +17,7 @@ import type {
   ResendOtpPayload,
   RequestPasswordResetPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from '@/features/auth/types';
 
 async function fetchCurrentUser(): Promise<AuthUser> {
@@ -48,6 +49,10 @@ export async function requestPasswordReset(payload: RequestPasswordResetPayload)
 
 export async function resetPassword(payload: ResetPasswordPayload): Promise<void> {
   await apiClient.post(authPaths.forgotPassword, payload);
+}
+
+export async function changePassword(payload: ChangePasswordPayload): Promise<void> {
+  await apiClient.post(authPaths.changePassword, payload);
 }
 
 export async function confirmEmail(payload: ConfirmEmailPayload): Promise<void> {
