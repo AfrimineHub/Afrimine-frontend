@@ -23,6 +23,7 @@ function normalizeBookingStatus(raw: unknown): ActiveLeaseRow['status'] {
   }
   if (s.includes('complete') || s.includes('closed') || s.includes('return')) return 'completed';
   if (s.includes('declin') || s.includes('reject') || s.includes('cancel')) return 'declined';
+  if (s.includes('disputed') || s.includes('dispute')) return 'disputed';
   return 'pending';
 }
 

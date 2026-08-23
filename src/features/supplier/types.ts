@@ -71,7 +71,7 @@ export interface ActiveLeaseRow {
   minerName: string;
   leasePeriod: string;
   nextMilestone: string;
-  status: 'pending' | 'active' | 'completed' | 'declined';
+  status: 'pending' | 'active' | 'completed' | 'declined' | 'disputed';
 }
 
 export function createEmptyMachine(): MachineAsset {
