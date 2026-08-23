@@ -46,48 +46,57 @@ export const ChangePasswordForm = () => {
   };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
-          {error}
-        </p>
-      )}
+    <div className="w-full px-4 sm:px-6">
+      <form 
+        className="w-full space-y-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6" 
+        onSubmit={handleSubmit}
+      >
+        {error && (
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        )}
 
-      <Input
-        label="Current password"
-        type="password"
-        name="currentPassword"
-        autoComplete="current-password"
-        required
-        value={currentPassword}
-        onChange={(e) => setCurrentPassword(e.target.value)}
-      />
-      <Input
-        label="New password"
-        type="password"
-        name="newPassword"
-        autoComplete="new-password"
-        required
-        minLength={8}
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
-      <Input
-        label="Confirm new password"
-        type="password"
-        name="confirmNewPassword"
-        autoComplete="new-password"
-        required
-        minLength={8}
-        value={confirmNewPassword}
-        onChange={(e) => setConfirmNewPassword(e.target.value)}
-      />
+        <Input
+          label="Current password"
+          type="password"
+          name="currentPassword"
+          autoComplete="current-password"
+          required
+          value={currentPassword}
+          onChange={(e) => setCurrentPassword(e.target.value)}
+        />
+        <Input
+          label="New password"
+          type="password"
+          name="newPassword"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+        />
+        <Input
+          label="Confirm new password"
+          type="password"
+          name="confirmNewPassword"
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={confirmNewPassword}
+          onChange={(e) => setConfirmNewPassword(e.target.value)}
+        />
 
-      <Button type="submit" disabled={changePasswordMutation.isPending}>
-        {changePasswordMutation.isPending
-          ? 'Updating password…'
-          : 'Change password'}
-      </Button>
-    </form>
+        <Button 
+          type="submit" 
+          disabled={changePasswordMutation.isPending}
+          className="w-full"
+        >
+          {changePasswordMutation.isPending
+            ? 'Updating password…'
+            : 'Change password'}
+        </Button>
+      </form>
+    </div>
   );
 };
