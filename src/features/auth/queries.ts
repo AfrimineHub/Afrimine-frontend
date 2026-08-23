@@ -8,6 +8,7 @@ import {
   resendOtp,
   requestPasswordReset,
   resetPassword,
+  changePassword,
 } from '@/features/auth/api';
 import { endSession, setSessionUser } from '@/features/auth/session';
 import type {
@@ -17,6 +18,7 @@ import type {
   ResendOtpPayload,
   RequestPasswordResetPayload,
   ResetPasswordPayload,
+  ChangePasswordPayload,
 } from '@/features/auth/types';
 
 export function useSessionQuery() {
@@ -62,6 +64,12 @@ export function useRequestPasswordResetMutation() {
 export function useResetPasswordMutation() {
   return useMutation({
     mutationFn: (payload: ResetPasswordPayload) => resetPassword(payload),
+  });
+}
+
+export function useChangePasswordMutation() {
+  return useMutation({
+    mutationFn: (payload: ChangePasswordPayload) => changePassword(payload),
   });
 }
 
