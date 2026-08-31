@@ -36,8 +36,16 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
-        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center overflow-hidden border border-gray-500">
-          <User size={18} aria-hidden />
+        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center overflow-hidden border border-gray-500 shrink-0">
+          {user?.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <User size={18} aria-hidden />
+          )}
         </div>
         <span className="text-sm text-gray-300 max-w-[120px] truncate">
           {user?.fullName ?? user?.email}

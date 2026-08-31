@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Bell, LogOut, Menu, X } from 'lucide-react';
+import { Bell, LogOut, Menu, User, X } from 'lucide-react';
 import Logo from '@/shared/components/Logo';
 import { UserMenu } from '@/shared/components/UserMenu';
 import { useAuth } from '@/features/auth/hooks/useAuth';
@@ -113,9 +113,18 @@ const Navbar = () => {
                 <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Account
                 </p>
-                <p className="px-1 pb-3 text-sm font-medium text-white truncate">
-                  {user?.fullName ?? user?.email}
-                </p>
+                <div className="flex items-center gap-2 px-1 pb-3">
+                 <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center overflow-hidden border border-gray-500 shrink-0">
+                    {user?.avatarUrl ? (
+                      <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <User size={18} aria-hidden />
+                    )}
+                  </div>
+                  <p className="text-sm font-medium text-white truncate">
+                    {user?.fullName ?? user?.email}
+                  </p>
+                </div>
               </div>
               {accountMenuLinks.map((link) => (
                 <Link
