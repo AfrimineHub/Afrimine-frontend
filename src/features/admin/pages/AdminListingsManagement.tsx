@@ -99,10 +99,10 @@ const AdminListingsManagement = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-slate-900 font-sans">
-      <main className="max-w-[1400px] mx-auto py-8 px-8">
-        <div className="flex justify-between items-start mb-8">
+      <main className="max-w-[1400px] mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 mb-1">Listings Management</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 mb-1">Listings Management</h1>
             <p className="text-slate-500 text-sm">Review and manage mineral listings from sellers</p>
           </div>
           <button
@@ -111,7 +111,7 @@ const AdminListingsManagement = () => {
               setActiveTab('Flagged');
               setPage(1);
             }}
-            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 self-start sm:self-auto"
           >
             <AlertCircle size={16} />
             View Flagged
@@ -124,7 +124,7 @@ const AdminListingsManagement = () => {
           </p>
         ) : null}
 
-        <div className="flex bg-slate-100/50 p-1 rounded-lg mb-6 w-max border border-slate-200 overflow-x-auto">
+        <div className="flex bg-slate-100/50 p-1 rounded-lg mb-6 max-w-full border border-slate-200 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.name}

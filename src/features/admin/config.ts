@@ -36,3 +36,6 @@ export const ADMIN_KYC_QUEUE_QUERY_KEY = ['admin', 'kyc', 'queue'] as const;
 export const ADMIN_KYC_DETAIL_QUERY_KEY = ['admin', 'kyc', 'detail'] as const;
 export const ADMIN_ESCROW_QUERY_KEY = ['admin', 'escrow'] as const;
 export const ADMIN_MILESTONES_QUERY_KEY = ['admin', 'milestones'] as const;
+
+export const ADMIN_PROFILE_PATH = '/admin/profile';
+export const ADMIN_PROFILE_QUERY_KEY = ['admin', 'profile'] as const;

@@ -1,4 +1,5 @@
 import { isSellerRole, USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
+import { BUYER_PROFILE_PATH } from '@/features/buyer/constants';
 import {
   SUPPLIER_DASHBOARD_PATH,
   SUPPLIER_ONBOARDING_PATH,
@@ -45,7 +46,7 @@ export function getRoleRoutePrefixes(type: UserType): string[] {
     case USER_TYPES.superAdmin:
       return ['/admin'];
     case USER_TYPES.buyer:
-      return ['/buyer-dashboard', '/my-order', '/my-bookings', '/rfq'];
+      return ['/buyer-dashboard', BUYER_PROFILE_PATH, '/my-order', '/my-bookings', '/rfq'];
     case USER_TYPES.investor:
       return ['/investor-dashboard'];
     default:
