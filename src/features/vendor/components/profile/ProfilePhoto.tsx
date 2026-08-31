@@ -72,7 +72,7 @@ export const ProfilePhoto = () => {
           type="button"
           onClick={handlePickFile}
           disabled={uploadPhoto.isPending}
-          className="text-sm font-medium text-primary hover:underline disabled:opacity-60"
+          className="text-sm font-medium text-primary hover:underline disabled:opacity-60 cursor-pointer"
         >
           {uploadPhoto.isPending ? 'Uploading…' : avatarUrl ? 'Change photo' : 'Upload photo'}
         </button>
