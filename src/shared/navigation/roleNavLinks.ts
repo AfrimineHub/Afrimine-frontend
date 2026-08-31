@@ -1,4 +1,6 @@
 import { getHomePathForUser } from '@/features/auth/routes';
+import { ADMIN_PROFILE_PATH } from '@/features/admin/config';
+import { BUYER_PROFILE_PATH } from '@/features/buyer/constants';
 import { isSellerRole, USER_TYPES, type AuthUser, type UserType } from '@/features/auth/types';
 import {
   SUPPLIER_DASHBOARD_PATH,
@@ -31,8 +33,11 @@ export function getProfilePathForUser(user: AuthUser | null | undefined): string
   if (isSellerRole(user?.type)) {
     return '/vendor-profile';
   }
+  if (user?.type === USER_TYPES.buyer) {
+    return BUYER_PROFILE_PATH;
+  }
   if (user?.type === USER_TYPES.superAdmin) {
-    return '/admin/user-management';
+    return ADMIN_PROFILE_PATH;
   }
   return null;
 }

@@ -28,7 +28,7 @@ export const sidebarNavigation = [
         { id: 'flagged', label: 'Flagged Content', icon: 'flagged' },
         { id: 'subscriptions', label: 'Subscriptions', icon: 'subscriptions' },
         { id: 'kyc', label: 'KYC Verification', icon: 'kyc', path: '/admin/kyc/verification-queue', },
-        { id: 'settings', label: 'Settings', icon: 'settings' },
+        { id: 'settings', label: 'Settings', icon: 'settings', path: '/admin/profile' },
       ]
     }
   ];

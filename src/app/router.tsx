@@ -74,6 +74,7 @@ const AdminDisputePage = lazy(() => import("@/features/admin/pages/AdminDisputeP
 const DisputeResolutionPage = lazy(() => import("@/features/admin/pages/DisputeResolutionPage"));
 const RevenueDashboard = lazy(() => import("@/features/admin/pages/RevenueDashboard"));
 const AdminVendorWithdrawals = lazy(() => import("@/features/admin/pages/AdminVendorWithdrawals"));
+const AdminProfilePage = lazy(() => import("@/features/admin/pages/AdminProfilePage"));
 const KYCVerificationQueue = lazy(() => import("@/features/admin/pages/KYCVerificationQueue"));
 const KYCReviewDetail = lazy(() => import("@/features/admin/components/KYCReviewDetail"));
 const EscrowPage = lazy(() => import("@/features/admin/pages/EscrowPage"));
@@ -81,6 +82,7 @@ const MilestonesPage = lazy(() => import("@/features/admin/pages/MilestonesPage"
 
 // Buyer / investor
 const BuyerDashboardPage = lazy(() => import("@/features/buyer/pages/BuyerDashboardPage"));
+const BuyerProfilePage = lazy(() => import("@/features/buyer/pages/BuyerProfilePage"));
 const InvestorDashboardPage = lazy(() => import("@/features/investor/pages/InvestorDashboardPage"));
 
 // Supplier
@@ -197,6 +199,7 @@ export const router = createBrowserRouter([
             element: <RoleGuard allowed={[USER_TYPES.buyer]} />,
             children: [
               { path: "buyer-dashboard", element: s(<BuyerDashboardPage />) },
+              { path: "buyer-profile", element: s(<BuyerProfilePage />) },
               { path: "my-bookings", element: s(<MyBookingsPage />) },
               { path: "my-bookings/:id", element: s(<MyBookingDetailPage />) },
             ],
@@ -270,6 +273,7 @@ export const router = createBrowserRouter([
               { path: "/admin/kyc/verification-queue", element: s(<KYCVerificationQueue />) },
               { path: "/admin/kyc/review/:submissionId", element: s(<KYCReviewDetail />) },
               { path: "/admin/user-management", element: s(<UsersManagementPage />) },
+              { path: "/admin/profile", element: s(<AdminProfilePage />) },
               { path: "/admin/escrow", element: s(<EscrowPage />) },
               { path: "/admin/milestones", element: s(<MilestonesPage />) },
             ],
