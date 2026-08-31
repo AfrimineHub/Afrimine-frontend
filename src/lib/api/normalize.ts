@@ -1,4 +1,4 @@
-import type { AuthUser, UserType } from '@/features/auth/types';
+import type { AuthUser, UserStatus, UserType } from '@/features/auth/types';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -75,6 +75,7 @@ export function extractUser(data: JsonRecord): AuthUser | undefined {
     type: readUserType(record),
     status: readUserStatus(record),
     statusText: typeof record.statusText === 'string' ? record.statusText : undefined,
+    avatarUrl: typeof record.avatarUrl === 'string' ? record.avatarUrl : undefined,
 
   };
 }

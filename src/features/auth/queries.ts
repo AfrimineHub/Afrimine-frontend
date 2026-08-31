@@ -9,6 +9,8 @@ import {
   requestPasswordReset,
   resetPassword,
   changePassword,
+  uploadProfilePhoto,
+  fetchCurrentUser,
 } from '@/features/auth/api';
 import { endSession, setSessionUser } from '@/features/auth/session';
 import type {
@@ -82,5 +84,19 @@ export function useConfirmEmailMutation() {
 export function useResendOtpMutation() {
   return useMutation({
     mutationFn: (payload: ResendOtpPayload) => resendOtp(payload),
+  });
+}
+
+export function useUploadProfilePhotoMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (file: File) => uploadProfilePhoto(file),
+    onSuccess: async () => {
+      // The upload response has no avatarUrl — pull the fresh one from /auth/current
+      // so the nav/header/dashboard avatar updates immediately everywhere it's used.
+      const user = await fetchCurrentUser();
+      setSessionUser(queryClient, user);
+    },
   });
 }
