@@ -6,9 +6,12 @@ import { ActivityItem } from '../components/AdminActivityItem';
 import { useAdminDashboardQuery } from '@/features/admin/queries';
 import { formatAdminAmount, formatAdminRelativeTime } from '@/features/admin/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
+import { Menu } from 'lucide-react';
+import { useState } from 'react';
 
 const AdminDashboardPage = () => {
   const dashboardQuery = useAdminDashboardQuery();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const stats = dashboardQuery.data?.stats ?? [];
   const priorityAlerts = dashboardQuery.data?.priorityAlerts ?? [];
@@ -21,9 +24,21 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="flex w-full h-full bg-[#F4F5F7] font-sans overflow-hidden">
-      <AdminSidebar />
+      <AdminSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <main className="flex-1 flex flex-col h-full overflow-hidden">
+      <main className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"
+            aria-label="Open admin menu"
+          >
+            <Menu size={20} />
+          </button>
+          <span className="text-sm font-bold text-gray-900">Admin Dashboard</span>
+        </div>
         <div className="flex-1 overflow-y-auto p-6 lg:p-8 pb-32">
           <div className="max-w-6xl mx-auto space-y-8">
             {loadError ? (
@@ -108,7 +123,49 @@ const AdminDashboardPage = () => {
                     View All Orders
                   </Link>
                 </div>
-                <div className="overflow-x-auto">
+
+                {/* Mobile: stacked cards */}
+                <div className="sm:hidden space-y-3">
+                  {dashboardQuery.isLoading ? (
+                    Array.from({ length: 3 }).map((_, index) => (
+                      <div key={index} className="h-24 rounded-lg bg-gray-50 animate-pulse" />
+                    ))
+                  ) : ongoingTransactions.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-6">No ongoing transactions.</p>
+                  ) : (
+                    ongoingTransactions.map((tx) => (
+                      <Link
+                        key={tx.id}
+                        to={`/admin/order-tracker?q=${encodeURIComponent(tx.orderId)}`}
+                        className="block rounded-lg border border-gray-200 p-3 hover:bg-gray-50"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className="text-sm font-medium text-gray-900 truncate">{tx.orderId}</span>
+                          <span
+                            className={`text-xs font-medium whitespace-nowrap ${
+                              (tx.status ?? '').toLowerCase().includes('dispute')
+                                ? 'text-red-500'
+                                : 'text-yellow-600'
+                            }`}
+                          >
+                            {tx.status ?? '—'}
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                          <span className="truncate">
+                            {tx.buyerName ?? '—'} → {tx.vendorName ?? '—'}
+                          </span>
+                          <span className="font-bold text-gray-900 whitespace-nowrap ml-2">
+                            {formatAdminAmount(tx.amount, tx.currency)}
+                          </span>
+                        </div>
+                      </Link>
+                    ))
+                  )}
+                </div>
+
+                {/* Desktop/tablet: table */}
+                <div className="hidden sm:block overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-gray-200">
