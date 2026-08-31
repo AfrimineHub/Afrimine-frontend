@@ -71,6 +71,17 @@ export async function logout(): Promise<void> {
   }
 }
 
+export async function uploadProfilePhoto(file: File): Promise<void> {
+  const formData = new FormData();
+  formData.append('Photo', file);
+
+  await apiClient.post(authPaths.profilePhoto, formData, {
+    // This override just clears whatever default JSON
+    // Content-Type apiClient instance applies globally.
+    headers: { 'Content-Type': undefined },
+  });
+}
+
 export async function bootstrapSession(): Promise<AuthUser | null> {
   hydrateAccessToken();
 

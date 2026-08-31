@@ -37,6 +37,7 @@ export interface AuthUser {
   type?: UserType;
   status?: UserStatus;
   statusText?: string;
+  avatarUrl?: string;
 }
 
 export function isEmailVerified(user: AuthUser | null | undefined): boolean {

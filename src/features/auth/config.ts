@@ -11,6 +11,7 @@ export const authPaths = {
   changePassword: trimSlash(import.meta.env.VITE_AUTH_FORGOT_PASSWORD_PATH ?? 'auth/change-password'),
   confirmEmail: trimSlash(import.meta.env.VITE_AUTH_CONFIRM_EMAIL_PATH ?? 'auth/confirm-email'),
   resendOtp: trimSlash(import.meta.env.VITE_AUTH_RESEND_OTP_PATH ?? 'auth/resend-otp'),
+  profilePhoto: trimSlash(import.meta.env.VITE_AUTH_PROFILE_PHOTO_PATH ?? '/auth/profile-photo'),
 } as const;
 
 export const AUTH_SESSION_QUERY_KEY = ['auth', 'session'] as const;
