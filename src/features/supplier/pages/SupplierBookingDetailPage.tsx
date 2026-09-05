@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import {
   BookingDetailView,
@@ -17,6 +18,7 @@ import { getApiErrorMessage } from '@/lib/api/errors';
 export default function SupplierBookingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const bookingQuery = useBookingQuery(id);
   const approveMutation = useApproveBookingMutation();
   const declineMutation = useDeclineBookingMutation();
@@ -84,6 +86,8 @@ export default function SupplierBookingDetailPage() {
             backTo={SUPPLIER_BOOKINGS_PATH}
             backLabel="Back to bookings"
             counterpartLabel="Miner"
+            raisedByRole="supplier"
+            operatorId={user?.id}
             actions={
               booking.status === 'pending' ? (
                 <BookingPendingActions

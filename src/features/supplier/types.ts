@@ -65,13 +65,23 @@ export interface SupplierDashboardStats {
   bookingsTrend?: string;
 }
 
+/** Normalized booking status — matches API filter values (case-insensitive). */
+export type BookingStatus =
+  | 'pending'
+  | 'approved'
+  | 'active'
+  | 'completed'
+  | 'declined'
+  | 'disputed'
+  | 'cancelled';
+
 export interface ActiveLeaseRow {
   id: string;
   machineName: string;
   minerName: string;
   leasePeriod: string;
   nextMilestone: string;
-  status: 'pending' | 'active' | 'completed' | 'declined' | 'disputed';
+  status: BookingStatus;
 }
 
 export function createEmptyMachine(): MachineAsset {
