@@ -8,6 +8,7 @@ import { RoleGuard } from "@/features/auth/components/RoleGuard";
 import { USER_TYPES } from "@/features/auth/types";
 import { SupplierOnboardingGuard } from "@/features/supplier/components/SupplierOnboardingGuard";
 import { VendorDashboardEntry } from "@/features/supplier/components/VendorDashboardEntry";
+import { RouteErrorFallback } from "@/app/RouteErrorFallback";
 
 // ---------------------------------------------------------------------------
 // Lazily-loaded pages.
@@ -121,6 +122,7 @@ export const router = createBrowserRouter([
   {
     path: "/auth",
     element: <AuthLayout />,
+    errorElement: <RouteErrorFallback />,
     children: [
       {
         path: "login",
@@ -180,6 +182,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
+    errorElement: <RouteErrorFallback />,
     children: [
       { index: true, element: s(<LandingPage />) },
       { path: "home", element: s(<LandingPage />) },
