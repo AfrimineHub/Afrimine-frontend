@@ -50,6 +50,7 @@ export const SUPPLIER_ONBOARDING_STORAGE_KEY = 'afrimine.supplier.onboarding';
 export const SUPPLIER_ONBOARDING_PATH = '/supplier/onboarding';
 export const SUPPLIER_DASHBOARD_PATH = '/supplier-dashboard';
 export const SUPPLIER_MACHINES_PATH = '/supplier/machines';
+export const SUPPLIER_OPERATORS_PATH = '/supplier/operators';
 export const SUPPLIER_BOOKINGS_PATH = '/supplier/bookings';
 export const BUYER_BOOKINGS_PATH = '/my-bookings';
 export const SUPPLIER_PROFILE_PATH = '/vendor-profile';

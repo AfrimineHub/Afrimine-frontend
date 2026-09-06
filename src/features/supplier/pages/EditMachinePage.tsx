@@ -5,6 +5,7 @@ import { Button } from '@/shared/buttons/Button';
 import { MachineAssetForm } from '@/features/supplier/components/MachineAssetForm';
 import { FileDropzone } from '@/features/supplier/components/FileDropzone';
 import { ToggleSwitch } from '@/features/supplier/components/ToggleSwitch';
+import { AssignOperatorPanel } from '@/features/supplier/components/AssignOperatorPanel';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
 import { createEmptyMachine, type MachineAsset } from '@/features/supplier/types';
 import {
@@ -179,6 +180,8 @@ export default function EditMachinePage() {
           onChange={setMachine}
           onRemove={() => undefined}
         />
+
+        {id ? <AssignOperatorPanel assetId={id} /> : null}
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
