@@ -1,13 +1,18 @@
 import { Link, useParams } from 'react-router-dom';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useBookingQuery } from '@/features/supplier/bookings/bookingsQueries';
 import { normalizeBooking } from '@/features/supplier/bookings/bookingsUtils';
 import { BookingDetailView } from '@/features/supplier/components/BookingDetailView';
-import { BookingPaymentCta } from '@/features/supplier/components/BookingPaymentCta';
+import {
+  BookingPaymentCta,
+  shouldShowPaymentCta,
+} from '@/features/supplier/components/BookingPaymentCta';
 import { BUYER_BOOKINGS_PATH } from '@/features/supplier/constants';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 export default function MyBookingDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const bookingQuery = useBookingQuery(id);
   const booking = normalizeBooking(bookingQuery.data);
 
@@ -30,7 +35,7 @@ export default function MyBookingDetailPage() {
           </div>
         ) : (
           <>
-            {booking.status !== 'declined' && (
+            {(shouldShowPaymentCta(booking) || booking.paymentStatus === 'Paid') && (
               <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <BookingPaymentCta booking={booking} />
               </div>
@@ -40,7 +45,8 @@ export default function MyBookingDetailPage() {
               backTo={BUYER_BOOKINGS_PATH}
               backLabel="Back to My Bookings"
               counterpartLabel="Supplier contact"
-              raisedByRole='miner'
+              raisedByRole="miner"
+              operatorId={user?.id}
             />
           </>
         )}

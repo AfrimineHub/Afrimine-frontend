@@ -3,15 +3,26 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/shared/buttons/Button';
 import {
+  BOOKING_STATUS_LABELS,
   BOOKING_STATUS_STYLES,
+  normalizeLogisticsStage,
+  normalizeMilestonesList,
+  normalizePaymentBreakdown,
   type BookingDetail,
+  type BookingMilestone,
+  type BookingPaymentBreakdown,
 } from '@/features/supplier/bookings/bookingsUtils';
 import {
   useBookingDisputesQuery,
+  useBookingMilestonesQuery,
+  useBookingTrackingQuery,
+  useLogisticsStatusQuery,
+  usePaymentBreakdownQuery,
   useRaiseBookingDisputeMutation,
 } from '@/features/supplier/bookings/bookingsQueries';
 import type { BookingDisputeRaisedByRole } from '@/features/supplier/bookings/bookingsApi';
 import { getApiErrorMessage } from '@/lib/api/errors';
+import { BookingLifecycleActions } from '@/features/supplier/components/BookingLifecycleActions';
 
 interface BookingDetailViewProps {
   booking: BookingDetail;
@@ -20,6 +31,8 @@ interface BookingDetailViewProps {
   actions?: React.ReactNode;
   counterpartLabel?: string;
   raisedByRole?: BookingDisputeRaisedByRole;
+  /** Current user id — required for daily check submissions (supplier). */
+  operatorId?: string;
 }
 
 function formatMoney(amount: number | undefined, currency = 'NGN'): string {
@@ -34,6 +47,12 @@ function formatMoney(amount: number | undefined, currency = 'NGN'): string {
     return `${currency} ${amount.toLocaleString()}`;
   }
 }
+
+const MILESTONE_STATUS_STYLES: Record<string, string> = {
+  locked: 'bg-slate-100 text-slate-600',
+  pending: 'bg-amber-50 text-amber-800',
+  released: 'bg-emerald-50 text-emerald-800',
+};
 
 const DISPUTE_STATUS_STYLES: Record<string, string> = {
   open: 'bg-red-50 text-red-700',
@@ -54,6 +73,10 @@ function formatDisputeDate(iso: string): string {
   return d.toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+function milestoneStyle(status: string): string {
+  return MILESTONE_STATUS_STYLES[status.toLowerCase()] ?? 'bg-slate-100 text-slate-600';
+}
+
 export function BookingDetailView({
   booking,
   backTo,
@@ -61,7 +84,60 @@ export function BookingDetailView({
   actions,
   counterpartLabel = 'Miner',
   raisedByRole = 'supplier',
+  operatorId,
 }: BookingDetailViewProps) {
+  const showOpsQueries =
+    booking.status === 'approved' ||
+    booking.status === 'active' ||
+    booking.status === 'completed' ||
+    booking.status === 'disputed';
+
+  const logisticsQuery = useLogisticsStatusQuery(booking.id, showOpsQueries);
+  const milestonesQuery = useBookingMilestonesQuery(
+    booking.id,
+    showOpsQueries && !booking.milestones?.length,
+  );
+  const breakdownQuery = usePaymentBreakdownQuery(
+    booking.id,
+    showOpsQueries && !booking.paymentBreakdown,
+  );
+  const trackingQuery = useBookingTrackingQuery(
+    booking.id,
+    showOpsQueries &&
+      ['Dispatched', 'EnRoute', 'Arrived'].includes(
+        normalizeLogisticsStage(logisticsQuery.data?.status ?? booking.logisticsStatus),
+      ),
+  );
+
+  const milestones: BookingMilestone[] =
+    booking.milestones?.length
+      ? booking.milestones
+      : normalizeMilestonesList(milestonesQuery.data);
+
+  const paymentBreakdown: BookingPaymentBreakdown | null =
+    booking.paymentBreakdown ?? normalizePaymentBreakdown(breakdownQuery.data);
+
+  const logisticsStatus =
+    logisticsQuery.data?.status ?? booking.logisticsStatus ?? null;
+  const gitInsuranceActive =
+    logisticsQuery.data?.gitInsuranceActive ?? booking.gitInsuranceActive ?? false;
+  const parInsuranceActive =
+    logisticsQuery.data?.parInsuranceActive ?? booking.parInsuranceActive ?? false;
+  const certificateUrl =
+    logisticsQuery.data?.insuranceCertificateUrl ?? booking.insuranceCertificateUrl ?? null;
+
+  const tracking = trackingQuery.data;
+  const trackingCoords =
+    tracking && typeof tracking === 'object'
+      ? {
+          lat: tracking.latitude,
+          lng: tracking.longitude,
+          updated: tracking.lastUpdated,
+        }
+      : null;
+
+  const canRaiseDispute = booking.status === 'active' || booking.status === 'approved';
+
   return (
     <div>
       <Link
@@ -82,7 +158,7 @@ export function BookingDetailView({
         <span
           className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${BOOKING_STATUS_STYLES[booking.status]}`}
         >
-          {booking.status}
+          {BOOKING_STATUS_LABELS[booking.status]}
         </span>
       </div>
 
@@ -116,8 +192,16 @@ export function BookingDetailView({
           ) : null}
           {booking.logisticsType ? (
             <div>
-              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Logistics</dt>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Logistics type</dt>
               <dd className="mt-1 text-sm font-semibold text-slate-900">{booking.logisticsType}</dd>
+            </div>
+          ) : null}
+          {logisticsStatus ? (
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Logistics status</dt>
+              <dd className="mt-1 text-sm font-semibold text-slate-900">
+                {normalizeLogisticsStage(logisticsStatus)}
+              </dd>
             </div>
           ) : null}
           {booking.totalAmount != null ? (
@@ -128,6 +212,12 @@ export function BookingDetailView({
               </dd>
             </div>
           ) : null}
+          {booking.paymentStatus ? (
+            <div>
+              <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Payment</dt>
+              <dd className="mt-1 text-sm font-semibold text-slate-900">{booking.paymentStatus}</dd>
+            </div>
+          ) : null}
           {booking.declineReason ? (
             <div className="sm:col-span-2">
               <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">Decline reason</dt>
@@ -135,6 +225,142 @@ export function BookingDetailView({
             </div>
           ) : null}
         </dl>
+
+        {(gitInsuranceActive ||
+          parInsuranceActive ||
+          booking.insurancePolicyNumber ||
+          certificateUrl) && (
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <h2 className="text-sm font-semibold text-slate-900">Insurance</h2>
+            <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">GIT</dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-900">
+                  {gitInsuranceActive ? 'Active' : 'Not active'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">PAR</dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-900">
+                  {parInsuranceActive ? 'Active' : 'Not active'}
+                </dd>
+              </div>
+              {booking.insurancePolicyNumber ? (
+                <div className="sm:col-span-2">
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Policy number
+                  </dt>
+                  <dd className="mt-1 text-sm font-semibold text-slate-900">
+                    {booking.insurancePolicyNumber}
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+            {certificateUrl ? (
+              <a
+                href={certificateUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-block text-sm font-semibold text-[#CA8A04] hover:underline"
+              >
+                Download insurance certificate
+              </a>
+            ) : null}
+          </div>
+        )}
+
+        {trackingCoords?.lat != null && trackingCoords?.lng != null ? (
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <h2 className="text-sm font-semibold text-slate-900">Live tracking</h2>
+            <p className="mt-2 text-sm text-slate-700">
+              {trackingCoords.lat.toFixed(5)}, {trackingCoords.lng.toFixed(5)}
+              {trackingCoords.updated ? (
+                <span className="text-slate-400">
+                  {' '}
+                  · updated {formatDisputeDate(trackingCoords.updated)}
+                </span>
+              ) : null}
+            </p>
+          </div>
+        ) : trackingQuery.isSuccess && typeof tracking === 'string' ? (
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <h2 className="text-sm font-semibold text-slate-900">Live tracking</h2>
+            <p className="mt-2 text-sm text-slate-500">{tracking}</p>
+          </div>
+        ) : null}
+
+        {paymentBreakdown ? (
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <h2 className="text-sm font-semibold text-slate-900">Payment breakdown</h2>
+            <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Total escrow
+                </dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-900">
+                  {formatMoney(paymentBreakdown.totalEscrow, paymentBreakdown.currency)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Platform fee (15%)
+                </dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-900">
+                  {formatMoney(paymentBreakdown.platformFee, paymentBreakdown.currency)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Supplier share (85%)
+                </dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-900">
+                  {formatMoney(paymentBreakdown.supplierShare, paymentBreakdown.currency)}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-wider text-slate-400">
+                  Milestone amounts
+                </dt>
+                <dd className="mt-1 text-sm text-slate-700">
+                  M1 {formatMoney(paymentBreakdown.milestone1Amount, paymentBreakdown.currency)} · M2{' '}
+                  {formatMoney(paymentBreakdown.milestone2Amount, paymentBreakdown.currency)} · M3{' '}
+                  {formatMoney(paymentBreakdown.milestone3Amount, paymentBreakdown.currency)}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        ) : null}
+
+        {milestones.length > 0 ? (
+          <div className="mt-6 border-t border-slate-100 pt-4">
+            <h2 className="text-sm font-semibold text-slate-900">Milestones</h2>
+            <ul className="mt-3 space-y-2">
+              {milestones.map((m) => (
+                <li
+                  key={m.name}
+                  className="flex flex-col gap-1 rounded-lg border border-slate-200 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{m.name}</p>
+                    {m.description ? (
+                      <p className="text-xs text-slate-500">{m.description}</p>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-slate-700">
+                      {formatMoney(m.amount, paymentBreakdown?.currency ?? booking.currency)}
+                    </span>
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${milestoneStyle(m.status)}`}
+                    >
+                      {m.status}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {booking.assetId ? (
           <div className="mt-6 border-t border-slate-100 pt-4">
@@ -149,10 +375,19 @@ export function BookingDetailView({
 
         {actions ? <div className="mt-6 border-t border-slate-100 pt-4">{actions}</div> : null}
 
+        <BookingLifecycleActions
+          booking={booking}
+          role={raisedByRole === 'miner' ? 'miner' : 'supplier'}
+          operatorId={operatorId}
+          logisticsStatus={logisticsStatus}
+          gitInsuranceActive={gitInsuranceActive}
+          parInsuranceActive={parInsuranceActive}
+        />
+
         <BookingDisputeSection
           bookingId={booking.id}
           raisedByRole={raisedByRole}
-          canRaise={booking.status === 'active'}
+          canRaise={canRaiseDispute}
         />
       </div>
     </div>
@@ -219,7 +454,6 @@ export function BookingPendingActions({
 interface BookingDisputeSectionProps {
   bookingId: string;
   raisedByRole: BookingDisputeRaisedByRole;
-  /** Hide the "raise a dispute" form when the booking isn't in a disputable state. */
   canRaise: boolean;
 }
 
@@ -301,7 +535,7 @@ export function BookingDisputeSection({ bookingId, raisedByRole, canRaise }: Boo
 
       {hasOpenDispute && !formOpen ? (
         <p className="mt-3 text-xs text-amber-700">
-          This booking already has an open dispute under review — Milestone 2 auto-release is paused until it's
+          This booking already has an open dispute under review — Milestone 2 auto-release is paused until it&apos;s
           resolved.
         </p>
       ) : null}

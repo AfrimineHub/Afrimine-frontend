@@ -8,7 +8,11 @@ import { useSupplierStatsQuery } from '@/features/supplier/dashboard/dashboardQu
 import { useSupplierStatusQuery } from '@/features/supplier/onboarding/onboardingQueries';
 import { useSupplierAssetsQuery } from '@/features/supplier/onboarding/assetsQueries';
 import { useBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
-import { BOOKING_STATUS_STYLES, normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
+import {
+  BOOKING_STATUS_LABELS,
+  BOOKING_STATUS_STYLES,
+  normalizeBookingsList,
+} from '@/features/supplier/bookings/bookingsUtils';
 import { ACCOUNT_STATUS } from '@/features/supplier/constants';
 
 function normalizeSupplierStats(raw: unknown): Partial<SupplierDashboardStats> {
@@ -197,7 +201,7 @@ export default function SupplierDashboardPage() {
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${STATUS_STYLES[lease.status]}`}
                       >
-                        {lease.status}
+                        {BOOKING_STATUS_LABELS[lease.status]}
                       </span>
                     </td>
                   </tr>

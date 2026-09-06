@@ -3,5 +3,18 @@ export const supplierBookingsApiPaths = {
   booking: (bookingId: string) => `bookings/${bookingId}`,
   approve: (bookingId: string) => `bookings/${bookingId}/approve`,
   decline: (bookingId: string) => `bookings/${bookingId}/decline`,
+  dispatch: (bookingId: string) => `bookings/${bookingId}/dispatch`,
+  siteArrival: (bookingId: string) => `bookings/${bookingId}/site-arrival`,
+  returnClearance: (bookingId: string) => `bookings/${bookingId}/return-clearance`,
+  dailyCheck: (bookingId: string) => `bookings/${bookingId}/daily-check`,
+  insurance: (bookingId: string) => `bookings/${bookingId}/insurance`,
+  insuranceCertificate: (bookingId: string) => `bookings/${bookingId}/insurance-certificate`,
+  logisticsStatus: (bookingId: string) => `bookings/${bookingId}/logistics-status`,
+  tracking: (bookingId: string) => `bookings/${bookingId}/tracking`,
+  contract: (bookingId: string) => `bookings/${bookingId}/contract`,
+  milestones: (bookingId: string) => `bookings/${bookingId}/milestones`,
+  paymentBreakdown: (bookingId: string) => `bookings/${bookingId}/payment-breakdown`,
   disputes: (bookingId: string) => `bookings/${bookingId}/disputes`,
+  /** Supplier-wide dispute list */
+  allDisputes: 'disputes',
 } as const;

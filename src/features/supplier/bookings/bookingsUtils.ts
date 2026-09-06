@@ -1,4 +1,4 @@
-import type { ActiveLeaseRow } from '@/features/supplier/types';
+import type { ActiveLeaseRow, BookingStatus } from '@/features/supplier/types';
 
 function pickString(obj: Record<string, unknown>, keys: string[]): string | undefined {
   for (const key of keys) {
@@ -16,16 +16,30 @@ function pickNumber(obj: Record<string, unknown>, keys: string[]): number | unde
   return undefined;
 }
 
-function normalizeBookingStatus(raw: unknown): ActiveLeaseRow['status'] {
-  const s = typeof raw === 'string' ? raw.toLowerCase() : '';
-  if (s.includes('active') || s.includes('progress') || s.includes('ongoing') || s.includes('approved')) {
-    return 'active';
+/** Map API status strings to normalized BookingStatus (spec filter values). */
+export function normalizeBookingStatus(raw: unknown): BookingStatus {
+  const s = typeof raw === 'string' ? raw.toLowerCase().replace(/\s+/g, '') : '';
+  if (s === 'cancelled' || s === 'canceled') return 'cancelled';
+  if (s === 'approved' || s.includes('approved')) return 'approved';
+  if (s === 'active' || s.includes('progress') || s.includes('ongoing')) return 'active';
+  if (s === 'completed' || s.includes('complete') || s.includes('closed') || s.includes('return')) {
+    return 'completed';
   }
-  if (s.includes('complete') || s.includes('closed') || s.includes('return')) return 'completed';
-  if (s.includes('declin') || s.includes('reject') || s.includes('cancel')) return 'declined';
+  if (s.includes('declin') || s.includes('reject')) return 'declined';
   if (s.includes('disputed') || s.includes('dispute')) return 'disputed';
+  if (s === 'pending' || s.includes('pending')) return 'pending';
   return 'pending';
 }
+
+export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
+  pending: 'Pending',
+  approved: 'Approved',
+  active: 'Active',
+  completed: 'Completed',
+  declined: 'Declined',
+  disputed: 'Disputed',
+  cancelled: 'Cancelled',
+};
 
 export interface BookingMilestone {
   name: string;
@@ -59,7 +73,12 @@ function normalizeMilestone(raw: unknown): BookingMilestone | null {
   };
 }
 
-function normalizePaymentBreakdown(raw: unknown): BookingPaymentBreakdown | null {
+export function normalizeMilestonesList(raw: unknown): BookingMilestone[] {
+  const items = Array.isArray(raw) ? raw : [];
+  return items.map(normalizeMilestone).filter((m): m is BookingMilestone => m !== null);
+}
+
+export function normalizePaymentBreakdown(raw: unknown): BookingPaymentBreakdown | null {
   if (!raw || typeof raw !== 'object') return null;
   const r = raw as Record<string, unknown>;
   return {
@@ -91,7 +110,9 @@ export interface BookingDetail extends ActiveLeaseRow {
   paymentBreakdown?: BookingPaymentBreakdown;
   logisticsStatus?: string;
   gitInsuranceActive?: boolean;
+  parInsuranceActive?: boolean;
   insurancePolicyNumber?: string | null;
+  insuranceCertificateUrl?: string | null;
 }
 
 export function normalizeBooking(raw: unknown): BookingDetail | null {
@@ -109,7 +130,11 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
   const endDate = pickString(r, ['endDate', 'leaseEnd']);
   const leasePeriod =
     pickString(r, ['leasePeriod']) ??
-    (startDate && endDate ? `${formatDate(startDate)} – ${formatDate(endDate)}` : startDate ? formatDate(startDate) : '—');
+    (startDate && endDate
+      ? `${formatDate(startDate)} – ${formatDate(endDate)}`
+      : startDate
+        ? formatDate(startDate)
+        : '—');
 
   // Milestone data only exists on the detail endpoint (GET /bookings/{id}), not the list.
   const milestones = [r.milestone1, r.milestone2, r.milestone3]
@@ -119,9 +144,7 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
   const nextMilestoneFromDetail = milestones.find((m) => m.status !== 'Released')?.name;
 
   const nextMilestone =
-    nextMilestoneFromDetail ??
-    pickString(r, ['nextMilestone', 'currentMilestone']) ??
-    '—';
+    nextMilestoneFromDetail ?? pickString(r, ['nextMilestone', 'currentMilestone']) ?? '—';
 
   const status = normalizeBookingStatus(r.status);
   const paymentLink = pickString(r, ['paymentLink']);
@@ -160,8 +183,12 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
     milestones: milestones.length ? milestones : undefined,
     paymentBreakdown: paymentBreakdown ?? undefined,
     logisticsStatus: pickString(r, ['logisticsStatus']),
-    gitInsuranceActive: typeof r.gitInsuranceActive === 'boolean' ? (r.gitInsuranceActive as boolean) : undefined,
+    gitInsuranceActive:
+      typeof r.gitInsuranceActive === 'boolean' ? (r.gitInsuranceActive as boolean) : undefined,
+    parInsuranceActive:
+      typeof r.parInsuranceActive === 'boolean' ? (r.parInsuranceActive as boolean) : undefined,
     insurancePolicyNumber: pickString(r, ['insurancePolicyNumber']) ?? null,
+    insuranceCertificateUrl: pickString(r, ['insuranceCertificateUrl']) ?? null,
   };
 }
 
@@ -180,9 +207,23 @@ export function normalizeBookingsList(raw: unknown): BookingDetail[] {
   return items.map(normalizeBooking).filter((b): b is BookingDetail => b !== null);
 }
 
-export const BOOKING_STATUS_STYLES: Record<ActiveLeaseRow['status'], string> = {
+export const BOOKING_STATUS_STYLES: Record<BookingStatus, string> = {
   pending: 'bg-amber-50 text-amber-800',
+  approved: 'bg-sky-50 text-sky-800',
   active: 'bg-emerald-50 text-emerald-800',
   completed: 'bg-slate-100 text-slate-600',
   declined: 'bg-red-50 text-red-700',
+  disputed: 'bg-orange-50 text-orange-800',
+  cancelled: 'bg-slate-100 text-slate-500',
 };
+
+export function normalizeLogisticsStage(raw: unknown): string {
+  if (typeof raw !== 'string' || !raw) return 'NotStarted';
+  const s = raw.replace(/\s+/g, '');
+  if (/notstarted/i.test(s)) return 'NotStarted';
+  if (/dispatched/i.test(s)) return 'Dispatched';
+  if (/enroute/i.test(s)) return 'EnRoute';
+  if (/arrived/i.test(s)) return 'Arrived';
+  if (/returned/i.test(s)) return 'Returned';
+  return raw;
+}

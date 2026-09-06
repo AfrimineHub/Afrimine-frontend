@@ -8,6 +8,7 @@ import {
   useBookingsQuery,
 } from '@/features/supplier/bookings/bookingsQueries';
 import {
+  BOOKING_STATUS_LABELS,
   BOOKING_STATUS_STYLES,
   normalizeBookingsList,
 } from '@/features/supplier/bookings/bookingsUtils';
@@ -53,7 +54,8 @@ export default function SupplierBookingsPage() {
     <SupplierLayout>
       <h1 className="text-2xl font-bold text-slate-900">Booking requests</h1>
       <p className="mt-2 text-sm text-slate-500 max-w-xl">
-        Approve or decline rental requests from miners.
+        Approve pending requests, then dispatch, confirm arrival, and complete return clearance as the
+        lease progresses.
       </p>
 
       {error && (
@@ -97,7 +99,7 @@ export default function SupplierBookingsPage() {
                 <span
                   className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${BOOKING_STATUS_STYLES[booking.status]}`}
                 >
-                  {booking.status}
+                  {BOOKING_STATUS_LABELS[booking.status]}
                 </span>
               </div>
 

@@ -209,7 +209,8 @@ export default function EquipmentDetailPage() {
           ) : createBooking.isSuccess ? (
             <div className="space-y-3 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800">
               <p>
-                Booking request sent. The supplier has 24 hours to approve it — track it from{' '}
+                Booking created. Complete PayScrow escrow payment next — the supplier is notified after
+                funds clear. Track progress from{' '}
                 <Link
                   to={createdBooking ? `/my-bookings/${createdBooking.id}` : '/my-bookings'}
                   className="font-bold hover:underline"

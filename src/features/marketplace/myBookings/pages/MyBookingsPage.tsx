@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom';
-import { BookingPaymentCta } from '@/features/supplier/components/BookingPaymentCta';
+import {
+  BookingPaymentCta,
+  shouldShowPaymentCta,
+} from '@/features/supplier/components/BookingPaymentCta';
 import { useBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
 import {
+  BOOKING_STATUS_LABELS,
   BOOKING_STATUS_STYLES,
   normalizeBookingsList,
 } from '@/features/supplier/bookings/bookingsUtils';
@@ -58,12 +62,12 @@ export default function MyBookingsPage() {
                     <span
                       className={`inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${BOOKING_STATUS_STYLES[booking.status]}`}
                     >
-                      {booking.status}
+                      {BOOKING_STATUS_LABELS[booking.status]}
                     </span>
                   </div>
                 </Link>
 
-                {booking.status !== 'declined' && (
+                {(shouldShowPaymentCta(booking) || booking.paymentStatus === 'Paid') && (
                   <div className="mt-4 border-t border-slate-100 pt-4">
                     <BookingPaymentCta booking={booking} />
                   </div>
