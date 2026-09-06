@@ -93,6 +93,9 @@ const CreateMachinePage = lazy(() => import("@/features/supplier/pages/CreateMac
 const EditMachinePage = lazy(() => import("@/features/supplier/pages/EditMachinePage"));
 const SupplierBookingsPage = lazy(() => import("@/features/supplier/pages/SupplierBookingsPage"));
 const SupplierBookingDetailPage = lazy(() => import("@/features/supplier/pages/SupplierBookingDetailPage"));
+const SupplierOperatorsPage = lazy(() => import("@/features/supplier/pages/SupplierOperatorsPage"));
+const CreateOperatorPage = lazy(() => import("@/features/supplier/pages/CreateOperatorPage"));
+const SupplierOperatorDetailPage = lazy(() => import("@/features/supplier/pages/SupplierOperatorDetailPage"));
 const SupplierAccountRestrictedPage = lazy(() => import("@/features/supplier/pages/SupplierAccountRestrictedPage"));
 
 // ---------------------------------------------------------------------------
@@ -226,6 +229,9 @@ export const router = createBrowserRouter([
                   { path: "supplier/machines", element: s(<SupplierMachinesPage />) },
                   { path: "supplier/machines/new", element: s(<CreateMachinePage />) },
                   { path: "supplier/machines/:id/edit", element: s(<EditMachinePage />) },
+                  { path: "supplier/operators", element: s(<SupplierOperatorsPage />) },
+                  { path: "supplier/operators/new", element: s(<CreateOperatorPage />) },
+                  { path: "supplier/operators/:id", element: s(<SupplierOperatorDetailPage />) },
                   { path: "supplier/bookings", element: s(<SupplierBookingsPage />) },
                   { path: "supplier/bookings/:id", element: s(<SupplierBookingDetailPage />) },
                 ],

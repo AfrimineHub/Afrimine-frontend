@@ -9,15 +9,18 @@ import {
   Menu,
   X,
   ClipboardList,
+  UserRound,
 } from 'lucide-react';
 import {
   SUPPLIER_DASHBOARD_PATH,
   SUPPLIER_MACHINES_PATH,
+  SUPPLIER_OPERATORS_PATH,
 } from '@/features/supplier/constants';
 
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: SUPPLIER_DASHBOARD_PATH },
   { name: 'My Machines', icon: Truck, path: SUPPLIER_MACHINES_PATH },
+  { name: 'Operators', icon: UserRound, path: SUPPLIER_OPERATORS_PATH },
   { name: 'Bookings', icon: ClipboardList, path: '/supplier/bookings' },
   { name: 'Payouts', icon: CreditCard, path: '/dashboard/my-payouts' },
   { name: 'Messages', icon: MessageSquare, path: '/messages' },

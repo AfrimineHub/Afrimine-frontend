@@ -5,6 +5,7 @@ import { isSellerRole, USER_TYPES, type AuthUser, type UserType } from '@/featur
 import {
   SUPPLIER_DASHBOARD_PATH,
   SUPPLIER_MACHINES_PATH,
+  SUPPLIER_OPERATORS_PATH,
 } from '@/features/supplier/constants';
 
 export interface RoleNavLink {
@@ -75,6 +76,7 @@ export function getNavLinksForUser(
   if (isSellerRole(type)) {
     links.push(
       { label: 'My Machines', path: SUPPLIER_MACHINES_PATH },
+      { label: 'Operators', path: SUPPLIER_OPERATORS_PATH },
       { label: 'Bookings', path: '/supplier/bookings' },
       { label: 'Payouts', path: '/dashboard/my-payouts' },
     );
