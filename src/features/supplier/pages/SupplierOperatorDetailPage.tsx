@@ -103,7 +103,6 @@ export default function SupplierOperatorDetailPage() {
       });
       setLicenseDocument(null);
       setSuccess('Operator details updated.');
-      await operatorsQuery.refetch();
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not update operator.'));
     }
@@ -138,7 +137,6 @@ export default function SupplierOperatorDetailPage() {
       setGOccupation('');
       setGIdNumber('');
       setSuccess('Guarantor added.');
-      await operatorsQuery.refetch();
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not add guarantor.'));
     }
