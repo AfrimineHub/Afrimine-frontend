@@ -6,7 +6,6 @@ export interface OperatorGuarantor {
   phoneNumber: string;
   occupation: string;
   idType: string;
-  idNumber: string;
 }
 
 export interface OperatorDetail {
@@ -54,15 +53,13 @@ function normalizeGuarantor(raw: unknown): OperatorGuarantor | null {
   const phoneNumber = pickString(r, ['phoneNumber', 'phone']);
   const occupation = pickString(r, ['occupation']);
   const idType = pickString(r, ['idType']);
-  const idNumber = pickString(r, ['idNumber']);
-  if (!fullName || !phoneNumber || !occupation || !idType || !idNumber) return null;
+  if (!fullName || !phoneNumber || !occupation || !idType) return null;
   return {
     id: pickString(r, ['id']),
     fullName,
     phoneNumber,
     occupation,
     idType,
-    idNumber,
   };
 }
 

@@ -307,7 +307,7 @@ export default function SupplierOperatorDetailPage() {
                 >
                   <p className="font-semibold text-slate-900">{g.fullName}</p>
                   <p className="text-slate-500">
-                    {g.phoneNumber} · {g.occupation} · {g.idType} {g.idNumber}
+                    {g.phoneNumber} · {g.occupation} · {g.idType}
                   </p>
                 </li>
               ))}

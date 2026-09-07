@@ -16,6 +16,7 @@ import {
   useBookingDisputesQuery,
   useBookingMilestonesQuery,
   useBookingTrackingQuery,
+  useInsuranceCertificateQuery,
   useLogisticsStatusQuery,
   usePaymentBreakdownQuery,
   useRaiseBookingDisputeMutation,
@@ -123,8 +124,14 @@ export function BookingDetailView({
     logisticsQuery.data?.gitInsuranceActive ?? booking.gitInsuranceActive ?? false;
   const parInsuranceActive =
     logisticsQuery.data?.parInsuranceActive ?? booking.parInsuranceActive ?? false;
+  const insuranceActive = gitInsuranceActive || parInsuranceActive;
+
+  const certificateQuery = useInsuranceCertificateQuery(booking.id, insuranceActive);
   const certificateUrl =
-    logisticsQuery.data?.insuranceCertificateUrl ?? booking.insuranceCertificateUrl ?? null;
+    certificateQuery.data ??
+    logisticsQuery.data?.insuranceCertificateUrl ??
+    booking.insuranceCertificateUrl ??
+    null;
 
   const tracking = trackingQuery.data;
   const trackingCoords =
@@ -256,7 +263,9 @@ export function BookingDetailView({
                 </div>
               ) : null}
             </dl>
-            {certificateUrl ? (
+            {certificateQuery.isLoading ? (
+              <p className="mt-3 text-sm text-slate-500">Loading insurance certificate…</p>
+            ) : certificateUrl ? (
               <a
                 href={certificateUrl}
                 target="_blank"
@@ -265,6 +274,15 @@ export function BookingDetailView({
               >
                 Download insurance certificate
               </a>
+            ) : insuranceActive ? (
+              <p className="mt-3 text-sm text-slate-500">
+                {certificateQuery.isError
+                  ? getApiErrorMessage(
+                      certificateQuery.error,
+                      'Insurance certificate is not available yet.',
+                    )
+                  : 'Insurance certificate is not available yet.'}
+              </p>
             ) : null}
           </div>
         )}

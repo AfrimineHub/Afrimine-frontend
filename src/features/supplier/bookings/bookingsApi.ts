@@ -141,9 +141,30 @@ export async function fetchPaymentBreakdown(bookingId: string): Promise<unknown>
   return extractApiData<unknown>(data);
 }
 
-export async function fetchInsuranceCertificate(bookingId: string): Promise<unknown> {
+export async function fetchInsuranceCertificate(bookingId: string): Promise<string | null> {
   const { data } = await apiClient.get(supplierBookingsApiPaths.insuranceCertificate(bookingId));
-  return extractApiData<unknown>(data);
+  const extracted = extractApiData<unknown>(data);
+  return normalizeInsuranceCertificateUrl(extracted);
+}
+
+/** Spec: use `insuranceCertificateUrl` from the response (or a bare URL string). */
+export function normalizeInsuranceCertificateUrl(raw: unknown): string | null {
+  if (typeof raw === 'string' && raw.trim()) {
+    const trimmed = raw.trim();
+    // Envelope sometimes nests the URL as JSON text.
+    if (trimmed.startsWith('{')) {
+      try {
+        return normalizeInsuranceCertificateUrl(JSON.parse(trimmed));
+      } catch {
+        return trimmed;
+      }
+    }
+    return trimmed;
+  }
+  if (!raw || typeof raw !== 'object') return null;
+  const r = raw as Record<string, unknown>;
+  const url = r.insuranceCertificateUrl ?? r.certificateUrl ?? r.url ?? r.data;
+  return typeof url === 'string' && url.trim() ? url.trim() : null;
 }
 
 export async function fetchBookingContract(bookingId: string): Promise<unknown> {

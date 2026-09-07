@@ -10,6 +10,7 @@ import {
   fetchBookingMilestones,
   fetchBookingTracking,
   fetchBookings,
+  fetchInsuranceCertificate,
   fetchLogisticsStatus,
   fetchPaymentBreakdown,
   fetchSupplierDisputes,
@@ -40,6 +41,9 @@ function invalidateBookingQueries(
     queryClient.invalidateQueries({ queryKey: [...BOOKINGS_QUERY_KEY, 'payment-breakdown', bookingId] });
     queryClient.invalidateQueries({ queryKey: [...BOOKINGS_QUERY_KEY, 'tracking', bookingId] });
     queryClient.invalidateQueries({ queryKey: [...BOOKINGS_QUERY_KEY, 'disputes', bookingId] });
+    queryClient.invalidateQueries({
+      queryKey: [...BOOKINGS_QUERY_KEY, 'insurance-certificate', bookingId],
+    });
   }
 }
 
@@ -182,6 +186,16 @@ export function useDailyCheckMutation() {
     onSuccess: (_data, variables) => {
       invalidateBookingQueries(queryClient, variables.bookingId);
     },
+  });
+}
+
+export function useInsuranceCertificateQuery(bookingId: string | undefined, enabled = true) {
+  return useQuery({
+    queryKey: [...BOOKINGS_QUERY_KEY, 'insurance-certificate', bookingId],
+    queryFn: () => fetchInsuranceCertificate(bookingId as string),
+    enabled: Boolean(bookingId) && enabled,
+    staleTime: 60 * 1000,
+    retry: false,
   });
 }
 

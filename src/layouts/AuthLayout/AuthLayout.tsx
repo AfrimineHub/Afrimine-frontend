@@ -42,7 +42,7 @@ const AuthLayout = () => {
         <div className="max-w-xl mx-auto lg:mx-0 text-center lg:text-left">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6">
             List and lease <span className="text-yellow-500">mining equipment</span>,
-            connect with verified buyers, and grow your yard.
+            connect with verified buyers, and grow your business.
           </h1>
 
           <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8">
