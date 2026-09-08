@@ -2,6 +2,7 @@ const trimSlash = (path: string) => path.replace(/^\/+|\/+$/g, '');
 
 export const authPaths = {
   login: trimSlash(import.meta.env.VITE_AUTH_LOGIN_PATH ?? 'auth/login'),
+  googleLogin: trimSlash(import.meta.env.VITE_AUTH_GOOGLE_LOGIN_PATH ?? 'auth/google-login'),
   register: trimSlash(import.meta.env.VITE_AUTH_REGISTER_PATH ?? 'auth/register'),
   refresh: trimSlash(import.meta.env.VITE_AUTH_REFRESH_PATH ?? 'auth/refresh-token'),
   logout: trimSlash(import.meta.env.VITE_AUTH_LOGOUT_PATH ?? 'auth/revoke'),
