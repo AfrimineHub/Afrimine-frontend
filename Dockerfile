@@ -13,6 +13,9 @@ ENV NODE_OPTIONS=--max_old_space_size=4096
 ARG VITE_API_BASE_URL=https://afrimine-api.onrender.com/api/v1/
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
+ARG VITE_GOOGLE_CLIENT_ID
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
 RUN npm run build
 
 FROM nginx:alpine
