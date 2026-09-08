@@ -35,6 +35,9 @@ export const GoogleSignInButton = ({
     console.log('Google Client ID:', clientId);
 
     if (!clientId || !buttonRef.current) {
+      console.error(
+    'VITE_GOOGLE_CLIENT_ID is missing. Google Sign-In cannot be initialized.'
+  );
       return;
     }
 
