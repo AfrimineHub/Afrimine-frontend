@@ -31,7 +31,7 @@ export const GoogleSignInButton = ({
   const buttonRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID ?? '1031061025304-la9pu3ek9u4hq7ilbm0do7013qjcn2n.apps.googleusercontent.com';
     console.log('Google Client ID:', clientId);
 
     if (!clientId || !buttonRef.current) {
