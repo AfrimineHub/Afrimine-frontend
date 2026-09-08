@@ -18,6 +18,7 @@ import type {
   RequestPasswordResetPayload,
   ResetPasswordPayload,
   ChangePasswordPayload,
+  GoogleLoginPayload,
 } from '@/features/auth/types';
 
 async function fetchCurrentUser(): Promise<AuthUser> {
@@ -34,6 +35,14 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const accessToken = extractAccessToken(data as Record<string, unknown>);
   setAccessToken(accessToken);
   // Login only returns an access token — load the session profile from auth/current.
+  const user = await fetchCurrentUser();
+  return { accessToken, user };
+}
+
+export async function googleLogin(payload: GoogleLoginPayload): Promise<AuthResponse> {
+  const { data } = await apiClient.post(authPaths.googleLogin, payload);
+  const accessToken = extractAccessToken(data as Record<string, unknown>);
+  setAccessToken(accessToken);
   const user = await fetchCurrentUser();
   return { accessToken, user };
 }

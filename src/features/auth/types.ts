@@ -50,6 +50,11 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface GoogleLoginPayload {
+  idToken: string;
+  type?: number;
+}
+
 export interface RegisterPayload {
   type: UserType;
   fullName: string;

@@ -11,6 +11,7 @@ import {
   changePassword,
   uploadProfilePhoto,
   fetchCurrentUser,
+  googleLogin,
 } from '@/features/auth/api';
 import { endSession, setSessionUser } from '@/features/auth/session';
 import type {
@@ -21,6 +22,7 @@ import type {
   RequestPasswordResetPayload,
   ResetPasswordPayload,
   ChangePasswordPayload,
+  GoogleLoginPayload,
 } from '@/features/auth/types';
 
 export function useSessionQuery() {
@@ -37,6 +39,17 @@ export function useLoginMutation() {
 
   return useMutation({
     mutationFn: (payload: LoginPayload) => login(payload),
+    onSuccess: ({ user }) => {
+      if (user) setSessionUser(queryClient, user);
+    },
+  });
+}
+
+export function useGoogleLoginMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: GoogleLoginPayload) => googleLogin(payload),
     onSuccess: ({ user }) => {
       if (user) setSessionUser(queryClient, user);
     },

@@ -1,15 +1,17 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Input } from '@/shared/inputs/Input';
 import { Button } from '@/shared/buttons/Button';
-import { useLoginMutation } from '@/features/auth/queries';
+import { useGoogleLoginMutation, useLoginMutation } from '@/features/auth/queries';
 import { resolvePostAuthPath } from '@/features/auth/routes';
 import { getApiErrorMessage } from '@/lib/api/errors';
+import { GoogleSignInButton } from './GoogleSignInButton';
 
 export const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const loginMutation = useLoginMutation();
+  const googleLoginMutation = useGoogleLoginMutation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,6 +32,17 @@ export const LoginForm = () => {
       setError(getApiErrorMessage(err, 'Login failed'));
     }
   };
+
+  const handleGoogleSuccess = useCallback(async (idToken: string) => {
+    setError(null);
+
+    try {
+      const { user } = await googleLoginMutation.mutateAsync({ idToken });
+      navigate(resolvePostAuthPath(user, requestedPath), { replace: true });
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Google authentication failed'));
+    }
+  }, [googleLoginMutation, navigate, requestedPath]);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
@@ -85,9 +98,10 @@ export const LoginForm = () => {
       </Button>
 
       <div className="text-center py-2 text-gray-400 text-xs">Or Continue with</div>
-      <Button variant="outline" type="button" className="cursor-pointer w-full">
-        Signup with Google
-      </Button>
+      <GoogleSignInButton
+        onSuccess={handleGoogleSuccess}
+        disabled={loginMutation.isPending || googleLoginMutation.isPending}
+      />
 
       <p className="text-center text-sm text-gray-500">
         Don&apos;t have an account?{' '}
