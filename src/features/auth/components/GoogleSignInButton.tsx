@@ -32,8 +32,12 @@ export const GoogleSignInButton = ({
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    console.log('Google Client ID:', clientId);
 
     if (!clientId || !buttonRef.current) {
+      console.error(
+    'VITE_GOOGLE_CLIENT_ID is missing. Google Sign-In cannot be initialized.'
+  );
       return;
     }
 
