@@ -1,12 +1,10 @@
 import { useMemo, useState } from 'react';
-import { AlertCircle, Eye, Check, Trash2, Flag } from 'lucide-react';
+import { Eye, Trash2, } from 'lucide-react';
 import { AdminPagination } from '../components/AdminPagination';
 import {
   useAdminListingCountsQuery,
   useAdminListingsQuery,
-  useApproveAdminListingMutation,
   useArchiveAdminListingMutation,
-  useRejectAdminListingMutation,
 } from '@/features/admin/queries';
 import {
   formatAdminAmount,
@@ -17,21 +15,21 @@ import { getApiErrorMessage } from '@/lib/api/errors';
 
 const TAB_STATUS: Record<string, string | undefined> = {
   'All Listings': undefined,
-  Pending: 'pending',
-  Approved: 'active',
-  Rejected: 'rejected',
-  Flagged: 'flagged',
+  Available: 'Available',
+  Rented: 'Rented',
+  'Under Maintenance': 'UnderMaintenance',
+  Inactive: 'Inactive',
 };
 
 const getStatusStyles = (status: string) => {
   switch (status) {
-    case 'Approved':
+    case 'Available':
       return 'bg-emerald-50 text-emerald-600 border border-emerald-100';
-    case 'Pending':
-      return 'bg-slate-50 text-slate-500 border border-slate-200';
-    case 'Flagged':
-      return 'bg-pink-50 text-pink-600 border border-pink-100 flex items-center gap-1';
-    case 'Rejected':
+    case 'Rented':
+      return 'bg-blue-50 text-blue-600 border border-blue-100';
+    case 'Under Maintenance':
+      return 'bg-amber-50 text-amber-600 border border-amber-100';
+    case 'Inactive':
       return 'bg-red-50 text-red-500 border border-red-100';
     default:
       return 'bg-gray-100 text-gray-600';
@@ -53,40 +51,21 @@ const AdminListingsManagement = () => {
 
   const listingsQuery = useAdminListingsQuery(queryParams);
   const countsQuery = useAdminListingCountsQuery();
-  const approveMutation = useApproveAdminListingMutation();
-  const rejectMutation = useRejectAdminListingMutation();
   const archiveMutation = useArchiveAdminListingMutation();
 
   const counts = countsQuery.data;
   const tabs = [
-    { name: 'All Listings', count: counts?.all },
-    { name: 'Pending', count: counts?.pending },
-    { name: 'Approved', count: counts?.approved },
-    { name: 'Rejected', count: counts?.rejected },
-    { name: 'Flagged', count: counts?.flagged },
+    { name: 'All Listings', count: counts?.totalAssets },
+    { name: 'Available', count: counts?.availableAssets },
+    { name: 'Rented', count: counts?.rentedAssets },
+    { name: 'Under Maintenance', count: counts?.underMaintenanceAssets },
+    { name: 'Inactive', count: counts?.inactiveAssets },
   ];
 
   const listings = listingsQuery.data?.items ?? [];
   const loadError =
     listingsQuery.isError &&
     getApiErrorMessage(listingsQuery.error, 'Could not load listings.');
-
-  const handleApprove = async (listingId: string) => {
-    try {
-      await approveMutation.mutateAsync(listingId);
-    } catch (error) {
-      window.alert(getApiErrorMessage(error, 'Could not approve listing.'));
-    }
-  };
-
-  const handleReject = async (listingId: string) => {
-    const reason = window.prompt('Rejection reason (optional):') ?? undefined;
-    try {
-      await rejectMutation.mutateAsync({ listingId, reason: reason?.trim() || undefined });
-    } catch (error) {
-      window.alert(getApiErrorMessage(error, 'Could not reject listing.'));
-    }
-  };
 
   const handleArchive = async (listingId: string) => {
     if (!window.confirm('Archive this listing?')) return;
@@ -102,20 +81,9 @@ const AdminListingsManagement = () => {
       <main className="max-w-[1400px] mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 mb-1">Listings Management</h1>
-            <p className="text-slate-500 text-sm">Review and manage mineral listings from sellers</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800 mb-1">Assets Management</h1>
+            <p className="text-slate-500 text-sm">Manage equipment inventory</p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('Flagged');
-              setPage(1);
-            }}
-            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 self-start sm:self-auto"
-          >
-            <AlertCircle size={16} />
-            View Flagged
-          </button>
         </div>
 
         {loadError ? (
@@ -197,7 +165,6 @@ const AdminListingsManagement = () => {
                           <span
                             className={`inline-flex px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide uppercase ${getStatusStyles(statusLabel)}`}
                           >
-                            {statusLabel === 'Flagged' && <Flag size={10} className="mr-1" />}
                             {statusLabel}
                           </span>
                         </td>
@@ -207,38 +174,16 @@ const AdminListingsManagement = () => {
                             <button type="button" className="text-slate-400 hover:text-slate-700" aria-label="View listing">
                               <Eye size={16} />
                             </button>
-                            {statusLabel === 'Pending' ? (
-                              <button
-                                type="button"
-                                onClick={() => handleApprove(item.id)}
-                                disabled={approveMutation.isPending}
-                                className="text-slate-400 hover:text-emerald-600 disabled:opacity-50"
-                                aria-label="Approve listing"
-                              >
-                                <Check size={16} />
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleArchive(item.id)}
-                                disabled={archiveMutation.isPending}
-                                className="text-slate-400 hover:text-red-500 disabled:opacity-50"
-                                aria-label="Archive listing"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            )}
-                            {statusLabel === 'Pending' ? (
-                              <button
-                                type="button"
-                                onClick={() => handleReject(item.id)}
-                                disabled={rejectMutation.isPending}
-                                className="text-slate-400 hover:text-red-500 disabled:opacity-50"
-                                aria-label="Reject listing"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            ) : null}
+            
+                            <button
+                              type="button"
+                              onClick={() => handleArchive(item.id)}
+                              disabled={archiveMutation.isPending}
+                              className="text-slate-400 hover:text-red-500 disabled:opacity-50"
+                              aria-label="Archive listing"
+                            >
+                              <Trash2 size={16} />
+                            </button>
                           </div>
                         </td>
                       </tr>
