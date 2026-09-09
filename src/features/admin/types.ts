@@ -106,11 +106,11 @@ export interface AdminListingsQueryParams extends AdminPagedQueryParams {
 }
 
 export interface AdminListingCounts {
-  all: number;
-  pending: number;
-  approved: number;
-  rejected: number;
-  flagged: number;
+  totalAssets: number;
+  availableAssets: number;
+  rentedAssets: number;
+  underMaintenanceAssets: number;
+  inactiveAssets: number;
 }
 
 export interface AdminRejectPayload {

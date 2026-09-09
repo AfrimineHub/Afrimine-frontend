@@ -53,10 +53,10 @@ export function titleCaseStatus(status: string | null | undefined): string {
 
 export function mapListingStatusLabel(status: string | null | undefined): string {
   const normalized = (status ?? '').toLowerCase();
-  if (normalized.includes('pending')) return 'Pending';
-  if (normalized.includes('active') || normalized.includes('approved')) return 'Approved';
-  if (normalized.includes('reject')) return 'Rejected';
-  if (normalized.includes('flag')) return 'Flagged';
+  if (normalized.includes('available')) return 'Available';
+  if (normalized.includes('rented')) return 'Rented';
+  if (normalized.includes('inactive')) return 'Inactive';
+  if (normalized.includes('undermaintenace')) return 'Undermaintenace';
   return titleCaseStatus(status);
 }
 

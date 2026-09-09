@@ -22,18 +22,25 @@ const getStatusColor = (status: string) => {
   return 'text-slate-500';
 };
 
+const ORDER_STATUSES = [
+  'pending', 'ongoing', 'paid', 'delivered',
+  'completed', 'disputed', 'frozen', 'cancelled',
+] as const;
+
 const AdminOrderTrackingPage = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') ?? '');
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [page, setPage] = useState(1);
 
   const queryParams = useMemo(
     () => ({
       q: searchQuery.trim() || undefined,
+      status: statusFilter,
       page,
       pageSize: 20,
     }),
-    [page, searchQuery],
+    [page, searchQuery, statusFilter],
   );
 
   const ordersQuery = useAdminOrdersQuery(queryParams);
@@ -59,7 +66,8 @@ const AdminOrderTrackingPage = () => {
           <p className="text-slate-500 text-sm font-medium">Manage and monitor all escrow transactions</p>
         </div>
 
-        <div className="relative mb-8 max-w-md">
+        <div className="flex flex-wrap items-center gap-3 mb-8">
+        <div className="relative max-w-md w-full sm:w-auto flex-1">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-4 w-4 text-slate-400" />
           </div>
@@ -74,6 +82,20 @@ const AdminOrderTrackingPage = () => {
             }}
           />
         </div>
+        <select
+          value={statusFilter ?? ''}
+          onChange={(e) => {
+            setStatusFilter(e.target.value || undefined);
+            setPage(1);
+          }}
+          className="border border-slate-200 rounded-lg text-sm px-3 py-2 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-slate-400"
+        >
+          <option value="">All statuses</option>
+          {ORDER_STATUSES.map((s) => (
+            <option key={s} value={s}>{titleCaseStatus(s)}</option>
+          ))}
+        </select>
+      </div>
 
         {loadError ? (
           <p className="mb-6 text-sm text-red-600 rounded-lg border border-red-100 bg-red-50 px-4 py-3" role="alert">
@@ -200,7 +222,6 @@ const AdminOrderTrackingPage = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-xs font-bold text-pink-500/70 uppercase tracking-wider mb-1">Failed/Canceled</span>
-              <span className="text-xl font-bold text-pink-600">{stats.failedOrCanceled}</span>
             </div>
           </div>
         </div>
