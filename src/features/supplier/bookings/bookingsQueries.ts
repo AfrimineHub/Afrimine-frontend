@@ -21,6 +21,7 @@ import {
   type DailyCheckPayload,
   type InsuranceType,
   type RaiseBookingDisputePayload,
+  confirmDelivery,
 } from './bookingsApi';
 
 /** Shared with buyer + supplier — GET bookings is role-scoped on the backend. */
@@ -240,6 +241,17 @@ export function useRaiseBookingDisputeMutation() {
     onSuccess: (_, variables) => {
       invalidateBookingQueries(queryClient, variables.bookingId);
       queryClient.invalidateQueries({ queryKey: [...BOOKINGS_QUERY_KEY, 'supplier-disputes'] });
+    },
+  });
+}
+
+export function useConfirmDeliveryMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (bookingId: string) => confirmDelivery(bookingId),
+    onSuccess: (_data, bookingId) => {
+      invalidateBookingQueries(queryClient, bookingId);
     },
   });
 }

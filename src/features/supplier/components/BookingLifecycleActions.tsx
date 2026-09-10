@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/shared/buttons/Button';
 import {
+  useConfirmDeliveryMutation,
   useDailyCheckMutation,
   useDispatchBookingMutation,
   useReturnClearanceMutation,
@@ -43,6 +44,7 @@ export function BookingLifecycleActions({
   const returnMutation = useReturnClearanceMutation();
   const dailyCheckMutation = useDailyCheckMutation();
   const insuranceMutation = useTriggerInsuranceMutation();
+  const confirmDeliveryMutation = useConfirmDeliveryMutation();
 
   const [error, setError] = useState<string | null>(null);
   const [dailyCheckOpen, setDailyCheckOpen] = useState(false);
@@ -77,9 +79,17 @@ export function BookingLifecycleActions({
     !booking.gitInsuranceActive;
   const canInsurePar =
     isSupplier && booking.status === 'active' && !parInsuranceActive && !booking.parInsuranceActive;
+  const canConfirmDelivery = !isSupplier && booking.paymentStatus === 'Paid';
 
   const hasAnyAction =
-    canDispatch || canConfirmArrival || canDailyCheck || canReturnClearance || canInsureGit || canInsurePar;
+    canDispatch || 
+    canConfirmArrival || 
+    canDailyCheck || 
+    canReturnClearance || 
+    canInsureGit || 
+    canInsurePar ||
+    canConfirmDelivery
+    ;
 
   if (!hasAnyAction && !dailyCheckOpen) return null;
 
@@ -117,6 +127,22 @@ export function BookingLifecycleActions({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
+        {canConfirmDelivery ? (
+          <Button
+            type="button"
+            onClick={() =>
+              run(
+                () => confirmDeliveryMutation.mutateAsync(booking.id),
+                'Could not confirm delivery.',
+              )
+            }
+            disabled={confirmDeliveryMutation.isPending}
+          >
+            {confirmDeliveryMutation.isPending ? 'Confirming…' : 'Confirm delivery'}
+          </Button>
+        ) : null}
+        
+
         {canDispatch ? (
           <Button
             type="button"
