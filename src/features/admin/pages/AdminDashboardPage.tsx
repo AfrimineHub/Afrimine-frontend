@@ -6,8 +6,28 @@ import { ActivityItem } from '../components/AdminActivityItem';
 import { useAdminDashboardQuery } from '@/features/admin/queries';
 import { formatAdminAmount, formatAdminRelativeTime } from '@/features/admin/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
-import { Menu } from 'lucide-react';
+import { Menu, Users,
+  UserCheck,
+  ShieldCheck,
+  Truck,
+  Wallet,
+  Clock,
+  AlertTriangle,
+  ListChecks, 
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useState } from 'react';
+
+const STAT_ICONS: Record<string, LucideIcon> = {
+  total_users: Users,
+  active_users: UserCheck,
+  kyc_verified: ShieldCheck,
+  vendors: Truck,
+  total_revenue: Wallet,
+  pending_payments: Clock,
+  open_disputes: AlertTriangle,
+  pending_listings: ListChecks,
+};
 
 const AdminDashboardPage = () => {
   const dashboardQuery = useAdminDashboardQuery();
@@ -55,9 +75,10 @@ const AdminDashboardPage = () => {
                 : stats.map((stat) => (
                     <StatCard
                       key={stat.id}
+                      icon={STAT_ICONS[stat.id] ?? Users}
                       title={stat.title}
                       value={stat.value}
-                      trend={stat.trend ?? '—'}
+                      trend={stat.trend ?? null}
                       isPositive={stat.isPositive ?? undefined}
                       isNeutral={stat.isNeutral ?? undefined}
                     />
