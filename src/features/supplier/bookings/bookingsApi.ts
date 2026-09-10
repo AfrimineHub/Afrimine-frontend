@@ -208,3 +208,7 @@ export async function fetchSupplierDisputes(): Promise<BookingDispute[]> {
   const extracted = extractApiData<BookingDispute[] | null>(data);
   return extracted ?? [];
 }
+
+export async function confirmDelivery(bookingId: string): Promise<void> {
+  await apiClient.patch(supplierBookingsApiPaths.confirmDelivery(bookingId));
+}

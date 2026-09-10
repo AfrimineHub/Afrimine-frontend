@@ -17,4 +17,6 @@ export const supplierBookingsApiPaths = {
   disputes: (bookingId: string) => `bookings/${bookingId}/disputes`,
   /** Supplier-wide dispute list */
   allDisputes: 'disputes',
+  confirmDelivery: (bookingId: string) =>
+    `buyer/orders/${bookingId}/confirm-delivery`,
 } as const;
