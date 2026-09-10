@@ -22,6 +22,8 @@ interface WithdrawalModalProps {
   data: AdminWithdrawalListItem | null;
 }
 
+const TERMINAL_STATUSES = ['completed', 'approved', 'rejected', 'declined'];
+
 type ActiveAction = 'approve' | 'hold' | 'reject' | null;
 
 const WithdrawalModal = ({ isOpen, onClose, data }: WithdrawalModalProps) => {
@@ -46,8 +48,9 @@ const WithdrawalModal = ({ isOpen, onClose, data }: WithdrawalModalProps) => {
   const vendorName = data.vendorName ?? 'Vendor';
   const color = avatarColorClass(vendorName);
   const statusLabel = titleCaseStatus(data.status);
+  const isFinalized = TERMINAL_STATUSES.includes(data.status.toLowerCase());
   const isBusy = approveMutation.isPending || holdMutation.isPending || rejectMutation.isPending;
-  const isLocked = isBusy || isApproved;
+  const isLocked = isBusy || isApproved || isFinalized;
 
   const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.target === event.currentTarget) onClose();
@@ -185,7 +188,14 @@ const WithdrawalModal = ({ isOpen, onClose, data }: WithdrawalModalProps) => {
           ) : null}
 
           <div className="mt-10 sm:mt-12 space-y-3 sm:space-y-4">
-            {activeAction === 'approve' ? (
+            {isFinalized && !activeAction ? (
+              <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-center">
+                <p className="text-sm font-semibold text-slate-600">
+                  This withdrawal is already <span className="lowercase">{statusLabel}</span>.
+                </p>
+                <p className="text-xs text-slate-400 mt-1">No further action is available.</p>
+              </div>
+            ): activeAction === 'approve' ? (
               <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-4 space-y-3">
                 <p className="text-sm text-center text-slate-600 font-medium">
                   Approve this {formatAdminAmount(data.amount, data.currency)} withdrawal for {vendorName}?
