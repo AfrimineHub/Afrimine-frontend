@@ -225,7 +225,7 @@ export async function fetchAdminKycQueue(
 }
 
 export async function fetchAdminKycDetail(submissionId: string): Promise<AdminKycDetail> {
-  const { data } = await apiClient.get(`${adminApiPaths.kyc}/${submissionId}`);
+  const { data } = await apiClient.get(`${adminApiPaths.kyc}/review/${submissionId}`);
   return extractApiData<AdminKycDetail>(data);
 }
 
