@@ -46,6 +46,13 @@ function invalidateOrderQueries(queryClient: ReturnType<typeof useQueryClient>, 
   }
 }
 
+function invalidateAdminDisputeQueries(qc: ReturnType<typeof useQueryClient>) {
+  qc.invalidateQueries({ queryKey: ADMIN_DISPUTES_QUERY_KEY });
+  qc.invalidateQueries({ queryKey: ADMIN_ORDERS_QUERY_KEY });
+  qc.invalidateQueries({ queryKey: BUYER_ORDERS_QUERY_KEY });
+  qc.invalidateQueries({ queryKey: VENDOR_ORDERS_QUERY_KEY });
+}
+
 export function useBuyerOrderEscrowQuery(orderId: string | undefined) {
   return useQuery({
     queryKey: [...ESCROW_DETAILS_QUERY_KEY, 'buyer', orderId],
@@ -170,14 +177,8 @@ export function useAcceptRfqQuoteMutation() {
 
 export function useAdminDisputesQuery(params: AdminDisputesQueryParams = {}) {
   return useQuery({
-    queryKey: [...ADMIN_DISPUTES_QUERY_KEY, params],
-    queryFn: async () => {
-      try {
-        return await fetchAdminDisputes(params);
-      } catch {
-        return { items: [], page: 1, pageSize: 10, totalCount: 0, totalPages: 0 };
-      }
-    },
+    queryKey: [...ADMIN_DISPUTES_QUERY_KEY, 'list', params],
+    queryFn: () => fetchAdminDisputes(params),   // no try/catch
     staleTime: 60 * 1000,
   });
 }
@@ -232,5 +233,15 @@ export function useReleaseAdminOrderFundsMutation() {
       queryClient.invalidateQueries({ queryKey: BUYER_ORDERS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: VENDOR_ORDERS_QUERY_KEY });
     },
+  });
+}
+
+export function useAdminOrderQuery(orderId: string | null | undefined) {
+  return useQuery({
+    queryKey: [...ADMIN_ORDERS_QUERY_KEY, orderId],
+    queryFn: () => fetchAdminOrder(orderId!),
+    enabled: Boolean(orderId),
+    staleTime: 30 * 1000,
+    retry: false,
   });
 }

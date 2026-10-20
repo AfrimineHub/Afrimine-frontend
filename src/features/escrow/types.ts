@@ -63,15 +63,18 @@ export interface OpenDisputePayload {
 
 export interface AdminDisputeListItem {
   id: string;
-  orderId: string;
+  orderId: string | null;
+  bookingId: string | null;
+  source: string | null;
   listingTitle: string | null;
-  buyerName: string | null;
-  vendorName: string | null;
+  raisedByName: string | null;
+  reason: string | null;
+  status: string | null;
+  adminNote: string | null;
+  resolvedAt: string | null;
+  createdAt: string;
   amount: number;
   currency: string | null;
-  status: string | null;
-  reason: string | null;
-  openedAt: string;
 }
 
 export interface AdminDisputesPage {
@@ -89,12 +92,23 @@ export interface AdminDisputesQueryParams {
 }
 
 export interface ResolveDisputePayload {
-  resolution: 'release' | 'refund' | 'partial';
-  notes?: string;
-  releaseAmount?: number;
-  refundAmount?: number;
+  resolution: 'buyer' | 'vendor';
+  adminNote?: string;
 }
 
-export interface AdminOrderActionPayload {
-  notes?: string;
+export interface AdminOrderDetail {
+  id: string;
+  listingTitle: string | null;
+  buyerName: string | null;
+  buyerEmail: string | null;
+  vendorName: string | null;
+  vendorEmail: string | null;
+  amount: number;
+  currency: string | null;
+  status: string | null;
+  createdAt: string | null;
+  timeline: { step: string | null; occurredAt: string | null; status: string | null }[] | null;
+  documents: { id: string | null; name: string | null; downloadUrl: string | null; uploadedBy: string | null }[] | null;
 }
+
+export const RESOLVED_DISPUTE_STATUSES = ['ResolvedBuyer', 'ResolvedVendor', 'Closed'];
