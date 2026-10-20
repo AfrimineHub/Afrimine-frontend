@@ -20,6 +20,7 @@ import {
 import {
   ADMIN_DISPUTES_QUERY_KEY,
   ESCROW_DETAILS_QUERY_KEY,
+  ADMIN_ORDERS_QUERY_KEY,
 } from '@/features/escrow/config';
 import type {
   AdminDisputesQueryParams,
