@@ -160,12 +160,8 @@ export async function fetchAdminDispute(disputeId: string): Promise<AdminDispute
 export async function resolveAdminDispute(
   disputeId: string,
   payload: ResolveDisputePayload,
-): Promise<AdminDisputeListItem> {
-  const { data } = await apiClient.post(
-    `${escrowApiPaths.adminDisputes}/${disputeId}/resolve`,
-    payload,
-  );
-  return extractApiData<AdminDisputeListItem>(data);
+): Promise<void> {
+  await apiClient.post(`${escrowApiPaths.adminDisputes}/${disputeId}/resolve`, payload);
 }
 
 export async function freezeAdminOrder(

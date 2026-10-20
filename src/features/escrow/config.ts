@@ -16,3 +16,4 @@ export const escrowApiPaths = {
 export const ESCROW_ORDER_QUERY_KEY = ['escrow', 'order'] as const;
 export const ESCROW_DETAILS_QUERY_KEY = ['escrow', 'details'] as const;
 export const ADMIN_DISPUTES_QUERY_KEY = ['admin', 'disputes'] as const;
+export const ADMIN_ORDERS_QUERY_KEY = ['admin', 'orders'] as const;
