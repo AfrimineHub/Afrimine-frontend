@@ -7,7 +7,7 @@ const Logo = ({ className = "" }) => {
       className={`flex items-center gap-2 ${className}`}
       >
       <img
-        src="/images/afrimine-logo.jpeg"
+        src="/images/afrimine-improved-logo.jpeg"
         alt="Afrimine logo"
         className="w-8 h-8 object-contain rounded-lg"
       />
