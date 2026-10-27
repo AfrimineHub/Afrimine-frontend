@@ -22,14 +22,14 @@ const AuthLayout = () => {
         to="/"
         className="absolute top-6 left-6 md:top-8 md:left-8 lg:top-12 lg:left-16 z-50 flex items-center gap-2"
       >
-        <div className="w-8 h-8 bg-white/50 backdrop-blur-lg rounded-lg flex items-center justify-center shadow-lg">
+        <div className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-white/30 transition-transform duration-200 group-hover:scale-105">
           <img
             src="/images/afrimine-improved-logo.jpeg"
             alt="Afrimine logo"
-            className="w-auto h-10 object-contain rounded-lg drop-shadow-md"
+            className="w-full h-full object-contain p-1"
           />
         </div>
-        <span className="text-lg md:text-xl font-bold tracking-tight text-white">
+        <span className="text-lg md:text-xl font-bold tracking-tight text-white drop-shadow-md">
           Afrimine
         </span>
       </Link>

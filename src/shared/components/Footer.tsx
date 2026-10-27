@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   return (
@@ -12,17 +13,18 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="mb-4 font-semibold text-white">Company</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-yellow-500">About Us</a></li>
-              <li><a href="#" className="hover:text-yellow-500">Careers</a></li>
-              <li><a href="#" className="hover:text-yellow-500">Press</a></li>
+              <li><Link to="/about" className="hover:text-yellow-500">About Us</Link></li>
+              <li><Link to="/careers" className="hover:text-yellow-500">Careers</Link></li>
+              <li><Link to="/press" className="hover:text-yellow-500">Press</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="mb-4 font-semibold text-white">Resources</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-yellow-500">Support</a></li>
-              <li><a href="#" className="hover:text-yellow-500">Contact</a></li>
-              <li><a href="#" className="hover:text-yellow-500">Terms of Service</a></li>
+              <li><Link to="/support" className="hover:text-yellow-500">Support</Link></li>
+              <li><Link to="/contact" className="hover:text-yellow-500">Contact</Link></li>
+              <li><Link to="/terms" className="hover:text-yellow-500">Terms of Service</Link></li>
+              <li><Link to="/privacy" className="hover:text-yellow-500">Privacy Policy</Link></li>
             </ul>
           </div>
           <div>

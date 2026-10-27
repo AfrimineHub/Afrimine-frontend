@@ -16,6 +16,14 @@ import { RouteErrorFallback } from "@/app/RouteErrorFallback";
 // it, instead of all shipping in the single main bundle.
 // ---------------------------------------------------------------------------
 
+const AboutPage = lazy(() => import('../features/company/pages/AboutPage'));
+const CareersPage = lazy(() => import('../features/company/pages/CareersPage'));
+const PressPage = lazy(() => import('../features/company/pages/PressPage'));
+const SupportPage = lazy(() => import('../features/company/pages/SupportPage'));
+const ContactPage = lazy(() => import('../features/company/pages/ContactPage'));
+const TermsPage = lazy(() => import('../features/company/pages/TermsPage'));
+const PrivacyPage = lazy(() => import('../features/company/pages/PrivacyPage'));
+
 // Auth
 const LoginPage = lazy(() => import('../features/auth/pages/LoginPage'));
 const ForgotPasswordPage = lazy(() => import('../features/auth/pages/ForgotPasswordPage'));
@@ -188,7 +196,14 @@ export const router = createBrowserRouter([
       { path: "home", element: s(<LandingPage />) },
       { path: "marketplace", element: s(<MarketplacePage />) },
       { path: "equipment/:id", element: s(<EquipmentdetailsPage />) },
-      {
+      { path: 'about', element: <AboutPage /> },
+      { path: 'careers', element: <CareersPage /> },
+      { path: 'press', element: <PressPage /> },
+      { path: 'support', element: <SupportPage /> },
+      { path: 'contact', element: <ContactPage /> },
+      { path: 'terms', element: <TermsPage /> },
+      { path: 'privacy', element: <PrivacyPage /> },
+            {
         element: <ProtectedRoute />,
         children: [
           { path: "messages", element: s(<MessagesPage />) },
