@@ -24,7 +24,7 @@ const AuthLayout = () => {
       >
         <div className="w-8 h-8 bg-white/50 backdrop-blur-lg rounded-lg flex items-center justify-center shadow-lg">
           <img
-            src="/images/afrimine-logo1.svg"
+            src="/images/afrimine-improved-logo.jpeg"
             alt="Afrimine logo"
             className="w-auto h-10 object-contain rounded-lg drop-shadow-md"
           />
