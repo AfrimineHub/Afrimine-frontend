@@ -46,7 +46,7 @@ const AuthLayout = () => {
           </h1>
 
           <p className="text-gray-300 text-base md:text-lg leading-relaxed mb-8">
-            Built for equipment suppliers. Investor tools are coming soon.
+            Built for equipment suppliers, mineral vendors and mine asset owners. Investor tools are coming soon.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 sm:gap-8 text-sm text-gray-400 font-medium tracking-wider">

@@ -1,9 +1,11 @@
-import { useState, type FormEvent } from 'react';
+import { useCallback, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/shared/inputs/Input';
 import { Select } from '@/shared/Select';
 import { Button } from '@/shared/buttons/Button';
-import { useRegisterMutation } from '@/features/auth/queries';
+import { useGoogleLoginMutation, useRegisterMutation } from '@/features/auth/queries';
+import { resolvePostAuthPath } from '@/features/auth/routes';
+import { GoogleSignInButton } from './GoogleSignInButton';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import { USER_TYPES, type UserType } from '../types';
 import { type Option } from '@/shared/Select';
@@ -21,6 +23,7 @@ const PHONE_COUNTRY_PREFIX = '+234';
 export const AccountRegistrationForm = () => {
   const navigate = useNavigate();
   const registerMutation = useRegisterMutation();
+  const { mutateAsync: googleLogin, isPending: isGooglePending } = useGoogleLoginMutation();
 
   const [userType, setUserType] = useState<RegisterableUserType | ''>('');
   const [fullName, setFullName] = useState('');
@@ -94,6 +97,25 @@ export const AccountRegistrationForm = () => {
       setError(getApiErrorMessage(err, 'Registration failed'));
     }
   };
+
+  const handleGoogleSuccess = useCallback(
+  async (idToken: string) => {
+    setError(null);
+
+    if (!userType) {
+      setError('Please choose a user type before continuing with Google');
+      return;
+    }
+
+    try {
+      const { user } = await googleLogin({ idToken, type: userType });
+      navigate(resolvePostAuthPath(user, undefined), { replace: true });
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Google sign-up failed'));
+    }
+  },
+  [googleLogin, navigate, userType]
+);
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
@@ -201,6 +223,18 @@ export const AccountRegistrationForm = () => {
       <Button type="submit" className="mt-4 w-full" disabled={registerMutation.isPending}>
         {registerMutation.isPending ? 'Creating account…' : 'Continue'}
       </Button>
+
+      <div className="text-center py-2 text-gray-400 text-xs cursor-pointer">Or sign up with</div>
+        <GoogleSignInButton
+          text="signup_with"
+          onSuccess={handleGoogleSuccess}
+          disabled={!userType || registerMutation.isPending || isGooglePending}
+        />
+        {!userType && (
+          <p className="text-center text-xs text-gray-400">
+            Choose a user type above to sign up with Google.
+          </p>
+        )}
     </form>
   );
 };

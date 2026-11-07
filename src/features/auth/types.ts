@@ -52,7 +52,7 @@ export interface LoginPayload {
 
 export interface GoogleLoginPayload {
   idToken: string;
-  type?: number;
+  type?: UserType;
 }
 
 export interface RegisterPayload {
