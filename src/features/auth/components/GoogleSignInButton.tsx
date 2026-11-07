@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 interface GoogleSignInButtonProps {
   onSuccess: (idToken: string) => void;
   disabled?: boolean;
+  text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
 }
 
 declare global {
@@ -27,12 +28,18 @@ declare global {
 export const GoogleSignInButton = ({
   onSuccess,
   disabled = false,
+  text = 'continue_with',
 }: GoogleSignInButtonProps) => {
   const buttonRef = useRef<HTMLDivElement>(null);
+  const onSuccessRef = useRef(onSuccess);
+
+  // Always call the latest handler without re-initializing GIS
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  }, [onSuccess]);
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-    console.log('Google Client ID :', clientId);
 
     if (!clientId || !buttonRef.current) {
       console.error(
@@ -50,7 +57,7 @@ export const GoogleSignInButton = ({
         client_id: clientId,
         callback: (response) => {
           if (response.credential) {
-            onSuccess(response.credential);
+            onSuccessRef.current(response.credential);
           }
         },
       });
@@ -60,8 +67,7 @@ export const GoogleSignInButton = ({
       window.google.accounts.id.renderButton(buttonRef.current, {
         theme: 'outline',
         size: 'large',
-        width: '100%',
-        text: 'continue_with',
+        text,
       });
     };
 
@@ -94,7 +100,7 @@ export const GoogleSignInButton = ({
     return () => {
       script.onload = null;
     };
-  }, [onSuccess]);
+  }, [text]);
 
   return (
     <div
