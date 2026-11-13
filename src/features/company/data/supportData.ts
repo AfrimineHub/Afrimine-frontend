@@ -11,10 +11,10 @@ export interface FaqCategory {
 }
 
 export const CONTACT_DETAILS = {
-  phone: '+234 (0) 800 000 0000',
-  phoneHref: 'tel:+2348000000000',
-  hours: 'Monday to Friday, 9:00 to 17:00 (WAT)',
-  location: 'Lagos, Nigeria',
+  phone: '+234 (7) 025 326 6610',
+  phoneHref: 'tel:+23470253266610',
+  hours: 'Monday to Friday, 8:00AM to 5:00PM (WAT)',
+  location: 'Vatebra Tech Hub, Ajah (Royal Office Building, 4th Floor, KM 25 Lekki-Epe Expressway, Opposite Fidelity Bank, Ajiwe-Ajah, Lagos, Nigeria)',
 } as const;
 
 export const CONTACT_TOPICS = [
