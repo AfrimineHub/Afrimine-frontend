@@ -67,7 +67,7 @@ export default function MyBookingsPage() {
                   </div>
                 </Link>
 
-                {(shouldShowPaymentCta(booking) || booking.paymentStatus === 'Paid') && (
+                {shouldShowPaymentCta(booking) && (
                   <div className="mt-4 border-t border-slate-100 pt-4">
                     <BookingPaymentCta booking={booking} />
                   </div>

@@ -82,6 +82,8 @@ export const BankDetailsForm = ({ initialValues, onSuccess,
           options={bankOptions}
           value={bankCode}
           onChange={(val) => setBankCode(val)}
+          searchable
+          searchPlaceholder="Type to search banks…"
         />
 
         <Input

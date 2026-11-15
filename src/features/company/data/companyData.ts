@@ -100,7 +100,7 @@ export const PRESS_ITEMS: PressItem[] = [
 ];
 
 export const COMPANY_EMAILS = {
-  careers: 'careers@afrimine.com',
-  press: 'press@afrimine.com',
-  support: 'support@afrimine.com',
+  careers: 'careers@afrimineng.com',
+  press: 'press@afrimineng.com',
+  support: 'hello@afrimineng.com',
 } as const;
