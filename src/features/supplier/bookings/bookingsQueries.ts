@@ -67,14 +67,13 @@ export function useBookingQuery(bookingId: string | undefined) {
     refetchOnWindowFocus: true,
     refetchInterval: (query) => {
       const raw = query.state.data as Record<string, unknown> | undefined;
-      const paymentLink = raw?.paymentLink;
+      const status = typeof raw?.status === 'string' ? raw.status.toLowerCase() : '';
       const paymentStatus = raw?.paymentStatus;
       const transactionNumber = raw?.payscrowTransactionNumber;
+      // Poll while approved and escrow is not yet funded (link may still be generating).
+      const isApproved = status.includes('approved');
       const awaitingPayment =
-        paymentStatus !== 'Paid' &&
-        typeof paymentLink === 'string' &&
-        Boolean(paymentLink) &&
-        !transactionNumber;
+        isApproved && paymentStatus !== 'Paid' && !transactionNumber;
       return awaitingPayment ? 8000 : false;
     },
   });
