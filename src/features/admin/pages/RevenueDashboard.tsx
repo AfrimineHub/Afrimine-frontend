@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { ArrowUpRight, ArrowDownRight, Link, ArrowLeft } from 'lucide-react';
+import { Link, } from 'react-router-dom';
+import { ArrowUpRight, ArrowDownRight, ArrowLeft } from 'lucide-react';
 import { AdminPagination } from '../components/AdminPagination';
 import {
   useAdminRevenueSummaryQuery,
