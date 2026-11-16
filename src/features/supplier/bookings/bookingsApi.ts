@@ -57,16 +57,19 @@ export async function declineBooking(bookingId: string, reason: string): Promise
   await apiClient.put(supplierBookingsApiPaths.decline(bookingId), payload);
 }
 
-export async function dispatchBooking(bookingId: string): Promise<void> {
-  await apiClient.post(supplierBookingsApiPaths.dispatch(bookingId));
+export async function dispatchBooking(bookingId: string): Promise<string | null> {
+  const { data } = await apiClient.post(supplierBookingsApiPaths.dispatch(bookingId));
+  return extractApiMessage(data);
 }
 
-export async function confirmSiteArrival(bookingId: string): Promise<void> {
-  await apiClient.post(supplierBookingsApiPaths.siteArrival(bookingId));
+export async function confirmSiteArrival(bookingId: string): Promise<string | null> {
+  const { data } = await apiClient.post(supplierBookingsApiPaths.siteArrival(bookingId));
+  return extractApiMessage(data);
 }
 
-export async function confirmReturnClearance(bookingId: string): Promise<void> {
-  await apiClient.post(supplierBookingsApiPaths.returnClearance(bookingId));
+export async function confirmReturnClearance(bookingId: string): Promise<string | null> {
+  const { data} = await apiClient.post(supplierBookingsApiPaths.returnClearance(bookingId));
+  return extractApiMessage(data);
 }
 
 export interface DailyCheckPayload {
@@ -79,8 +82,9 @@ export interface DailyCheckPayload {
   checkedByOperatorId: string;
 }
 
-export async function submitDailyCheck(bookingId: string, payload: DailyCheckPayload): Promise<void> {
-  await apiClient.post(supplierBookingsApiPaths.dailyCheck(bookingId), payload);
+export async function submitDailyCheck(bookingId: string, payload: DailyCheckPayload): Promise<string | null> {
+  const { data } = await apiClient.post(supplierBookingsApiPaths.dailyCheck(bookingId), payload);
+  return extractApiMessage(data);
 }
 
 export type InsuranceType = 'GIT' | 'PAR';
@@ -92,9 +96,9 @@ export interface TriggerInsurancePayload {
 export async function triggerBookingInsurance(
   bookingId: string,
   payload: TriggerInsurancePayload,
-): Promise<unknown> {
+): Promise<string | null | void> {
   const { data } = await apiClient.post(supplierBookingsApiPaths.insurance(bookingId), payload);
-  return extractApiData<unknown>(data);
+  return extractApiMessage(data);
 }
 
 export interface LogisticsStatusDto {
@@ -209,6 +213,19 @@ export async function fetchSupplierDisputes(): Promise<BookingDispute[]> {
   return extracted ?? [];
 }
 
-export async function confirmDelivery(bookingId: string): Promise<void> {
-  await apiClient.patch(supplierBookingsApiPaths.confirmDelivery(bookingId));
+export async function confirmDelivery(bookingId: string): Promise<string | null> {
+  const { data } = await apiClient.patch(supplierBookingsApiPaths.confirmDelivery(bookingId));
+  return extractApiMessage(data);
+}
+
+function extractApiMessage(body: unknown): string | null {
+  if (typeof body === 'string' && body.trim()) return body.trim();
+  if (!body || typeof body !== 'object') return null;
+  const { data, message } = body as { data?: unknown; message?: unknown };
+  if (typeof data === 'string' && data.trim()) return data.trim();
+  // "Successful" is generic noise
+  if (typeof message === 'string' && message.trim() && message !== 'Successful') {
+    return message.trim();
+  }
+  return null;
 }

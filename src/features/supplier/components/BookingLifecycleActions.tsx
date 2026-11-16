@@ -8,7 +8,10 @@ import {
   useSiteArrivalMutation,
   useTriggerInsuranceMutation,
 } from '@/features/supplier/bookings/bookingsQueries';
-import { normalizeLogisticsStage, type BookingDetail } from '@/features/supplier/bookings/bookingsUtils';
+import { 
+  normalizeLogisticsStage, 
+  type BookingDetail 
+} from '@/features/supplier/bookings/bookingsUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
 
 interface BookingLifecycleActionsProps {
@@ -47,6 +50,7 @@ export function BookingLifecycleActions({
   const confirmDeliveryMutation = useConfirmDeliveryMutation();
 
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [dailyCheckOpen, setDailyCheckOpen] = useState(false);
   const [notes, setNotes] = useState('');
   const [checks, setChecks] = useState<Record<DailyCheckKey, boolean>>({
@@ -57,12 +61,20 @@ export function BookingLifecycleActions({
     greaseChecked: false,
   });
 
-  const run = async (fn: () => Promise<unknown>, fallback: string) => {
+  const run = async (
+    fn: () => Promise<string | null | void>, 
+    fallback: string,
+    successFallback: string,
+    ): Promise<boolean> => {
     setError(null);
+    setSuccess(null)
     try {
-      await fn();
+      const message = await fn();
+      setSuccess(message || successFallback);
+      return true;
     } catch (err) {
       setError(getApiErrorMessage(err, fallback));
+      return false;
     }
   };
 
@@ -91,7 +103,7 @@ export function BookingLifecycleActions({
     canConfirmDelivery
     ;
 
-  if (!hasAnyAction && !dailyCheckOpen) return null;
+  if (!hasAnyAction && !dailyCheckOpen && !success) return null;
 
   const handleDailyCheck = async () => {
     if (!operatorId) {
@@ -103,7 +115,7 @@ export function BookingLifecycleActions({
       setError('Confirm all safety checklist items before submitting.');
       return;
     }
-    await run(
+    const ok = await run(
       () =>
         dailyCheckMutation.mutateAsync({
           bookingId: booking.id,
@@ -111,10 +123,19 @@ export function BookingLifecycleActions({
           notes: notes.trim() || null,
           checkedByOperatorId: operatorId,
         }),
-      'Could not submit daily check.',
+      'Could not submit daily check.', 'Daily check submitted.'
     );
-    setDailyCheckOpen(false);
-    setNotes('');
+    if (ok) {
+      setDailyCheckOpen(false);
+      setNotes('');
+      setChecks({
+        engineOilChecked: false,
+        hydraulicFluidChecked: false,
+        coolingSystemChecked: false,
+        undercarriageChecked: false,
+        greaseChecked: false,
+      });
+    }
   };
 
   return (
@@ -125,6 +146,11 @@ export function BookingLifecycleActions({
           {error}
         </p>
       ) : null}
+      {success ? (
+        <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700" role="status">
+          {success}
+        </p>
+      ) : null}
 
       <div className="flex flex-wrap gap-2">
         {canConfirmDelivery ? (
@@ -133,7 +159,7 @@ export function BookingLifecycleActions({
             onClick={() =>
               run(
                 () => confirmDeliveryMutation.mutateAsync(booking.id),
-                'Could not confirm delivery.',
+                'Could not confirm delivery.', 'Delivery confirmed.',
               )
             }
             disabled={confirmDeliveryMutation.isPending}
@@ -147,7 +173,7 @@ export function BookingLifecycleActions({
           <Button
             type="button"
             onClick={() =>
-              run(() => dispatchMutation.mutateAsync(booking.id), 'Could not confirm dispatch.')
+              run(() => dispatchMutation.mutateAsync(booking.id), 'Could not confirm dispatch.', 'Dispatch confirmed.')
             }
             disabled={dispatchMutation.isPending}
           >
@@ -159,7 +185,7 @@ export function BookingLifecycleActions({
           <Button
             type="button"
             onClick={() =>
-              run(() => arrivalMutation.mutateAsync(booking.id), 'Could not confirm site arrival.')
+              run(() => arrivalMutation.mutateAsync(booking.id), 'Could not confirm site arrival.', 'Site arrival confirmed.')
             }
             disabled={arrivalMutation.isPending}
           >
@@ -174,7 +200,7 @@ export function BookingLifecycleActions({
             onClick={() =>
               run(
                 () => returnMutation.mutateAsync(booking.id),
-                'Could not confirm return clearance.',
+                'Could not confirm return clearance.', 'Return clearance submitted.'
               )
             }
             disabled={returnMutation.isPending}
@@ -196,7 +222,7 @@ export function BookingLifecycleActions({
             onClick={() =>
               run(
                 () => insuranceMutation.mutateAsync({ bookingId: booking.id, type: 'GIT' }),
-                'Could not activate GIT insurance.',
+                'Could not activate GIT insurance.', 'GIT insurance activated.'
               )
             }
             disabled={insuranceMutation.isPending}
@@ -212,7 +238,7 @@ export function BookingLifecycleActions({
             onClick={() =>
               run(
                 () => insuranceMutation.mutateAsync({ bookingId: booking.id, type: 'PAR' }),
-                'Could not activate PAR insurance.',
+                'Could not activate PAR insurance.', 'PAR insurance activated.'
               )
             }
             disabled={insuranceMutation.isPending}

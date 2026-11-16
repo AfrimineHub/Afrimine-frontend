@@ -94,7 +94,7 @@ const AdminDisputePage = () => {
     <div className="flex flex-col h-full bg-[#F8F9FA] text-slate-900 font-sans overflow-hidden min-h-screen">
       <Link
             to="/admin"
-            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 mt-2 transition-all"
           >
       <ArrowLeft size={16} /> Back to Dashboard
           </Link>
