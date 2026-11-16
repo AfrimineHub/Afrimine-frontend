@@ -1,3 +1,5 @@
+import type { WalletBalance, WalletTransaction } from './walletTypes';
+
 function pickString(obj: Record<string, unknown>, keys: string[]): string | undefined {
   for (const key of keys) {
     const v = obj[key];
@@ -13,8 +15,6 @@ function pickNumber(obj: Record<string, unknown>, keys: string[]): number | unde
   }
   return undefined;
 }
-
-import type { WalletBalance, WalletTransaction } from './walletTypes';
 
 export function normalizeWalletBalance(raw: unknown): WalletBalance {
   const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
@@ -57,15 +57,22 @@ export function formatWalletAmount(amount: number, currency?: string | null): st
   return `${symbol}${amount.toLocaleString()}`;
 }
 
-function formatDate(iso: string): string {
+function formatDateTime(iso: string): string {
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso || '—';
-  return d.toLocaleDateString('en-NG', { year: 'numeric', month: 'short', day: 'numeric' });
+  if (!iso || Number.isNaN(d.getTime())) return iso || '—';
+  return d.toLocaleString('en-NG', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
 }
 
 export interface WalletTransactionRow {
   id: string;
   date: string;
+  createdAt: string;
   description: string;
   reference: string;
   amount: string;
@@ -76,7 +83,8 @@ export function mapWalletTransactionToRow(tx: WalletTransaction): WalletTransact
   const sign = tx.type === 'debit' ? '-' : '+';
   return {
     id: tx.id,
-    date: formatDate(tx.createdAt),
+    date: formatDateTime(tx.createdAt),
+    createdAt: tx.createdAt,
     description: tx.description,
     reference: tx.reference,
     amount: `${sign}${formatWalletAmount(tx.amount, tx.currency)}`,
@@ -88,3 +96,29 @@ export const WALLET_TRANSACTION_TYPE_STYLES: Record<'credit' | 'debit', string> 
   credit: 'bg-emerald-50 text-emerald-800',
   debit: 'bg-red-50 text-red-700',
 };
+
+export interface WalletTransactionFilters {
+  type: string; // 'all' | 'credit' | 'debit'
+  from: string; // datetime-local value, '' when unset
+  to: string;
+}
+
+export function filterWalletTransactions(
+  rows: WalletTransactionRow[],
+  { type, from, to }: WalletTransactionFilters,
+): WalletTransactionRow[] {
+  const fromMs = from ? new Date(from).getTime() : null;
+  // datetime-local has minute precision, so include the whole "to" minute
+  const toMs = to ? new Date(to).getTime() + 59_999 : null;
+  const hasRange = fromMs !== null || toMs !== null;
+
+  return rows.filter((tx) => {
+    if (type !== 'all' && tx.type !== type) return false;
+    if (!hasRange) return true;
+    const t = new Date(tx.createdAt).getTime();
+    if (Number.isNaN(t)) return false;
+    if (fromMs !== null && t < fromMs) return false;
+    if (toMs !== null && t > toMs) return false;
+    return true;
+  });
+}
