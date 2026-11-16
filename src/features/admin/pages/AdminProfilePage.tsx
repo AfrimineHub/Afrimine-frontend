@@ -2,10 +2,18 @@ import { SectionCard, SecuritySettings } from '@/features/vendor/components/prof
 import { UserAccountStatus } from '@/features/account/profile/UserAccountStatus';
 import { UserProfilePhoto } from '@/features/account/profile/UserProfilePhoto';
 import { AdminProfileForm } from '../profile/AdminProfileForm';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const AdminProfilePage = () => {
   return (
     <div className="p-6 space-y-6">
+      <Link
+            to="/admin"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </Link>
       <div>
         <h1 className="text-2xl font-semibold">Admin Profile</h1>
         <p className="text-gray-500 text-sm">

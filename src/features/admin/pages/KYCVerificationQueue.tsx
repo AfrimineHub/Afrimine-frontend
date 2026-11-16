@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Search, AlertCircle, FileBadge, Globe, Mail, Phone } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, AlertCircle, FileBadge, Globe, Mail, Phone, ArrowLeft } from 'lucide-react';
 import { AdminPagination } from '../components/AdminPagination';
 import { useAdminKycQueueQuery } from '@/features/admin/queries';
 import { formatAdminDateTime, getInitials } from '@/features/admin/utils';
@@ -31,6 +31,12 @@ const KYCVerificationQueue = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-slate-900 font-sans">
       <main className="p-8 max-w-7xl mx-auto">
+        <Link
+            to="/admin"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </Link>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
             <h1 className="text-3xl font-black text-slate-800 tracking-tight mb-2">KYC Verification Queue</h1>

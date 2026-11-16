@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import { AdminPagination } from '../components/AdminPagination';
 import { useAdminOrdersQuery, useAdminOrdersSummaryQuery } from '@/features/admin/queries';
 import {
@@ -61,6 +61,12 @@ const AdminOrderTrackingPage = () => {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans p-8">
       <div className="max-w-[1600px] mx-auto">
+        <Link
+            to="/admin"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </Link>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800 mb-2">Order Tracking Page</h1>
           <p className="text-slate-500 text-sm font-medium">Manage and monitor all escrow transactions</p>

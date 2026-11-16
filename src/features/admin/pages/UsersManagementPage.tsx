@@ -13,6 +13,8 @@ import {
   mapUserRoleLabel,
 } from '@/features/admin/utils';
 import { getApiErrorMessage } from '@/lib/api/errors';
+import { Link } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 
 const ROLE_OPTIONS = [
   { label: 'All Roles', value: '' },
@@ -75,6 +77,12 @@ const UsersManagementPage = () => {
     <div className="min-h-screen bg-[#F4F5F7] font-sans">
       <main className="w-full mx-auto p-8">
         <div className="mb-8">
+          <Link
+            to="/admin"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </Link>
           <h1 className="text-2xl font-extrabold text-gray-900 mb-2">Users Management</h1>
           <p className="text-sm text-gray-500 font-medium">
             Manage vendor and buyer accounts, KYC verification, and account status

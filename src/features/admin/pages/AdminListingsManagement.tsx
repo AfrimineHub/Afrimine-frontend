@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Eye, Trash2, } from 'lucide-react';
+import { ArrowLeft, Eye, Link, Trash2, } from 'lucide-react';
 import { AdminPagination } from '../components/AdminPagination';
 import {
   useAdminListingCountsQuery,
@@ -80,6 +80,12 @@ const AdminListingsManagement = () => {
     <div className="min-h-screen bg-[#F8F9FA] text-slate-900 font-sans">
       <main className="max-w-[1400px] mx-auto py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 sm:mb-8">
+          <Link
+            to="/admin"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </Link>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-800 mb-1">Assets Management</h1>
             <p className="text-slate-500 text-sm">Manage equipment inventory</p>
