@@ -1,6 +1,6 @@
 import { Button } from '@/shared/buttons/Button';
 import type { BookingDetail } from '@/features/supplier/bookings/bookingsUtils';
-import { BUYER_BOOKINGS_PATH } from '../constants';
+// import { BUYER_BOOKINGS_PATH } from '../constants';
 import { useNavigate } from 'react-router-dom';
 
 type PaymentState =
@@ -103,9 +103,9 @@ export function BookingPaymentCta({ booking }: { booking: BookingDetail }) {
       >
         Complete payment
       </Button>
-      <Button variant="secondary" onClick={() => navigate(BUYER_BOOKINGS_PATH)}>
+      {/*<Button variant="secondary" onClick={() => navigate(BUYER_BOOKINGS_PATH)}>
         Pay later
-      </Button>
+      </Button>*/}
     </div>
   );
 }

@@ -227,3 +227,14 @@ export function normalizeLogisticsStage(raw: unknown): string {
   if (/returned/i.test(s)) return 'Returned';
   return raw;
 }
+
+export function getApiSuccessMessage(res: unknown): string | null {
+  if (typeof res === 'string' && res.trim()) return res;
+  if (res && typeof res === 'object') {
+    const { data, message } = res as { data?: unknown; message?: unknown };
+    if (typeof data === 'string' && data.trim()) return data;
+    // "Successful" is generic noise, so ignore it
+    if (typeof message === 'string' && message.trim() && message !== 'Successful') return message;
+  }
+  return null;
+}
