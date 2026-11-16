@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import { useAdminDisputesQuery } from '@/features/escrow/queries';
 import { formatBuyerAmount } from '@/features/buyer/dashboardUtils';
 import { getApiErrorMessage } from '@/lib/api/errors';
@@ -93,6 +93,12 @@ const AdminDisputePage = () => {
   return (
     <div className="flex flex-col h-full bg-[#F8F9FA] text-slate-900 font-sans overflow-hidden min-h-screen">
       <div className="flex flex-1 overflow-hidden">
+        <Link
+            to="/admin"
+            className="flex items-center gap-2 text-slate-400 hover:text-slate-600 font-bold text-xs uppercase tracking-widest mb-6 transition-all"
+          >
+            <ArrowLeft size={16} /> Back to Dashboard
+          </Link>
         <aside className="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0">
           <div className="p-6 border-b border-slate-100 space-y-3">
             <h2 className="text-2xl font-black text-slate-800">Disputes</h2>
