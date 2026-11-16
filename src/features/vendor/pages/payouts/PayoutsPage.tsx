@@ -4,7 +4,7 @@ import { RequestPayout } from '../../components/payouts/RequestPayout';
 import { TransactionsTable } from '../../components/payouts/TransactionTable';
 import { TransactionsHistoryFilter } from '../../components/payouts/TransactionHistoryFilter';
 import { useWalletBalanceQuery, useWalletTransactionsQuery } from '@/features/supplier/wallet/walletQueries';
-import { filterWalletTransactions, mapWalletTransactionToRow } from '@/features/supplier/wallet/walletUtils';
+import { mapWalletTransactionToRow } from '@/features/supplier/wallet/walletUtils';
 import { useSupplierProfileQuery } from '@/features/supplier/onboarding/onboardingQueries';
 import { getApiErrorMessage } from '@/lib/api/errors';
 import { SUPPLIER_PROFILE_PATH } from '@/features/supplier/constants';
@@ -18,8 +18,6 @@ function hasBankAccountNumber(raw: unknown): boolean {
 
 const PayoutPage = () => {
   const [filter, setFilter] = useState('all');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
   const balanceQuery = useWalletBalanceQuery();
   const transactionsQuery = useWalletTransactionsQuery();
   const profileQuery = useSupplierProfileQuery();
@@ -31,17 +29,10 @@ const PayoutPage = () => {
     [transactionsQuery.data],
   );
 
-  const filteredTransactions = useMemo(
-    () => filterWalletTransactions(transactions, { type: filter, from, to }),
-    [transactions, filter, from, to],
-  );
-
-  const hasActiveFilters = filter !== 'all' || from !== '' || to !== '';
-  const resetFilters = () => {
-    setFilter('all');
-    setFrom('');
-    setTo('');
-  };
+  const filteredTransactions = transactions.filter((tx) => {
+  if (filter === 'all') return true;
+  return tx.type === filter;
+});
 
   const loadError =
     (balanceQuery.isError && getApiErrorMessage(balanceQuery.error, 'Could not load wallet balance.')) ||
@@ -98,12 +89,6 @@ const PayoutPage = () => {
             <TransactionsHistoryFilter 
               value={filter} 
               onChange={setFilter}
-              from={from}
-              to={to}
-              onFromChange={setFrom}
-              onToChange={setTo}
-              onReset={resetFilters}
-              hasActiveFilters={hasActiveFilters}
             />
           </div>
 
@@ -115,8 +100,8 @@ const PayoutPage = () => {
             </div>
           ) : filteredTransactions.length === 0 ? (
             <p className="text-sm text-gray-500 py-8 text-center">
-              {hasActiveFilters
-                ? 'No transactions match these filters.'
+              {filter !== 'all'
+                ? `No ${filter} transactions found.`
                 : 'No wallet transactions yet.'}
             </p>
           ) : (

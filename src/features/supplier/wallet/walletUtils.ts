@@ -96,29 +96,3 @@ export const WALLET_TRANSACTION_TYPE_STYLES: Record<'credit' | 'debit', string> 
   credit: 'bg-emerald-50 text-emerald-800',
   debit: 'bg-red-50 text-red-700',
 };
-
-export interface WalletTransactionFilters {
-  type: string; // 'all' | 'credit' | 'debit'
-  from: string; // datetime-local value, '' when unset
-  to: string;
-}
-
-export function filterWalletTransactions(
-  rows: WalletTransactionRow[],
-  { type, from, to }: WalletTransactionFilters,
-): WalletTransactionRow[] {
-  const fromMs = from ? new Date(from).getTime() : null;
-  // datetime-local has minute precision, so include the whole "to" minute
-  const toMs = to ? new Date(to).getTime() + 59_999 : null;
-  const hasRange = fromMs !== null || toMs !== null;
-
-  return rows.filter((tx) => {
-    if (type !== 'all' && tx.type !== type) return false;
-    if (!hasRange) return true;
-    const t = new Date(tx.createdAt).getTime();
-    if (Number.isNaN(t)) return false;
-    if (fromMs !== null && t < fromMs) return false;
-    if (toMs !== null && t > toMs) return false;
-    return true;
-  });
-}
