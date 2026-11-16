@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Link, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Search } from 'lucide-react';
 import { AdminPagination } from '../components/AdminPagination';
 import WithdrawalModal from '../components/AdminVendorWithdrawalModal';
 import { useAdminWithdrawalsQuery } from '@/features/admin/queries';
