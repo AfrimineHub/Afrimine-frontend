@@ -3,6 +3,7 @@ interface ToggleSwitchProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   description?: string;
+  disabled?: boolean;
 }
 
 export function ToggleSwitch({ label, checked, onChange, description }: ToggleSwitchProps) {
@@ -16,6 +17,7 @@ export function ToggleSwitch({ label, checked, onChange, description }: ToggleSw
         type="button"
         role="switch"
         aria-checked={checked}
+        disabled={disabled}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
           checked ? 'bg-[#EAB308]' : 'bg-slate-200'
