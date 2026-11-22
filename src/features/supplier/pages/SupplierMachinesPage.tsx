@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Pencil, Plus, Trash2, Truck } from 'lucide-react';
 import { SupplierLayout } from '@/features/supplier/components/SupplierLayout';
@@ -10,6 +10,9 @@ import {
   useSupplierAssetsQuery,
   useUpdateAssetMutation,
 } from '@/features/supplier/onboarding/assetsQueries';
+import { useBookingsQuery } from '@/features/supplier/bookings/bookingsQueries';
+import { normalizeBookingsList } from '@/features/supplier/bookings/bookingsUtils';
+import type { BookingStatus } from '@/features/supplier/types';
 import { normalizeAssetsList } from '@/features/supplier/onboarding/onboardingNormalize';
 import {
   ASSET_STATUS_ENUM,
@@ -23,11 +26,17 @@ function machineTypeLabel(value: string): string {
   return MACHINE_TYPES.find((t) => t.value === value)?.label ?? value;
 }
 
+const LEASE_LOCKING_STATUSES: ReadonlySet<BookingStatus> = new Set(['approved', 'active', 'disputed']);
+
+const ON_LEASE_MESSAGE =
+  'This machine has a booking in progress. Its availability can be changed once the lease is completed.';
+
 export default function SupplierMachinesPage() {
   const assetsQuery = useSupplierAssetsQuery();
   const subscriptionQuery = useVendorSubscriptionQuery();
   const deleteMutation = useDeleteAssetMutation();
   const updateMutation = useUpdateAssetMutation();
+  const bookingsQuery = useBookingsQuery();
 
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -36,12 +45,45 @@ export default function SupplierMachinesPage() {
   const machines = normalizeAssetsList(assetsQuery.data);
   const canCreateListing = canCreateNewListing(subscriptionQuery.data);
 
+  const leasedAssetIds = useMemo(
+  () =>
+    new Set(
+      normalizeBookingsList(bookingsQuery.data)
+        .filter((b) => b.assetId && LEASE_LOCKING_STATUSES.has(b.status))
+        .map((b) => b.assetId as string),
+    ),
+    [bookingsQuery.data],
+  );
+
+    // Fail closed: unknown booking state is treated as locked.
+  const bookingsUnverified = bookingsQuery.isLoading || bookingsQuery.isError;
+  const isLocked = (assetId: string) => bookingsUnverified || leasedAssetIds.has(assetId);
+
+  /** Fresh server check right before a write. */
+  const verifyNoLiveLease = async (assetId: string): Promise<boolean> => {
+    const result = await bookingsQuery.refetch();
+    if (result.isError) {
+      setError('Could not verify this machine\u2019s bookings. Please try again.');
+      return false;
+    }
+    const hasLiveLease = normalizeBookingsList(result.data).some(
+      (b) => b.assetId === assetId && LEASE_LOCKING_STATUSES.has(b.status),
+    );
+    if (hasLiveLease) {
+      setError(ON_LEASE_MESSAGE);
+      return false;
+    }
+    return true;
+  };
+
+
   const handleDelete = async (assetId: string) => {
     if (!window.confirm('Remove this machine from your yard? This cannot be undone.')) return;
     setError(null);
     setDeletingId(assetId);
     try {
-      await deleteMutation.mutateAsync(assetId);
+      if (!(await verifyNoLiveLease(assetId))) return;
+        await deleteMutation.mutateAsync(assetId);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not delete this machine.'));
     } finally {
@@ -53,12 +95,13 @@ export default function SupplierMachinesPage() {
     setError(null);
     setTogglingId(assetId);
     try {
-      await updateMutation.mutateAsync({
-        assetId,
-        payload: {
-          status: nextAvailable ? ASSET_STATUS_ENUM.Available : ASSET_STATUS_ENUM.Inactive,
-        },
-      });
+      if (!(await verifyNoLiveLease(assetId))) return;
+        await updateMutation.mutateAsync({
+          assetId,
+          payload: {
+            status: nextAvailable ? ASSET_STATUS_ENUM.Available : ASSET_STATUS_ENUM.Inactive,
+          },
+        });
     } catch (err) {
       setError(getApiErrorMessage(err, 'Could not update availability.'));
     } finally {
@@ -143,7 +186,9 @@ export default function SupplierMachinesPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {machines.map((machine) => {
             const assetId = machine.remoteId!;
-            const available = isAssetAvailable(machine.status);
+            const onLease = leasedAssetIds.has(assetId);
+            const locked = isLocked(assetId);
+            const available = !onLease && isAssetAvailable(machine.status);
 
             return (
               <article
@@ -181,9 +226,16 @@ export default function SupplierMachinesPage() {
 
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <ToggleSwitch
-                    label={available ? 'Available' : 'Unavailable'}
-                    description="Shown in marketplace when on"
+                    label={onLease ? 'On lease' : available ? 'Available' : 'Unavailable'}
+                    description={
+                      onLease
+                        ? 'Locked until return clearance is completed'
+                        : bookingsUnverified
+                          ? 'Checking bookings…'
+                          : 'Shown in marketplace when on'
+                    }
                     checked={available}
+                    disabled={locked || togglingId === assetId}
                     onChange={(checked) => handleAvailabilityToggle(assetId, checked)}
                   />
                   {togglingId === assetId ? (
@@ -202,7 +254,7 @@ export default function SupplierMachinesPage() {
                   <button
                     type="button"
                     onClick={() => handleDelete(assetId)}
-                    disabled={deletingId === assetId}
+                    disabled={locked || deletingId === assetId}
                     className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-red-100 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
                   >
                     <Trash2 size={14} aria-hidden />
