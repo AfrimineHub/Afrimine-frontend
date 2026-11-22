@@ -6,7 +6,13 @@ interface ToggleSwitchProps {
   disabled?: boolean;
 }
 
-export function ToggleSwitch({ label, checked, onChange, description }: ToggleSwitchProps) {
+export function ToggleSwitch({
+ label, 
+ checked, 
+ onChange, 
+ description, 
+ disabled = false 
+}: ToggleSwitchProps) {
   return (
     <div className="flex items-start justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4">
       <div className="min-w-0">
