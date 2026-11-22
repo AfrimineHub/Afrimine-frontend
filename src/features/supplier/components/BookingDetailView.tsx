@@ -159,7 +159,7 @@ export function BookingDetailView({
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{booking.machineName}</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {counterpartLabel}: {booking.minerName}
+            {counterpartLabel}: {booking.supplierName}
           </p>
         </div>
         <span

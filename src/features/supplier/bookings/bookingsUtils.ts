@@ -93,6 +93,7 @@ export function normalizePaymentBreakdown(raw: unknown): BookingPaymentBreakdown
 }
 
 export interface BookingDetail extends ActiveLeaseRow {
+  supplierName: string;
   assetId?: string;
   siteAddress?: string;
   minerPhone?: string;
@@ -126,6 +127,8 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
     pickString(r, ['machineName', 'assetName', 'assetTitle', 'listingTitle']) ?? 'Machine';
   const minerName =
     pickString(r, ['minerName', 'buyerName', 'customerName', 'clientName']) ?? 'Miner';
+  const supplierName =
+    pickString(r, ['supplierName', 'vendorName',]) ?? 'Supplier';
   const startDate = pickString(r, ['startDate', 'leaseStart']);
   const endDate = pickString(r, ['endDate', 'leaseEnd']);
   const leasePeriod =
@@ -160,6 +163,7 @@ export function normalizeBooking(raw: unknown): BookingDetail | null {
     id,
     machineName,
     minerName,
+    supplierName,
     leasePeriod,
     nextMilestone,
     status,
